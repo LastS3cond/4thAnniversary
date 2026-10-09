@@ -18,10 +18,11 @@ class InputManager {
         e.preventDefault();
       }
 
-      if (!this.keysDown[e.code]) {
-        this.keysPressed[e.code] = true;
+      const code = InputManager.ALIASES[e.code] || e.code;
+      if (!this.keysDown[code]) {
+        this.keysPressed[code] = true;
       }
-      this.keysDown[e.code] = true;
+      this.keysDown[code] = true;
     });
 
     const triggerAudio = () => {
@@ -37,7 +38,8 @@ class InputManager {
     window.addEventListener('touchstart', triggerAudio, { passive: true });
 
     window.addEventListener('keyup', (e) => {
-      this.keysDown[e.code] = false;
+      const code = InputManager.ALIASES[e.code] || e.code;
+      this.keysDown[code] = false;
     });
   }
 
@@ -54,6 +56,13 @@ class InputManager {
   }
 }
 
+// Right-hand modifiers / keypad enter behave exactly like their left-hand counterparts
+InputManager.ALIASES = {
+  ShiftRight: 'ShiftLeft',
+  ControlRight: 'ControlLeft',
+  NumpadEnter: 'Enter'
+};
+
 class Game {
   constructor() {
     this.canvas = document.getElementById('game-canvas');
@@ -62,7 +71,7 @@ class Game {
 
     this.input = new InputManager();
 
-    // Game States: 'TITLE', 'OVERWORLD', 'DIALOGUE', 'ENCOUNTER_FLASH', 'BATTLE', 'FINALE'
+    // Game States: 'TITLE', 'OVERWORLD', 'CUTSCENE', 'ENCOUNTER_FLASH', 'BATTLE', 'FINALE'
     this.state = 'TITLE';
 
     // Player (Mallika)
@@ -89,8 +98,10 @@ class Game {
     this.targetRoom = null;
     this.targetSpawn = null;
 
-    // Jaydon stepping into hallway
+    // Jaydon stepping into hallway (short scripted cutscene before the battle)
     this.isJaydonInHallway = false;
+    this.jaydon = null;
+    this.cutscene = null;
 
     // Overworld C-Menu
     this.isMenuOpen = false;
@@ -166,6 +177,12 @@ class Game {
           window.battleManager.startBattle();
         }
       }
+      return;
+    }
+
+    // 1b. Jaydon steps out of his room while Mallika steps aside
+    if (this.state === 'CUTSCENE') {
+      this.updateCutscene(dt);
       return;
     }
 
@@ -424,6 +441,12 @@ class Game {
           return;
         }
 
+        // Doors / stairs can also be used by facing them and pressing Z
+        if (item.isDoor && item.onEnter && !item.text) {
+          if (this.doorCooldown <= 0 && !this.isTransitioning) item.onEnter();
+          return;
+        }
+
         // Standard Dialogue Text
         if (item.text) {
           window.dialogueManager.start(item.text, item.onComplete || null);
@@ -439,15 +462,9 @@ class Game {
       "* There are dirty dishes piled in the sink.\n* Clean them?",
       (choice) => {
         if (choice === 'YES') {
-          window.dialogueManager.start([
-            "* There are too many.",
-            "* Above the sink, the blinds hang completely crooked."
-          ]);
+          window.dialogueManager.start(["* There are too many."]);
         } else {
-          window.dialogueManager.start([
-            "* You decide to leave them for later.",
-            "* Above the sink, the blinds hang completely crooked."
-          ]);
+          window.dialogueManager.start(["* You decide to leave them for later."]);
         }
       }
     );
@@ -495,18 +512,63 @@ class Game {
           window.audioManager.playDoor();
         }
 
-        // Jaydon steps out into hallway!
-        this.isJaydonInHallway = true;
-
-        window.dialogueManager.start([
-          "* The door opens with a gentle click.",
-          "* Jaydon steps into the hallway wearing glasses, a long-sleeve shirt, and red plaid pajama pants."
-        ], () => {
-          // Launch the Undertale encounter flash!
-          this.triggerBattleEncounter();
-        });
+        // Jaydon steps out into the hallway, to the SIDE of Mallika (never behind her)
+        this.startJaydonEntrance();
       }
     });
+  }
+
+  startJaydonEntrance() {
+    const p = this.player;
+    this.isJaydonInHallway = true;
+    // Mallika keeps the left half of the 80px corridor; Jaydon takes the right half.
+    const mallikaX = Math.min(p.x, 276);
+    const jaydonX = Math.max(316, Math.min(322, mallikaX + 44));
+    this.jaydon = { x: 352, y: p.y - 2, dir: 'left' };
+    this.cutscene = {
+      t: 0,
+      duration: 520,
+      fromX: p.x,
+      toX: mallikaX,
+      jFromX: 352,
+      jToX: jaydonX
+    };
+    p.dir = 'right';
+    this.state = 'CUTSCENE';
+  }
+
+  updateCutscene(dt) {
+    const c = this.cutscene;
+    const p = this.player;
+    c.t = Math.min(c.duration, c.t + dt);
+    const k = c.t / c.duration;
+    const ease = k * (2 - k);
+    p.x = c.fromX + (c.toX - c.fromX) * ease;
+    this.jaydon.x = c.jFromX + (c.jToX - c.jFromX) * ease;
+
+    // Little walk cycle while Mallika steps aside
+    if (Math.abs(c.toX - c.fromX) > 1 && k < 1) {
+      p.animTimer += dt;
+      if (p.animTimer >= 140) {
+        p.animTimer = 0;
+        p.walkFrame = (p.walkFrame === 1) ? 2 : 1;
+      }
+    } else {
+      p.walkFrame = 0;
+    }
+
+    if (k >= 1) {
+      p.walkFrame = 0;
+      this.cutscene = null;
+      this.state = 'OVERWORLD';
+      window.dialogueManager.start([
+        "* The door opens with a gentle click.",
+        "* Jaydon steps into the hallway wearing glasses, a long-sleeve shirt, and red plaid pajama pants."
+      ], () => {
+        // Launch the Undertale encounter flash!
+        this.triggerBattleEncounter();
+      });
+    }
   }
 
   triggerBattleEncounter() {
@@ -555,14 +617,8 @@ class Game {
       return;
     }
 
-    // 1. Draw Current Room Environment
-    const room = window.mapManager.getCurrentRoom();
-    if (room && room.draw) {
-      room.draw(this.ctx);
-    }
-
-    // 2. Draw Player Sprite (Mallika)
-    this.drawPlayer();
+    // 1 + 2. Room environment with Mallika (and Jaydon) depth-sorted among the props
+    window.mapManager.drawRoom(this.ctx, this.collectActors());
 
     // 3. Draw Overworld C-Menu (if open)
     if (this.isMenuOpen) {
@@ -664,6 +720,7 @@ class Game {
     this.ctx.font = '14px "Press Start 2P", monospace';
     this.ctx.fillStyle = '#ffffff';
     this.ctx.textBaseline = 'top';
+    this.ctx.textAlign = 'left';
 
     items.forEach((item, idx) => {
       const iy = menuY + 25 + idx * 38;
@@ -674,12 +731,20 @@ class Game {
     });
   }
 
-  drawPlayer() {
+  // Characters handed to the map renderer, sorted by where their feet touch the floor
+  collectActors() {
+    const actors = [];
     const dirSprites = window.spriteManager.mallika[this.player.dir];
-    if (!dirSprites) return;
-
-    const sprite = dirSprites[this.player.walkFrame] || dirSprites[0];
-    this.ctx.drawImage(sprite, this.player.x, this.player.y);
+    if (dirSprites) {
+      const sprite = dirSprites[this.player.walkFrame] || dirSprites[0];
+      actors.push({ img: sprite, x: this.player.x, y: this.player.y, baseY: this.player.y + 58 });
+    }
+    if (this.isJaydonInHallway && this.jaydon && window.mapManager.currentRoom === 'second_floor') {
+      const j = window.spriteManager.jaydonOW;
+      const img = j[this.jaydon.dir] || j.down;
+      actors.push({ img, x: this.jaydon.x, y: this.jaydon.y, baseY: this.jaydon.y + 60 });
+    }
+    return actors;
   }
 }
 
