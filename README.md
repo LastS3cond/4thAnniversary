@@ -98,8 +98,8 @@ flowchart LR
 | `index.html` | CRT container, canvas viewport, and script bootstrap. |
 | `style.css` | Retro CRT scanlines, CRT screen curvature, and letterboxing styling. |
 | `src/game.js` | Main game loop, title screen, input engine, and room transitions. |
-| `src/sprites.js` | Procedural pixel art generation for Mallika, Jaydon, portraits, and environment. |
-| `src/maps.js` | Room layouts, colliders, inspectable zones, and environment renderers. |
+| `src/sprites.js` | Procedural pixel art (native 320×240 art pixels, shown at 2x) for Mallika, Jaydon, portraits, props, UI, and a tiny 3×5 pixel font. |
+| `src/maps.js` | Room layouts, colliders, inspectable zones, cached room backgrounds, depth-sorted props, and animated details (leaves, lantern, LED, oven glow, snow). |
 | `src/dialogue.js` | Undertale dialogue boxes, typewriter animations, and `[ YES / NO ]` prompts. |
 | `src/battle.js` | Complete battle engine (FIGHT, ACT, ITEM, MERCY, damage capping). |
 | `src/finale.js` | Golden Save Star, particle systems, and Determination climax. |

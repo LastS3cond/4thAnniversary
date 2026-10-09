@@ -33,6 +33,9 @@
 - **Sprite Generation Pattern**: Sprites are procedurally rendered to off-screen canvases on boot (`window.spriteManager`), then drawn via `ctx.drawImage()`. Redesigns can replace procedural canvas draw commands or load external pixel art PNG assets.
 - **Collision Physics**: Top-down 2.5D perspective where the player's collision box is anchored at the feet (`x + 8, y + 42, w: 24, h: 16`), allowing head and torso to overlap furniture tops naturally.
 - **Boundary Colliders**: All rooms must have strict enclosing colliders so the player cannot step onto walls or walk off the canvas.
+- **Native Art Pixel Grid**: All art is authored at Undertale's native **320 × 240 "art pixel"** resolution and displayed at exactly **2x** (one art pixel = one crisp 2 × 2 block). Room backgrounds are painted once into cached offscreen canvases; colliders, interactables and spawns stay in 640 × 480 screen coordinates (art coordinate × 2).
+- **Depth Sorting**: Props the player can walk behind (TV stand, shoe rack) and characters are drawn in order of where their feet touch the floor, so Mallika correctly disappears behind the TV when standing in the couch/TV corridor.
+- **Overworld Text**: No floating text labels in the overworld (doors and fixtures speak for themselves). The only in-world lettering is the brass `316` plaque and the second-floor door nameplates, drawn with a tiny 3 × 5 pixel font.
 
 ---
 
@@ -41,12 +44,12 @@
 ```
 +-------------------------------------------------------------------------------+
 | BLACK VOID (x: 0..160)   |  AUTUMN NIGHT SKY: Falling Leaves  | BLACK VOID   |
-|                          |  Full Brick Stairwell Bay (Left)   | (x: 480..640)|
+|                          |  Full Brick Stairwell Bay (Right)  | (x: 480..640)|
 |                          |  White Siding (Above Door Only)    |              |
 |                          |  Front Door Framed in Red Brick    |              |
-|                          |  Brass '316' Plaque                |              |
+|                          |  Brass '316' Plaque (Left of Door) |              |
 |                          |  Autumn Lawn & Concrete Walkway    |              |
-|                          |  Asphalt Street (y: 360..480)      |              |
+|                          |  Sidewalk + Asphalt Street (y>344) |              |
 +-------------------------------------------------------------------------------+
 ```
 
@@ -56,17 +59,19 @@
 - **Playable Alleyway Bounds**: Thinner playable alleyway—the first 1/4 and last 1/4 of the 640px screen are cut out. Walkable area is strictly bounded between **$x = 160$** and **$x = 480$**. Outside this ($x < 160$ and $x > 480$) is pitch-black void.
 
 ### Facade Architecture:
-1. **Full Brick Stairwell Bay (Left of Door)**:
-   - The protruding bay feature where the interior stairs reside is **100% full red brick** (`#8b3a2b`, `#6a261a`) from the ground up to the roofline ($x = 160..245$). No white siding appears on this protruding structure.
+1. **Full Brick Stairwell Bay (Right of Door)**:
+   - The protruding bay feature where the interior stairs reside is **100% full red brick** (`#8b3a2b`, `#6a261a`) from the ground up to the roofline ($x = 392..480$). No white siding appears on this protruding structure.
+   - It sits to the **right** of the door, matching the photo of the real house (and the interior, where the stairs are east of the front door). Its shadowed side face and lower foundation line sell the protrusion.
 2. **Front Door Framing**:
    - The front door is **completely framed in red brick** on both sides and around its immediate casing.
    - The door does **not** merge into any white wall; there is zero white siding inside the door frame or beside the door jamb.
 3. **White Siding Placement**:
-   - Horizontal white vinyl siding (`#dedede`, `#cccccc`) exists **strictly directly above the door**, spanning **exactly 3 door widths wide** (~138px wide, $x = 245..383$, $y = 80..165$).
+   - Horizontal white vinyl siding (`#dedede`, `#cccccc`) exists **strictly directly above the door**, spanning **exactly 3 door widths wide** (138px wide, $x = 254..392$, $y = 60..156$), with one warmly lit upstairs window.
+   - A small brown shingled awning runs along the bottom of the siding, directly over the door ($y = 156..170$).
 4. **House Number Plaque**:
-   - A distinct brass plaque marked **"316"** is mounted directly on the red brick next to the door casing ($x = 300, y = 175$).
+   - A distinct brass plaque marked **"316"** is mounted directly on the red brick to the left of the door casing ($x = 262..294, y = 186..204$).
 5. **Front Doorway**:
-   - Dark wooden exterior door ($x = 248..292, y = 170..235$) with brass hardware, transom header, and a lantern light casting a warm amber glow.
+   - Dark wooden four-panel exterior door ($x = 300..344, y = 176..232$) with a brass knob, a warm transom header, a concrete stoop, and a black lantern to its right casting a gently flickering amber glow.
 
 ---
 
@@ -140,7 +145,7 @@ Running from top to bottom along the right wall ($x = 545..600$):
    - **Microwave**: **Completely removed** to eliminate visual clutter.
    - **Atmosphere**: Warm oven glow. Inspect text: `* The oven is warm. A rich aroma of brown sugar and dates fills the kitchen.`
 4. **Washer & Dryer**:
-   - **Completely removed**. That corner is left as clean pitch-black void.
+   - **Completely removed**. That corner (below the stove, $x = 545..600, y = 384..440$) is left as clean pitch-black void.
 
 ### Living Room & Furniture Layout
 Located in the northern left quadrant ($x = 40..325, y = 60..200$):
@@ -178,7 +183,9 @@ Located in the northern left quadrant ($x = 40..325, y = 60..200$):
 4. **Hallway Corridor**:
    - Clean 80px corridor ($x = 135..215$) connecting the front entrance to the living room.
 5. **Left Wall Brickwork**:
-   - Only a single vertical strip of exposed red brick along the left living room wall ($x = 40..60, y = 60..190$). All other walls use warm neutral drywall (`#eae3d2`).
+   - Only a single vertical strip of exposed red brick along the left living room wall ($x = 40..60, y = 60..200$, solid collider). All other walls use warm neutral drywall (`#eae3d2`).
+6. **How Walls Read**:
+   - Wall masses (bathroom block, center box, coat closet) show a muted taupe top (`#6b5a4e`), cream side bands where doors face the hallway/foyer, and a cream south face with a wood baseboard. Fixtures on the kitchen walls show their fronts toward the room (cabinet doors / black dishwasher along the north edge of the south run, oven door and fridge handles along the west edge of the east run).
 
 ---
 
@@ -252,8 +259,9 @@ Located in the northern left quadrant ($x = 40..325, y = 60..200$):
 - **Pair 3 (End of Hallway, $y = 80$)**:
   - **Left**: Kevin's Door (`KEVIN`). Inspect: `* You hear him speaking very formally, must be interviewing.`
   - **Right (Opposite)**: Jaydon's Door (`JAYDON`, Gold Trim). Inspect / Knock prompts boss encounter.
+- **Nameplates**: Each door has a small dark nameplate on the wall just above it (Jaydon's is gold), drawn in the 3 × 5 pixel font. The side walls are drawn as cream bands flanking the 80px corridor.
 - **Jaydon Hallway Staging**:
-  - When Jaydon steps out into the hallway upon knocking, **he stands to the side of Mallika** ($x = 338, y = 70$), never behind her.
+  - When Jaydon steps out into the hallway upon knocking, **he stands to the side of Mallika**, never behind her: his door swings open, Mallika steps over to the left half of the corridor ($x \le 276$) while Jaydon slides out into the right half ($x \approx 316..322$), feet aligned, facing her.
 
 ---
 
@@ -266,7 +274,7 @@ Located in the northern left quadrant ($x = 40..325, y = 60..200$):
   - **Denim Overalls** with silver buckles worn **over** an olive-green tube top (`#556b2f`). The tube top is visible at the shoulders and sides beneath the denim straps.
   - Rolled denim cuffs.
 - **Footwear**: Barefoot or clean white socks indoors.
-- **Hair & Face**: Long, voluminous, wavy dark brunette hair (`#2c1a12`) cascading past shoulders; expressive dark brown eyes.
+- **Hair & Face**: Long, voluminous, wavy dark brunette hair (`#2c1a12`) cascading past shoulders; expressive dark brown eyes behind rose-colored glasses frames (`#b34a5e`).
 - **Walk Cycle**: Natural, straight-forward foot stepping (frames 1 and 2). **Legs do not splay or sprawl outwards** during walking.
 
 ### Jaydon (Overworld Sprite)
@@ -309,6 +317,9 @@ $80 \times 80$ pixel dialogue portraits displayed in the combat text box:
 | Hardwood Flooring | Room base | Light Blonde Birch / Natural Oak | `#caa478`, `#b59068` |
 | Drywall Interior | Wall surfaces | Warm Alabaster / Beige | `#eae3d2`, `#3d281a` (baseboard) |
 | Carpet Runner | $60 \times 375$ | Toasted Almond / Camel | `#a68c76`, `#8f745e` |
+| Kitchen Floor | Kitchen half | Warm Vinyl (faint lattice, no tile grid) | `#cfc0a0`, `#bba987` |
+| Countertops | Kitchen runs | Cream Laminate | `#ece2c8`, `#ddd2b6` |
+| Wall Mass Tops | Interior blocks | Muted Taupe | `#6b5a4e`, `#84705f` |
 | Pitch-Black Void | Room boundaries | Void Black | `#000000` |
 
 ### Furniture & Props
@@ -322,7 +333,7 @@ $80 \times 80$ pixel dialogue portraits displayed in the combat text box:
 | Puzzle Table | $36 \times 96$ | Right Living Room Wall | Duckling and flowers jigsaw puzzle |
 | Heavy Punching Bag | $48 \times 70$ | West Brick Corner | Metal stand, cantilever, sandbag legs |
 | Kitchen Sink | $36 \times 28$ | South Kitchen Wall | Rotated 180°, NO window, dirty dishes |
-| Stove / Oven | $55 \times 45$ | East Kitchen Wall | Rotated 90°, warm glow, NO microwave |
+| Stove / Oven | $55 \times 70$ | East Kitchen Wall | Rotated 90°, white coil range, warm glow, NO microwave |
 
 ---
 *End of Master Scene Specification.*

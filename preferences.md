@@ -25,7 +25,11 @@ This document tracks learned preferences, design rules, and behavioral guideline
    - **Season**: Fall emulation with autumn leaves drifting across the sky and an autumn-toned lawn.
    - **Brickwork**: Protruding stairwell bay is 100% full brick. The front door is completely framed in brick.
    - **White Siding**: Sits strictly directly above the front door, spanning 3 door widths wide (~138px).
-6. **Decluttering & Perspective**:
+6. **Less Is More (Reference Photos)**:
+   - Use the real photos for palette, materials and the overall read of each object (white coil stove, black dishwasher, walnut cabinets, cream counters, maroon couch, duckling puzzle), **not** as a checklist of every detail.
+   - Do not draw individual floor tiles, wall outlets/switches, or extra clutter on the TV. Be deliberate about what earns a place in the scene; details already in the game stay.
+   - Keep every sprite on the native 2x art-pixel grid (Undertale's 320 × 240) with black character outlines so everything reads as one cohesive pixel-art world.
+7. **Decluttering & Perspective**:
    - Kitchen sink is rotated 180° (faucet south pointing into basin) with exterior window removed.
    - Kitchen stove is rotated 90° (backguard east, oven door west). Countertop microwave is removed to eliminate visual clutter.
    - Remove unnecessary text labels in the overworld (e.g., remove `[WALL]` label, remove `TURN 180° ►` prompt).

@@ -89,8 +89,8 @@ Dials Jaydon's phone:
 
 | Location / Prop | Trigger Type | Interaction Text / Sequence |
 |---|---|---|
-| **Front Door** ($x: 248..292, y: 170..235$) | Door Transition | Steps over threshold into First Floor foyer. Plays door sound, switches BGM to `home`. |
-| **Brass Plaque** ($x: 300, y: 175$) | Inspect | `* A polished brass plaque reads: 316.` |
+| **Front Door** ($x: 300..344, y: 176..232$) | Door Transition | Steps over threshold into First Floor foyer. Plays door sound, switches BGM to `home`. |
+| **Brass Plaque** ($x: 262..294, y: 186..204$, left of the door) | Inspect | `* A polished brass plaque reads: 316.` |
 | **Autumn Yard / Leaves** | Inspect | `* Crisp autumn breeze rustles through the fallen leaves.` |
 | **Sidewalk** | Boundary | Player cannot walk off screen ($x < 160$ or $x > 480$). |
 
@@ -108,7 +108,7 @@ Dials Jaydon's phone:
    * A familiar row of New Balances resting in the foyer pocket.
    ```
 3. **Front Door Exit** ($x: 156..202, y: 430..444$):
-   - Transitions back outside to the exterior walkway.
+   - Plays door sound and transitions back outside to the exterior walkway.
 4. **First Floor Bathroom** ($x: 130, y: 250$):
    ```text
    * You don't have to use the bathroom right now.
