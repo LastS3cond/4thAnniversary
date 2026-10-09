@@ -128,48 +128,51 @@ flowchart TD
 
 ### 2. First Floor (The Open Loop)
 
-The first floor functions as a continuous rectangular loop connecting the Foyer, Hallway, Living Room, and Kitchen around a pitch-black central core.
+The first floor functions as a continuous rectangular loop connecting the Foyer, Hallway, Living Room, and Kitchen around a finished central interior dividing wall.
 
 ```
 +----------------------------------------------------------------------------------+
 | [GREEN CEILING LED STRIP RUNNING ACROSS THE TOP MOULDING]                        |
 |                                                                                  |
-| [BRICK] [SCREEN DOOR]       [TV STAND & TV]       [FOLDING TABLE]     [KITCHEN   |
-| [WALL]  (Sliding Glass)   (Rainbow Streamer)   (Duckling Puzzle &      ENTRANCE] |
-| [PUNCH                                          Blue Cups on Half)               |
-|  BAG]                      [RED L-COUCH]                               [FRIDGE]  |
-|                         [COFFEE TABLE: Notes,                           (Top)    |
-|                          Strewn Papers, Bowl]                          [CABINET] |
-|                                                                        (Middle)  |
-| [BATHROOM BLOCK]        [HALLWAY RUNNER]        [BLACK VOID]           [OVEN /   |
-| (Door: "BATH")                                  (Where closet leads,    MICROWAVE]
-|                                                  no washer/dryer)       (Bottom) |
-| [FOYER: COATS]          [CLOSET: "CLOSET"]                             [CABINETS]|
-| [SHOE RACK: NBs]        [FRONT DOOR]  [STAIRS▲] [PANTRY] [CABINETS]    [DISHWSHR]|
-| [TILE LANDING]          (Exit Outside) (To 2nd)                        [SINK]    |
+| [BRICK] [SCREEN DOOR]             [RED L-COUCH]            [VERTICAL     [KITCHEN|
+| [WALL]  (Sliding Glass)        (Facing South, Switch)       TABLE &       DOORWAY|
+|                                                             BENCH]       OPENING]|
+| [PUNCH                          [COFFEE TABLE: Notes,      (Ducklings            |
+|  BAG]                            Strewn Papers, Bowl]       Puzzle /             |
+| (Freestanding                                               Blue Cups)   [FRIDGE]|
+|  Stand & Legs                  [TV STAND & TV SCREEN]                    (Top)   |
+|  w/ Sandbags)                   (Facing North, Streamer)                 [CABINET|
+|                                                                           COUNTER]
+| [BATHROOM BLOCK]        [HALLWAY RUNNER]    [WARM INTERIOR WALL]         [OVEN & |
+| (Door: "BATH")                              (Finished drywall, baseboard, MICROWAVE]
+| [SHOE RACK: NBs]                             closet door, no void)       (Bottom)|
+| (Leaning on Bath Wall)                                                   [CABINET|
+| [FOYER COATS]           [CLOSET: "CLOSET"]                               [SINK & |
+| [TILE LANDING]          [FRONT DOOR]  [STAIRS▲] [PANTRY] [CABINETS]       BLINDS] |
+|                         (Exit Outside) (To 2nd)                          [DISHWSHR
 +----------------------------------------------------------------------------------+
 ```
 
 #### Detailed Room Layout & Item Catalog:
 
 1. **Bottom-Left Corner (Foyer & Landing)**:
-   - **Coat Closet** (`x: 40, y: 390, w: 35, h: 50`): Tucked in the far corner. Solid dark wood door with brass knob.
+   - **Coat Closet** (`x: 40, y: 385, w: 35, h: 55`): Tucked in the far corner. Solid dark wood door with brass knob.
      - *Flavor text*: `* Just some coats hanging.`
-   - **White Shoe Rack** (`x: 75, y: 400, w: 45, h: 40`): Two-tier white rack holding familiar navy, grey, and white New Balance sneakers.
-     - *Flavor text*: `* A familiar row of New Balances.`
-   - **Entry Tile Landing**: Off-white tiled foyer floor in front of the shoe rack and closet.
+   - **White Shoe Rack Leaning Against Bathroom Wall** (`x: 135, y: 330, w: 25, h: 40`): Vertical leaning rack resting against the bathroom wall holding navy, grey, and white New Balance sneakers.
+     - *Flavor text*: `* A familiar row of New Balances leaning against the bathroom wall.`
+   - **Entry Tile Landing**: Off-white tiled foyer floor (`x: 40, y: 365, w: 100, h: 75`) in front of the shoe rack and coat closet.
+   - **Front Door Entryway** (`x: 155, y: 434, w: 45, h: 12`): High-contrast dark casing (`#1c0f0a`) cleanly separated from the wall and baseboards, with brass threshold and textured coir welcome mat (`x: 158, y: 416, w: 42, h: 16`).
 
 2. **North-Bound Hallway Corridor**:
-   - Looking straight ahead from the front door enters a carpeted corridor (`x: 138..213, y: 190..420`) leading into the living room.
+   - Looking straight ahead from the front door enters a carpeted corridor (`x: 138..213, y: 180..420`) leading directly into the living room.
    - **First-Floor Bathroom** (`x: 130, y: 245, w: 15, h: 45`): Door on the left wall with brass knob and "BATH" label.
      - *Flavor text*: `* You don't have to use the bathroom right now.`
-   - **Hallway Storage Closet** (`x: 215, y: 245, w: 15, h: 45`): Door on the right wall leading toward the middle void.
+   - **Hallway Storage Closet** (`x: 215, y: 245, w: 15, h: 45`): Door on the right wall mounted on the center dividing wall.
      - *Flavor text*: `* A hallway storage closet. It's packed full.`
 
-3. **Center of House (The Black Void)**:
-   - Defined by `{ x: 215, y: 190, w: 245, h: 155 }`.
-   - Rendered in solid pitch black (`#000000`).
-   - Washer and dryer removed completely. Solid collider boundary.
+3. **Center of House (Interior Partition Wall)**:
+   - Defined by `{ x: 215, y: 190, w: 240, h: 155 }`.
+   - Replaces the former pitch-black void with authentic warm interior drywall (`#eae3d2`), perimeter wood baseboards (`#3d281a`), and a hallway closet door. Washer and dryer removed completely. Solid collider boundary separating hallway and kitchen.
 
 4. **South Kitchen Wall (The Full Wall from Left to Right)**:
    - **Stairs Entrance** (`x: 215, y: 405, w: 50, h: 35`): Carpeted staircase landing immediately right of the front door.
@@ -206,8 +209,8 @@ The first floor functions as a continuous rectangular loop connecting the Foyer,
 6. **The Living Room (North Area)**:
    - **Green Ceiling LED Perimeter Strip**: (Photo 1) Vibrant emerald LED lights running along the ceiling moulding (`x: 40..600, y: 58`) casting an ambient green glow.
    - **Exposed Brick Accent Wall**: Small line of bricks on the left wall only (`x: 40..60, y: 60..190`); removed from all other walls.
-   - **Heavy Punching Bag** (`x: 50, y: 65, w: 35, h: 45`): Hanging from a steel chain on the brick wall.
-     - *Interactive Prompt*: `* A heavy punching bag hanging from the brick wall. Give it a punch? [ YES / NO ]`
+    - **Freestanding Heavy Punching Bag Station** (`x: 50, y: 68, w: 40, h: 60`): Heavy bag hanging from its own steel contraption with tubular upright, arched arm, and support legs weighed down by heavy canvas sandbags to keep it upright.
+     - *Interactive Prompt*: `* A heavy punching bag on its own contraption, weighed down with sandbags. Give it a punch? [ YES / NO ]`
      - Selecting **YES**: Plays hit sound, grants `Attack power +1` (`hasPunchedBag = true`), and responds:
        ```text
        * WHAM!
@@ -215,18 +218,18 @@ The first floor functions as a continuous rectangular loop connecting the Foyer,
        * Attack power +1.
        ```
      - Selecting **NO**: `* You leave the punching bag hanging peacefully.`
-   - **Sliding Screen Door** (`x: 85, y: 45, w: 55, h: 25`): Looking out into the snowy night.
+   - **Sliding Screen Door** (`x: 95, y: 45, w: 55, h: 30`): Looking out into the snowy night.
      - *Flavor text*: `* It's cold outside.`
-   - **Big TV Stand & TV** (`x: 180, y: 55, w: 120, h: 35`): Wooden media stand directly opposite the couch, holding a wide television screen with a festive metallic rainbow foil banner taped along the wall.
-     - *Flavor text*: `* The TV is quiet. A cozy reflection fills the screen.`
-   - **Plastic Long Folding Table & Bench** (`x: 335, y: 55, w: 95, h: 40`): (Photo 1) White table against the wall with matching white bench.
-     - **The Puzzle on Half the Table**: The left half of the table is covered by a jigsaw puzzle of yellow baby ducklings, green lily pads, and pink/white flowers.
-     - **Clutter & Blue Cups**: The right half holds two tall blue plastic cups and pens.
-     - *Flavor text*: `* A cute puzzle of ducklings and flowers.`
-   - **Big Red L-Couch** (`x: 185, y: 120, w: 100, h: 55`): (Photo 3) Deep maroon/red sectional couch in the middle of the room, featuring the Nintendo Switch (with red and blue Joy-Cons) resting on the cushion.
+   - **Big Red L-Couch in Middle (Swapped)** (`x: 180, y: 72, w: 105, h: 58`): (Photo 1 & 3) Deep maroon/red sectional couch in the middle of the room facing south towards the TV, featuring the Nintendo Switch (with red and blue Joy-Cons) resting on the cushion.
      - *Flavor text*: `* The red couch in the center of the room. Perfect for playing Switch (which is sitting right there).`
-   - **Coffee Table Inside the L** (`x: 215, y: 135, w: 45, h: 30`): (Photo 1) Walnut coffee table holding a blue spiral notebook with ruled pages, loose papers just strewn about with handwritten notes, a red pen, and a white cereal bowl with spoon.
+   - **Coffee Table Inside the L** (`x: 210, y: 105, w: 45, h: 28`): (Photo 1) Walnut coffee table holding a blue spiral notebook with ruled pages, loose papers just strewn about with handwritten notes, a red pen, and a white cereal bowl with spoon.
      - *Flavor text*: `* Papers just strewn about.`
+   - **Big TV Stand & TV in Middle (Swapped)** (`x: 175, y: 142, w: 115, h: 36`): (Photo 1) Wooden media stand directly opposite the couch facing north, holding a wide television screen with a festive metallic rainbow foil banner draped along the adjacent wall.
+     - *Flavor text*: `* The TV is quiet. A cozy reflection fills the screen.`
+   - **Plastic Long Folding Table Rotated 90° & Bench** (`x: 345, y: 65, w: 48, h: 84`): (Photo 1) White table positioned vertically against the east living room wall with matching white folding bench (`x: 380, y: 70, w: 8, h: 74`).
+     - **The Puzzle on Half the Table**: The top half of the table is covered by a jigsaw puzzle of yellow baby ducklings, green lily pads, and pink/white flowers.
+     - **Clutter & Blue Cups**: The bottom half holds two tall blue plastic cups and pens.
+     - *Flavor text*: `* A cute puzzle of ducklings and flowers.`
 
 ---
 

@@ -89,18 +89,43 @@ class MapManager {
         ctx.fillStyle = '#4a3728';
         ctx.fillRect(50, 56, 540, 10);
 
-        // Recessed Dark Front Doorway
-        ctx.fillStyle = '#0e0b0b';
-        ctx.fillRect(296, 160, 44, 60);
-        // Interior white door slightly visible inside (Photo 3)
-        ctx.fillStyle = '#f0ebe1';
-        ctx.fillRect(302, 164, 34, 56);
-        ctx.fillStyle = '#3a3530';
-        ctx.fillRect(304, 166, 14, 24);
-        ctx.fillRect(304, 194, 14, 24);
-        // Brass knob
-        ctx.fillStyle = '#ffd700';
-        ctx.fillRect(305, 192, 3, 3);
+        // Recessed Dark Front Doorway (Photo 3)
+        // High-contrast framing cleanly separated from wall
+        ctx.fillStyle = '#110b0a';
+        ctx.fillRect(296, 155, 46, 65);
+        ctx.strokeStyle = '#1a0d0a';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(296, 155, 46, 65);
+
+        // Inside the open doorway (Photo 3):
+        // Right side: interior foyer white wall visible inside
+        ctx.fillStyle = '#f5f0e6';
+        ctx.fillRect(314, 158, 26, 60);
+        // White closet louver door visible inside on right
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(322, 162, 16, 54);
+        ctx.strokeStyle = '#d6cdbd';
+        ctx.lineWidth = 1;
+        for (let ly = 168; ly < 212; ly += 5) {
+          ctx.beginPath(); ctx.moveTo(324, ly); ctx.lineTo(336, ly); ctx.stroke();
+        }
+
+        // Left side: Dark front door opened inward (Photo 3)
+        // Distinct dark wood door panel swung open to the left with silver hinges
+        ctx.fillStyle = '#26150e';
+        ctx.fillRect(298, 158, 16, 60);
+        ctx.fillStyle = '#180d09';
+        ctx.fillRect(299, 160, 13, 56);
+        ctx.fillStyle = '#d0d0d0';
+        ctx.fillRect(297, 164, 2, 4);
+        ctx.fillRect(297, 185, 2, 4);
+        ctx.fillRect(297, 206, 2, 4);
+        // Deep shadow cast by door inside opening separating it from interior wall
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.fillRect(310, 158, 6, 60);
+        // Door threshold stone at bottom
+        ctx.fillStyle = '#444444';
+        ctx.fillRect(296, 218, 46, 4);
 
         // --- PROTRUDING FEATURE: BRICK STAIRWELL BAY (Photo 3) ---
         // Extends forward on the right of the door where the stairs are
@@ -175,7 +200,7 @@ class MapManager {
       bgm: 'home',
       width: 640,
       height: 480,
-      spawn: { x: 155, y: 375, dir: 'up' },
+      spawn: { x: 175, y: 380, dir: 'up' },
       colliders: [
         // Perimeter outer walls
         { x: 0, y: 0, w: 640, h: 60 },   // Top wall
@@ -183,16 +208,17 @@ class MapManager {
         { x: 0, y: 0, w: 40, h: 480 },   // Left wall
         { x: 600, y: 0, w: 40, h: 480 }, // Right wall
 
-        // PITCH BLACK VOID IN THE CENTER (where closet leads, no washer/dryer)
-        { x: 215, y: 190, w: 245, h: 155 },
+        // Center Interior Dividing Wall (warm drywall partition, NOT a black void)
+        { x: 215, y: 190, w: 240, h: 155 },
 
         // Bathroom Block on Left of Hallway
         { x: 40, y: 200, w: 95, h: 165 },
 
         // Bottom Wall (South Wall) Fixtures:
-        // Bottom-left corner: coat closet & shoe rack
-        { x: 40, y: 390, w: 35, h: 50 },  // Bottom-left coat closet
-        { x: 75, y: 400, w: 45, h: 40 },  // Shoe rack
+        // Bottom-left corner: coat closet
+        { x: 40, y: 385, w: 35, h: 55 },
+        // Shoe rack leaning against the vertical bathroom wall
+        { x: 135, y: 330, w: 24, h: 36 },
         // Kitchen South Wall: Pantry, Cabinets, Sink, Dishwasher, More Cabinets
         { x: 270, y: 395, w: 275, h: 45 },
 
@@ -200,25 +226,31 @@ class MapManager {
         { x: 545, y: 195, w: 55, h: 195 },
 
         // Living Room Furniture:
-        { x: 50, y: 65, w: 30, h: 45 },   // Punching bag on left brick line
-        { x: 180, y: 55, w: 120, h: 30 }, // BIG TV stand opposite couch
-        { x: 185, y: 120, w: 100, h: 55 }, // BIG Red L-Couch in the middle
-        { x: 335, y: 55, w: 95, h: 35 }   // Plastic long folding table & bench
+        // Freestanding heavy punching bag station on left brick corner
+        { x: 50, y: 68, w: 40, h: 55 },
+        // Red L-Couch on north side in the middle facing south
+        { x: 180, y: 72, w: 105, h: 58 },
+        // Coffee table inside the L of the couch
+        { x: 210, y: 105, w: 45, h: 28 },
+        // TV stand directly opposite couch on south side facing north
+        { x: 175, y: 142, w: 115, h: 36 },
+        // Plastic long folding table rotated 90 degrees (vertical against wall) & bench
+        { x: 345, y: 65, w: 48, h: 84 }
       ],
       interactables: [
         // 1. Bottom-Left Coat Closet
         {
-          x: 40, y: 390, w: 35, h: 50,
+          x: 40, y: 385, w: 35, h: 55,
           text: ["* Just some coats hanging."]
         },
-        // 2. White Shoe Rack (Bottom-left corner)
+        // 2. White Shoe Rack (Leaning against the bathroom wall)
         {
-          x: 75, y: 400, w: 45, h: 40,
-          text: ["* A familiar row of New Balances."]
+          x: 135, y: 330, w: 25, h: 40,
+          text: ["* A familiar row of New Balances leaning against the bathroom wall."]
         },
         // 3. Front Door (Exit back outside)
         {
-          x: 140, y: 436, w: 35, h: 10,
+          x: 155, y: 434, w: 45, h: 12,
           isDoor: true,
           onEnter: () => { window.game.transitionToRoom('exterior', 318, 240, 'down'); }
         },
@@ -288,33 +320,33 @@ class MapManager {
         },
         // 15. Living Room: Punching Bag (Interactive punch choice)
         {
-          x: 50, y: 65, w: 35, h: 45,
+          x: 50, y: 68, w: 40, h: 60,
           triggerPunchingBag: true
         },
         // 16. Living Room: Screen Door (Sliding glass door)
         {
-          x: 85, y: 45, w: 55, h: 25,
+          x: 95, y: 45, w: 55, h: 30,
           text: ["* It's cold outside."]
         },
-        // 17. Living Room: BIG TV Stand & TV directly opposite couch
+        // 17. Living Room: BIG Red L-Couch in the middle
         {
-          x: 180, y: 55, w: 120, h: 35,
-          text: ["* The TV is quiet. A cozy reflection fills the screen."]
-        },
-        // 18. Living Room: Plastic Long Folding Table & Bench (Duckling puzzle & cups)
-        {
-          x: 335, y: 55, w: 95, h: 40,
-          text: ["* A cute puzzle of ducklings and flowers."]
-        },
-        // 19. Living Room: BIG Red L-Couch in the middle
-        {
-          x: 185, y: 120, w: 100, h: 55,
+          x: 180, y: 72, w: 105, h: 58,
           text: ["* The red couch in the center of the room. Perfect for playing Switch (which is sitting right there)."]
         },
-        // 20. Living Room: Coffee Table Inside the L
+        // 18. Living Room: Coffee Table Inside the L
         {
-          x: 215, y: 135, w: 45, h: 30,
+          x: 210, y: 105, w: 45, h: 30,
           text: ["* Papers just strewn about."]
+        },
+        // 19. Living Room: BIG TV Stand & TV directly opposite couch
+        {
+          x: 175, y: 142, w: 115, h: 36,
+          text: ["* The TV is quiet. A cozy reflection fills the screen."]
+        },
+        // 20. Living Room: Plastic Long Folding Table & Bench (Duckling puzzle & cups)
+        {
+          x: 345, y: 65, w: 48, h: 84,
+          text: ["* A cute puzzle of ducklings and flowers."]
         }
       ],
       draw: (ctx) => {
@@ -323,13 +355,26 @@ class MapManager {
         ctx.fillStyle = '#caa478';
         ctx.fillRect(40, 60, 560, 380);
 
-        // --- PITCH BLACK VOID IN THE MIDDLE (where closet leads, no washer/dryer) ---
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(215, 190, 245, 155);
+        // --- CENTER INTERIOR DIVIDING WALL (Photo 1) ---
+        // Finished warm interior drywall replacing the previous black void
+        ctx.fillStyle = '#eae3d2';
+        ctx.fillRect(215, 190, 240, 155);
+        // Baseboard molding along bottom and sides
+        ctx.fillStyle = '#3d281a';
+        ctx.fillRect(215, 341, 240, 4); // South baseboard
+        ctx.fillRect(215, 190, 240, 4); // North baseboard (behind TV)
+        ctx.fillRect(215, 190, 4, 155); // West baseboard (hallway)
+        ctx.fillRect(451, 190, 4, 155); // East baseboard (kitchen)
+        // Subtle wall edge shading
+        ctx.fillStyle = 'rgba(0,0,0,0.06)';
+        ctx.fillRect(219, 194, 232, 147);
 
         // --- BATHROOM ROOM BLOCK (Left of hallway) ---
-        ctx.fillStyle = '#1c1618';
+        ctx.fillStyle = '#eae3d2';
         ctx.fillRect(40, 200, 95, 165);
+        ctx.fillStyle = '#3d281a';
+        ctx.fillRect(40, 361, 95, 4);  // South baseboard
+        ctx.fillRect(131, 200, 4, 165); // East baseboard facing hallway
         // Bathroom Door facing hallway
         ctx.fillStyle = '#3d2b20';
         ctx.fillRect(130, 245, 8, 45);
@@ -339,18 +384,18 @@ class MapManager {
         ctx.font = '6px "Press Start 2P", monospace';
         ctx.fillText("BATH", 85, 272);
 
-        // --- CLOSET DOOR ON RIGHT OF HALLWAY (leads to middle void) ---
+        // --- CLOSET DOOR ON RIGHT OF HALLWAY (on center wall) ---
         ctx.fillStyle = '#3d2b20';
         ctx.fillRect(215, 245, 8, 45);
         ctx.fillStyle = '#ffd700';
         ctx.fillRect(217, 267, 3, 3);
-        ctx.fillStyle = '#aaaaaa';
+        ctx.fillStyle = '#333333';
         ctx.font = '6px "Press Start 2P", monospace';
         ctx.fillText("CLOSET", 228, 272);
 
         // --- HALLWAY FLOOR RUNNER ---
         ctx.fillStyle = '#b59068';
-        ctx.fillRect(138, 190, 75, 230);
+        ctx.fillRect(138, 180, 75, 240);
 
         // --- OUTER WALLS ---
         ctx.fillStyle = '#221a18';
@@ -360,6 +405,10 @@ class MapManager {
         ctx.fillRect(0, 0, 40, 480);   // Left wall
         ctx.fillRect(600, 0, 40, 480); // Right wall
 
+        // Baseboard along south perimeter wall
+        ctx.fillStyle = '#3d281a';
+        ctx.fillRect(40, 436, 560, 4);
+
         // --- ONLY A SMALL LINE OF BRICKS ON LEFT WALL (Photo 4 & 5) ---
         // Removed bricks from everywhere else in the room!
         const brick = window.spriteManager.env.brickWall;
@@ -368,29 +417,42 @@ class MapManager {
         }
 
         // --- BOTTOM-LEFT CORNER: CLOSET, SHOE RACK, FOYER LANDING ---
-        // Coat Closet on far left
-        ctx.fillStyle = '#3d2b20';
-        ctx.fillRect(40, 390, 35, 50);
-        ctx.fillStyle = '#ffd700';
-        ctx.fillRect(70, 415, 3, 3);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '5px "Press Start 2P", monospace';
-        ctx.fillText("COATS", 42, 405);
-
-        // White Shoe Rack with New Balances
-        ctx.drawImage(window.spriteManager.env.shoeRack, 75, 400, 45, 35);
-
         // Entry Foyer Tile Landing in front of shoe rack & closet
         ctx.fillStyle = '#d6cdbd';
-        ctx.fillRect(40, 370, 95, 20);
+        ctx.fillRect(40, 365, 100, 75);
         ctx.strokeStyle = '#b8ad9b';
-        ctx.strokeRect(40, 370, 95, 20);
+        ctx.strokeRect(40, 365, 100, 75);
 
-        // Front Door Entryway Mat
-        ctx.fillStyle = '#111111';
-        ctx.fillRect(140, 432, 35, 8);
-        ctx.fillStyle = '#5c4a3b';
-        ctx.fillRect(143, 420, 29, 12);
+        // Coat Closet on far left
+        ctx.fillStyle = '#3d2b20';
+        ctx.fillRect(40, 385, 35, 55);
+        ctx.fillStyle = '#ffd700';
+        ctx.fillRect(70, 412, 3, 3);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '5px "Press Start 2P", monospace';
+        ctx.fillText("COATS", 42, 402);
+
+        // White Shoe Rack Leaning Against the Bathroom Wall (Photo 3/5)
+        ctx.drawImage(window.spriteManager.env.shoeRack, 136, 330, 24, 36);
+
+        // --- FRONT DOOR (South Wall Entryway) ---
+        // High contrast dark casing clearly separated from wall & baseboard
+        ctx.fillStyle = '#1c0f0a';
+        ctx.fillRect(156, 430, 46, 14);
+        ctx.fillStyle = '#2c1a12';
+        ctx.fillRect(158, 432, 42, 12);
+        // Dark door leaf / threshold
+        ctx.fillStyle = '#150c08';
+        ctx.fillRect(160, 434, 38, 10);
+        // Brass door threshold trim
+        ctx.fillStyle = '#c5a059';
+        ctx.fillRect(160, 433, 38, 2);
+        // Coir Welcome Mat in front of door
+        ctx.fillStyle = '#5c432d';
+        ctx.fillRect(158, 416, 42, 16);
+        ctx.strokeStyle = '#7c5c3f';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(159, 417, 40, 14);
 
         // --- KITCHEN SOUTH WALL (STAIRS, PANTRY, CABINETS, SINK, DISHWASHER, MORE CABINETS) ---
         // 1. Staircase Landing & Stairs going up (to the right of hallway)
@@ -453,40 +515,43 @@ class MapManager {
         ctx.fillRect(40, 60, 560, 40);
 
         // Screen Door (Sliding glass door looking into cold)
-        ctx.drawImage(window.spriteManager.env.slidingDoor, 85, 45, 55, 35);
+        ctx.drawImage(window.spriteManager.env.slidingDoor, 95, 45, 55, 35);
 
-        // Heavy Punching Bag on the brick line
-        ctx.drawImage(window.spriteManager.env.punchBag, 55, 65, 24, 48);
+        // Freestanding Heavy Punching Bag Station with sandbag legs in brick corner
+        ctx.drawImage(window.spriteManager.env.punchBag, 50, 68, 40, 60);
 
-        // BIG TV Stand & TV directly opposite the couch
+        // --- SWAPPED: COUCH ON NORTH, TV STAND ON SOUTH (Photo 1) ---
+        // BIG Red L-Couch in the middle facing south
+        ctx.drawImage(window.spriteManager.env.redCouch, 180, 72, 105, 58);
+
+        // Coffee Table INSIDE THE L of the couch (Photo 1)
+        ctx.drawImage(window.spriteManager.env.coffeeTable, 210, 105, 45, 28);
+
+        // BIG TV Stand & TV directly opposite the couch facing north (Photo 1)
         ctx.fillStyle = '#3a2618';
-        ctx.fillRect(180, 78, 120, 12); // wooden TV stand
+        ctx.fillRect(175, 154, 115, 18); // wooden TV stand
         ctx.fillStyle = '#111111';
-        ctx.fillRect(185, 48, 110, 34);  // big TV screen
+        ctx.fillRect(180, 138, 105, 22); // TV screen facing north
         ctx.fillStyle = '#1e1e1e';
-        ctx.fillRect(188, 51, 104, 28);
-        // Rainbow foil streamer next to TV (Photo 1)
+        ctx.fillRect(182, 140, 101, 18); // screen face
+        ctx.fillStyle = '#444444';
+        ctx.fillRect(228, 156, 9, 4);   // TV pedestal base
+        // Rainbow foil streamer next to TV draping down wall (Photo 1)
         ctx.strokeStyle = '#c0d8f0';
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(305, 80);
-        ctx.quadraticCurveTo(315, 55, 310, 38);
+        ctx.moveTo(295, 140);
+        ctx.quadraticCurveTo(305, 158, 298, 172);
         ctx.stroke();
 
-        // Plastic Long Folding Table and Bench against the wall
-        ctx.drawImage(window.spriteManager.env.puzzleTable, 340, 50, 90, 42);
-        // Bench in front of table
+        // White Long Folding Table Rotated 90 Degrees (Vertical, Longer: 32x84)
+        ctx.drawImage(window.spriteManager.env.puzzleTable, 345, 65, 32, 84);
+        // Folding bench alongside table
         ctx.fillStyle = '#dcdcdc';
-        ctx.fillRect(345, 92, 80, 8);
-        ctx.fillStyle = '#999999';
-        ctx.fillRect(350, 100, 4, 4);
-        ctx.fillRect(420, 100, 4, 4);
-
-        // BIG Red L-Couch in the middle (Photo 3)
-        ctx.drawImage(window.spriteManager.env.redCouch, 185, 120, 100, 60);
-
-        // Coffee Table INSIDE THE L of the couch (Photo 1)
-        ctx.drawImage(window.spriteManager.env.coffeeTable, 215, 135, 45, 28);
+        ctx.fillRect(380, 70, 8, 74);
+        ctx.fillStyle = '#888888';
+        ctx.fillRect(382, 68, 4, 4);
+        ctx.fillRect(382, 140, 4, 4);
       }
     };
 

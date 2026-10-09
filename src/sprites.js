@@ -626,93 +626,108 @@ class SpriteManager {
     sCtx.fillRect(12, 27, 2, 2);
     this.env.snow = snow;
 
-    // 4. White Shoe Rack with New Balances (32x24)
-    const { canvas: shoeRack, ctx: srCtx } = this.createCanvas(32, 24);
-    srCtx.fillStyle = '#e6e6e6';
-    srCtx.fillRect(2, 6, 28, 16);
+    // 4. White Shoe Rack Leaning Against the Bathroom Wall (24x36)
+    const { canvas: shoeRack, ctx: srCtx } = this.createCanvas(24, 36);
+    // Vertical frame leaning against the wall on left
+    srCtx.fillStyle = '#e2e2e2';
+    srCtx.fillRect(0, 4, 4, 30);  // Left vertical support upright against wall
+    srCtx.fillRect(18, 8, 4, 26); // Right slanted support
+    // Angled shoe shelves
     srCtx.fillStyle = '#ffffff';
-    srCtx.fillRect(4, 8, 24, 5);
-    srCtx.fillRect(4, 15, 24, 5);
-    // New Balance shoes (Navy/Grey/White)
-    srCtx.fillStyle = '#5c6475';
-    srCtx.fillRect(5, 9, 6, 3);
-    srCtx.fillRect(12, 9, 6, 3);
-    srCtx.fillRect(19, 9, 6, 3);
-    srCtx.fillStyle = '#ffffff'; // N logo
-    srCtx.fillRect(7, 10, 2, 1);
-    srCtx.fillRect(14, 10, 2, 1);
-    srCtx.fillRect(21, 10, 2, 1);
+    srCtx.fillRect(2, 10, 18, 4);
+    srCtx.fillRect(2, 20, 18, 4);
+    srCtx.fillRect(2, 30, 18, 4);
+    // New Balance sneakers on the shelves (Navy / Grey / White)
+    srCtx.fillStyle = '#4a5568'; // Navy sneaker
+    srCtx.fillRect(4, 9, 7, 3);
+    srCtx.fillRect(12, 9, 7, 3);
+    srCtx.fillStyle = '#718096'; // Grey sneaker
+    srCtx.fillRect(4, 19, 7, 3);
+    srCtx.fillRect(12, 19, 7, 3);
+    srCtx.fillStyle = '#e2e8f0'; // White sneaker
+    srCtx.fillRect(4, 29, 7, 3);
+    srCtx.fillRect(12, 29, 7, 3);
+    // Tiny white N logos
+    srCtx.fillStyle = '#ffffff';
+    srCtx.fillRect(7, 9, 2, 1);
+    srCtx.fillRect(15, 19, 2, 1);
     this.env.shoeRack = shoeRack;
 
-    // 5. White Folding Table with Duckling & Flower Puzzle on Half (48x32)
-    const { canvas: puzzleTable, ctx: ptCtx } = this.createCanvas(48, 32);
-    // Table surface
-    ptCtx.fillStyle = '#f2f2f2';
-    ptCtx.fillRect(0, 2, 48, 28);
-    ptCtx.fillStyle = '#cccccc';
-    ptCtx.fillRect(2, 28, 4, 4);
-    ptCtx.fillRect(42, 28, 4, 4);
-    // Table edge bevel
-    ptCtx.fillStyle = '#e0e0e0';
-    ptCtx.fillRect(0, 2, 48, 2);
+    // 5. White Long Folding Table Rotated 90 Degrees (Vertical, Longer: 32x84)
+    const { canvas: puzzleTable, ctx: ptCtx } = this.createCanvas(32, 84);
+    // White plastic folding tabletop (longer, oriented vertically)
+    ptCtx.fillStyle = '#f5f5f5';
+    ptCtx.fillRect(2, 2, 28, 80);
+    ptCtx.fillStyle = '#dcdcdc'; // Beveled edge trim
+    ptCtx.strokeRect(2, 2, 28, 80);
+    // Folding metal leg hinges visible at top and bottom
+    ptCtx.fillStyle = '#999999';
+    ptCtx.fillRect(0, 6, 2, 8);
+    ptCtx.fillRect(30, 6, 2, 8);
+    ptCtx.fillRect(0, 70, 2, 8);
+    ptCtx.fillRect(30, 70, 2, 8);
 
-    // Cute Jigsaw Puzzle of Ducklings & Flowers on LEFT HALF of table
-    ptCtx.fillStyle = '#24523d'; // Pond water base
-    ptCtx.fillRect(3, 5, 20, 20);
-    // Jigsaw border trim
-    ptCtx.strokeStyle = '#1b3d2d';
+    // --- TOP HALF OF TABLE: CUTE PUZZLE OF DUCKLINGS & FLOWERS ---
+    ptCtx.fillStyle = '#224a37'; // Pond water backing
+    ptCtx.fillRect(4, 4, 24, 36);
+    ptCtx.strokeStyle = '#183829';
     ptCtx.lineWidth = 1;
-    ptCtx.strokeRect(3, 5, 20, 20);
+    ptCtx.strokeRect(4, 4, 24, 36);
 
     // Lily pads
     ptCtx.fillStyle = '#488b48';
-    ptCtx.fillRect(5, 7, 6, 5);
-    ptCtx.fillRect(13, 16, 7, 5);
+    ptCtx.fillRect(7, 8, 8, 6);
+    ptCtx.fillRect(15, 22, 9, 6);
+    ptCtx.fillRect(6, 28, 7, 5);
 
     // Cute yellow baby ducklings!
+    // Duckling 1 (Top)
     ptCtx.fillStyle = '#ffd13b';
-    ptCtx.fillRect(14, 8, 4, 4);   // Duckling 1 body
-    ptCtx.fillRect(16, 7, 3, 3);   // Duckling 1 head
-    ptCtx.fillStyle = '#ff7700';   // Beak
-    ptCtx.fillRect(19, 8, 2, 1);
-    ptCtx.fillStyle = '#111111';   // Eye
-    ptCtx.fillRect(17, 7, 1, 1);
+    ptCtx.fillRect(15, 10, 6, 5); // Body
+    ptCtx.fillRect(19, 8, 4, 4);  // Head
+    ptCtx.fillStyle = '#ff7700';  // Beak
+    ptCtx.fillRect(23, 9, 2, 2);
+    ptCtx.fillStyle = '#111111';  // Eye
+    ptCtx.fillRect(20, 8, 1, 1);
 
+    // Duckling 2 (Middle)
     ptCtx.fillStyle = '#ffd13b';
-    ptCtx.fillRect(7, 14, 4, 4);   // Duckling 2 body
-    ptCtx.fillRect(6, 13, 3, 3);   // Duckling 2 head
+    ptCtx.fillRect(9, 18, 5, 5);  // Body
+    ptCtx.fillRect(7, 16, 4, 4);  // Head
     ptCtx.fillStyle = '#ff7700';
-    ptCtx.fillRect(4, 14, 2, 1);
+    ptCtx.fillRect(5, 17, 2, 2);
     ptCtx.fillStyle = '#111111';
-    ptCtx.fillRect(7, 13, 1, 1);
+    ptCtx.fillRect(8, 16, 1, 1);
 
-    // Flowers (Water lilies and pink/white blossoms)
-    ptCtx.fillStyle = '#ff88aa';   // Pink water lily
-    ptCtx.fillRect(6, 8, 3, 3);
+    // Flowers (Pink water lilies & white blossoms)
+    ptCtx.fillStyle = '#ff88aa';  // Pink water lily
+    ptCtx.fillRect(8, 10, 4, 4);
     ptCtx.fillStyle = '#ffffff';
-    ptCtx.fillRect(7, 9, 1, 1);
+    ptCtx.fillRect(9, 11, 2, 2);
 
-    ptCtx.fillStyle = '#ffffff';   // White flower
-    ptCtx.fillRect(15, 17, 3, 3);
-    ptCtx.fillStyle = '#ffd700';   // Yellow blossom center
-    ptCtx.fillRect(16, 18, 1, 1);
+    ptCtx.fillStyle = '#ffffff';  // White flower
+    ptCtx.fillRect(17, 24, 4, 4);
+    ptCtx.fillStyle = '#ffd700';  // Yellow center
+    ptCtx.fillRect(18, 25, 2, 2);
 
-    // RIGHT HALF OF TABLE: Clutter, blue cups, and pens
+    // --- BOTTOM HALF OF TABLE: CLUTTER, BLUE CUPS & PENS ---
     // Tall blue plastic cup (Photo 1)
     ptCtx.fillStyle = '#1b56a3';
-    ptCtx.fillRect(35, 6, 6, 9);
+    ptCtx.fillRect(10, 46, 8, 12);
     ptCtx.fillStyle = '#3a79d0';
-    ptCtx.fillRect(36, 7, 4, 3);
+    ptCtx.fillRect(11, 47, 6, 3);
 
     // Second blue cup
     ptCtx.fillStyle = '#1b56a3';
-    ptCtx.fillRect(37, 18, 5, 7);
+    ptCtx.fillRect(12, 64, 7, 10);
+    ptCtx.fillStyle = '#3a79d0';
+    ptCtx.fillRect(13, 65, 5, 2);
 
-    // Colored pens lying on table
-    ptCtx.fillStyle = '#111111';   // Black pen
-    ptCtx.fillRect(26, 11, 7, 2);
-    ptCtx.fillStyle = '#d9333f';   // Red pen
-    ptCtx.fillRect(27, 16, 7, 2);
+    // Pens and pencils lying on table
+    ptCtx.fillStyle = '#111111';  // Black pen
+    ptCtx.fillRect(21, 50, 2, 14);
+    ptCtx.fillStyle = '#d9333f';  // Red pen
+    ptCtx.fillRect(6, 56, 2, 12);
     this.env.puzzleTable = puzzleTable;
 
     // 6. Kitchen Stove with Warm Oven & Microwave on top (36x48)
@@ -870,20 +885,61 @@ class SpriteManager {
     cfCtx.fillRect(33, 11, 4, 1); // spoon handle
     this.env.coffeeTable = coffeeTable;
 
-    // 10. Heavy Punching Bag (16x36)
-    const { canvas: punchBag, ctx: pbCtx } = this.createCanvas(16, 36);
-    // Chain mount
+    // 10. Freestanding Punching Bag Contraption with Sandbag Legs (40x60)
+    const { canvas: punchBag, ctx: pbCtx } = this.createCanvas(40, 60);
+    // Heavy tubular steel frame
+    // Upright main pole
+    pbCtx.fillStyle = '#222222';
+    pbCtx.fillRect(6, 6, 4, 48);
+    pbCtx.fillStyle = '#444444';
+    pbCtx.fillRect(8, 6, 2, 48); // metal highlight
+    // Overhead cantilever arched arm
+    pbCtx.fillStyle = '#222222';
+    pbCtx.fillRect(6, 4, 18, 4);
+    pbCtx.fillRect(20, 6, 4, 6);
+    // Steel hanging chain & swivel
     pbCtx.strokeStyle = '#aaaaaa';
-    pbCtx.lineWidth = 1;
+    pbCtx.lineWidth = 1.5;
     pbCtx.beginPath();
-    pbCtx.moveTo(8, 0);
-    pbCtx.lineTo(8, 8);
+    pbCtx.moveTo(22, 10);
+    pbCtx.lineTo(22, 18);
     pbCtx.stroke();
-    // Heavy black bag
-    pbCtx.fillStyle = '#181818';
-    pbCtx.fillRect(3, 8, 10, 24);
-    pbCtx.fillStyle = '#333333';
-    pbCtx.fillRect(5, 8, 2, 24);
+    // Heavy black punching bag
+    pbCtx.fillStyle = '#141414';
+    pbCtx.fillRect(15, 18, 14, 28);
+    pbCtx.fillStyle = '#2a2a2a';
+    pbCtx.fillRect(17, 18, 4, 28); // bag sheen
+    pbCtx.fillStyle = '#d9333f'; // Red reinforced collar strap
+    pbCtx.fillRect(15, 19, 14, 2);
+
+    // --- FREESTANDING BASE CONTRAPTION LEGS ---
+    // Metal support legs extending diagonally on the floor
+    pbCtx.fillStyle = '#1c1c1c';
+    pbCtx.fillRect(2, 52, 12, 4);  // Left support foot
+    pbCtx.fillRect(6, 54, 28, 4);  // Center/right cross brace foot
+    pbCtx.fillRect(28, 52, 10, 4); // Far right stabilizing foot
+
+    // --- HEAVY SANDBAGS RESTING ON BASE LEGS TO KEEP IT UPRIGHT ---
+    // Sandbag 1 (Left leg sandbag)
+    pbCtx.fillStyle = '#c5b382'; // Canvas tan sandbag
+    pbCtx.fillRect(1, 48, 12, 7);
+    pbCtx.fillStyle = '#9e8d5f'; // Sandbag shadow & tied seams
+    pbCtx.fillRect(1, 54, 12, 2);
+    pbCtx.fillRect(0, 50, 2, 3); // tied end knot
+
+    // Sandbag 2 (Right leg sandbag)
+    pbCtx.fillStyle = '#c5b382';
+    pbCtx.fillRect(25, 48, 13, 7);
+    pbCtx.fillStyle = '#9e8d5f';
+    pbCtx.fillRect(25, 54, 13, 2);
+    pbCtx.fillRect(37, 50, 2, 3);
+
+    // Sandbag 3 (Center stack)
+    pbCtx.fillStyle = '#bfa975';
+    pbCtx.fillRect(5, 45, 10, 6);
+    pbCtx.fillStyle = '#8f7e53';
+    pbCtx.fillRect(5, 50, 10, 1);
+
     this.env.punchBag = punchBag;
 
     // 11. Sliding Glass Door (32x48)

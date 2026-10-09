@@ -24,6 +24,15 @@ class InputManager {
       this.keysDown[e.code] = true;
     });
 
+    const triggerAudio = () => {
+      if (window.audioManager) {
+        window.audioManager.ensureAudio();
+      }
+    };
+    window.addEventListener('pointerdown', triggerAudio, { passive: true });
+    window.addEventListener('click', triggerAudio, { passive: true });
+    window.addEventListener('touchstart', triggerAudio, { passive: true });
+
     window.addEventListener('keyup', (e) => {
       this.keysDown[e.code] = false;
     });
@@ -399,8 +408,8 @@ class Game {
   // Punching Bag Interaction Sequence
   triggerPunchingBagInteraction() {
     const promptText = this.hasPunchedBag
-      ? "* A heavy punching bag hanging from the brick wall.\n* Punch it again?"
-      : "* A heavy punching bag hanging from the brick wall.\n* Give it a punch?";
+      ? "* A heavy punching bag on a metal stand, weighed down with sandbags.\n* Punch it again?"
+      : "* A heavy punching bag on its own contraption, weighed down with sandbags.\n* Give it a punch?";
 
     window.dialogueManager.startChoice(promptText, (choice) => {
       if (choice === 'YES') {
@@ -522,6 +531,20 @@ class Game {
     if (this.transitionAlpha > 0) {
       this.ctx.fillStyle = `rgba(0, 0, 0, ${this.transitionAlpha})`;
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    // 7. Audio Autoplay suspended hint
+    if (window.audioManager && window.audioManager.ctx && window.audioManager.ctx.state === 'suspended') {
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      this.ctx.fillRect(110, 8, 420, 26);
+      this.ctx.strokeStyle = '#ffff55';
+      this.ctx.lineWidth = 1;
+      this.ctx.strokeRect(110, 8, 420, 26);
+      this.ctx.fillStyle = '#ffffff';
+      this.ctx.font = '8px "Press Start 2P", monospace';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText('[ Click anywhere or press any key for audio ♫ ]', 320, 24);
+      this.ctx.textAlign = 'left';
     }
   }
 

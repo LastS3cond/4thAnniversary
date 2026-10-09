@@ -14,6 +14,7 @@ class AudioManager {
     this.masterGain = null;
     this.bgmGain = null;
     this.sfxGain = null;
+    this.pendingTrack = null;
   }
 
   init() {
@@ -38,7 +39,17 @@ class AudioManager {
   ensureAudio() {
     if (!this.ctx) this.init();
     if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().then(() => {
+        if (this.pendingTrack) {
+          const track = this.pendingTrack;
+          this.pendingTrack = null;
+          this.playBgm(track);
+        }
+      }).catch(() => {});
+    } else if (this.ctx && this.ctx.state === 'running' && this.pendingTrack) {
+      const track = this.pendingTrack;
+      this.pendingTrack = null;
+      this.playBgm(track);
     }
   }
 
@@ -252,9 +263,14 @@ class AudioManager {
   // --- Background Music Engine ---
 
   playBgm(trackName) {
-    if (this.currentTrack === trackName) return;
+    if (!this.ctx) this.init();
+    if (!this.ctx || this.ctx.state === 'suspended') {
+      this.pendingTrack = trackName;
+      this.currentTrack = trackName;
+      return;
+    }
+    if (this.currentTrack === trackName && this.bgmTimer) return;
     this.stopBgm();
-    this.ensureAudio();
     this.currentTrack = trackName;
     this.bgmStep = 0;
 
@@ -432,3 +448,15 @@ class AudioManager {
 }
 
 window.audioManager = new AudioManager();
+
+// Global unlock on any user gesture
+if (typeof window !== 'undefined') {
+  const unlockAudio = () => {
+    if (window.audioManager) {
+      window.audioManager.ensureAudio();
+    }
+  };
+  ['click', 'pointerdown', 'mousedown', 'keydown', 'touchstart'].forEach(evt => {
+    window.addEventListener(evt, unlockAudio, { passive: true });
+  });
+}
