@@ -58,6 +58,10 @@ class BattleManager {
     this.jaydonBubbleText = "";
     this.jaydonBubbleTimer = 0;
     this.jaydonPortrait = 'neutral';
+
+    // FIGHT impact feedback (shake, surprised 'o' mouth, damage number)
+    this.hitFx = null;
+    this.buttonIcons = null;
   }
 
   startBattle() {
@@ -81,11 +85,20 @@ class BattleManager {
       { name: 'Dress', used: false }
     ];
 
+    this.hitFx = null;
     this.setBattleText("* (Why is he in pajama pants?)");
 
     if (window.audioManager) {
       window.audioManager.playBgm('battle');
     }
+  }
+
+  // Splits a message into pages of at most 4 wrapped lines so text never spills out of the box.
+  paginate(text, maxChars) {
+    const lines = this.wrapText(text, maxChars).split('\n');
+    const pages = [];
+    for (let i = 0; i < lines.length; i += 4) pages.push(lines.slice(i, i + 4).join('\n'));
+    return pages.length ? pages : [''];
   }
 
   wrapText(text, maxChars = 26) {
@@ -122,7 +135,8 @@ class BattleManager {
   }
 
   setMultipleMessages(messages, onDone = null) {
-    this.messageQueue = [...messages];
+    this.messageQueue = [];
+    messages.forEach((m) => this.messageQueue.push(...this.paginate(m, 26)));
     this.battleState = 'MESSAGE';
     this.advanceMessageQueue(onDone);
   }
@@ -145,6 +159,11 @@ class BattleManager {
 
   update(dt, input) {
     if (!this.isActive) return;
+
+    if (this.hitFx) {
+      this.hitFx.t += dt;
+      if (this.hitFx.t > 1500) this.hitFx = null;
+    }
 
     // Typewriter text animation
     if (this.textCharIndex < this.currentText.length) {
@@ -293,6 +312,8 @@ class BattleManager {
         window.audioManager.playSlash();
         setTimeout(() => window.audioManager.playHit(), 200);
       }
+      // 1 damage until he is at 11 HP, then he has "pretended enough" (0 damage)
+      this.hitFx = { t: 0, dmg: this.jaydonHp > 11 ? 1 : 0 };
       this.battleState = 'FIGHT_SLASH';
       this.slashTimer = 0;
     }
@@ -465,7 +486,12 @@ class BattleManager {
   // --- JAYDON'S REACTION TURN ---
   jaydonTurnReaction(text, onDone = null) {
     this.battleState = 'JAYDON_TALK';
-    this.setBattleText(`* Jaydon: "${text}"`, onDone, 22);
+    const pages = this.paginate(`* Jaydon: "${text}"`, 22);
+    const showPage = (i) => {
+      const last = i === pages.length - 1;
+      this.setBattleText(pages[i], last ? onDone : () => showPage(i + 1), 22);
+    };
+    showPage(0);
   }
 
   // --- VICTORY & FINALE TRIGGER ---
@@ -479,173 +505,206 @@ class BattleManager {
   // --- RENDER BATTLE SCREEN ---
   draw(ctx, canvasWidth, canvasHeight) {
     if (!this.isActive) return;
+    const S = window.spriteManager;
 
     // Pitch Black Void Background
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.textAlign = 'left';
 
-    // 1. Draw Jaydon's Large Battle Sprite (Centered top)
-    if (window.spriteManager && window.spriteManager.jaydonBattle) {
-      const bob = Math.sin(Date.now() * 0.003) * 3;
-      const jx = canvasWidth / 2 - 72;
-      const jy = 30 + bob;
-      ctx.drawImage(window.spriteManager.jaydonBattle, jx, jy);
+    // 1. Jaydon's battle sprite (centered top). Gentle bob on the 2x pixel grid.
+    if (S && S.jaydonBattle) {
+      const fx = this.hitFx;
+      const tookHit = fx && fx.dmg > 0 && fx.t < 1400;
+      const sprite = tookHit ? S.jaydonBattleHit : S.jaydonBattle;
+      let shake = 0;
+      if (fx && fx.t > 200 && fx.t < 750) shake = Math.round(Math.sin(fx.t * 0.09) * 4 * (1 - (fx.t - 200) / 550)) * 2;
+      const bob = Math.round(Math.sin(Date.now() * 0.003) * 1.5) * 2;
+      const jx = canvasWidth / 2 - sprite.width / 2 + shake;
+      const jy = 28 + (tookHit ? 0 : bob);
+      ctx.drawImage(sprite, jx, jy);
 
-      // Render attack slash animation if fighting
+      // Slash animation
       if (this.battleState === 'FIGHT_SLASH') {
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 4;
+        const k = Math.min(1, this.slashTimer / 220);
+        ctx.strokeStyle = '#ff2b2b';
+        ctx.lineWidth = 6;
         ctx.beginPath();
-        ctx.moveTo(jx + 20, jy + 20);
-        ctx.lineTo(jx + 120, jy + 120);
+        ctx.moveTo(jx + 30, jy + 30);
+        ctx.lineTo(jx + 30 + 84 * k, jy + 30 + 84 * k);
         ctx.stroke();
+      }
+
+      // Damage number / MISS
+      if (fx && fx.t > 220 && fx.t < 1300) {
+        const rise = Math.min(1, (fx.t - 220) / 250);
+        const ny = jy + 10 - Math.round(rise * 14);
+        ctx.font = '20px "Press Start 2P", monospace';
+        ctx.textBaseline = 'alphabetic';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#000000';
+        const label = fx.dmg > 0 ? String(fx.dmg) : 'MISS';
+        ctx.fillText(label, canvasWidth / 2 + 2, ny + 2);
+        ctx.fillStyle = fx.dmg > 0 ? '#ff2020' : '#c0c0c0';
+        ctx.fillText(label, canvasWidth / 2, ny);
+        ctx.textAlign = 'left';
       }
     }
 
-    // 2. Main Central Box (Action/Message/Fight Box)
-    const boxX = 40;
-    const boxY = 220;
-    const boxW = 560;
+    // 2. Main central box (action / message / fight box)
+    const boxX = 32;
+    const boxY = 224;
+    const boxW = 576;
     const boxH = 140;
 
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(boxX, boxY, boxW, boxH);
     ctx.fillStyle = '#000000';
-    ctx.fillRect(boxX + 4, boxY + 4, boxW - 8, boxH - 8);
+    ctx.fillRect(boxX + 5, boxY + 5, boxW - 10, boxH - 10);
 
-    // --- CENTRAL BOX CONTENT DEPENDING ON STATE ---
-    if (this.battleState === 'FIGHT_METER') {
-      // Fight target oval
-      ctx.strokeStyle = '#555555';
+    ctx.font = '16px "Press Start 2P", monospace';
+    ctx.textBaseline = 'top';
+
+    if (this.battleState === 'FIGHT_METER' || this.battleState === 'FIGHT_SLASH') {
+      // Undertale-style eye-shaped target
+      const cx = boxX + boxW / 2;
+      const cy = boxY + boxH / 2;
+      ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 3;
-      ctx.strokeRect(boxX + 20, boxY + 20, boxW - 40, boxH - 40);
-
-      // Target center line
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, boxW / 2 - 30, boxH / 2 - 22, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = '#5a5a5a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, boxW / 2 - 110, boxH / 2 - 36, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 70, boxH / 2 - 46, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      // center line
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(boxX + boxW / 2 - 2, boxY + 10, 4, boxH - 20);
-
-      // Moving reticle bar
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(this.fightMeterX, boxY + 10, 10, boxH - 20);
-      ctx.fillStyle = '#ff0000';
-      ctx.fillRect(this.fightMeterX + 3, boxY + 10, 4, boxH - 20);
+      ctx.fillRect(cx - 2, boxY + 14, 4, boxH - 28);
+      // moving bar (flashes once the attack is locked in)
+      const bx = Math.round(this.fightMeterX);
+      const flash = this.battleState === 'FIGHT_SLASH' && Math.floor(this.slashTimer / 60) % 2 === 0;
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(bx - 2, boxY + 10, 16, boxH - 20);
+      ctx.fillStyle = flash ? '#ffff00' : '#ffffff';
+      ctx.fillRect(bx, boxY + 12, 12, boxH - 24);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(bx + 4, boxY + 16, 4, boxH - 32);
 
     } else if (this.battleState === 'SUBMENU_ACT') {
       const acts = ['* Check', '* Flirt', '* Smoke', '* Hug'];
       ctx.fillStyle = '#ffffff';
-      ctx.font = '16px "Press Start 2P", monospace';
       acts.forEach((act, idx) => {
-        const ax = boxX + 60 + (idx % 2) * 260;
-        const ay = boxY + 45 + Math.floor(idx / 2) * 45;
+        const ax = boxX + 70 + (idx % 2) * 260;
+        const ay = boxY + 34 + Math.floor(idx / 2) * 46;
         if (this.actIndex === idx) {
-          ctx.drawImage(window.spriteManager.ui.soul, ax - 30, ay - 14, 16, 16);
+          ctx.drawImage(S.ui.soul, ax - 34, ay, 16, 16);
         }
         ctx.fillText(act, ax, ay);
       });
 
     } else if (this.battleState === 'SUBMENU_ITEM') {
-      ctx.font = '16px "Press Start 2P", monospace';
       this.items.forEach((item, idx) => {
-        const ix = boxX + 60;
-        const iy = boxY + 45 + idx * 45;
+        const ix = boxX + 70;
+        const iy = boxY + 34 + idx * 46;
         ctx.fillStyle = '#ffffff';
         if (this.itemIndex === idx) {
-          ctx.drawImage(window.spriteManager.ui.soul, ix - 30, iy - 14, 16, 16);
+          ctx.drawImage(S.ui.soul, ix - 34, iy, 16, 16);
         }
         ctx.fillText(`* ${item.name}`, ix, iy);
       });
 
     } else if (this.battleState === 'SUBMENU_MERCY') {
-      ctx.font = '16px "Press Start 2P", monospace';
-      // Spare option (yellow only if eligible via Hug!)
-      const spareColor = this.jaydonSparedEligible ? '#ffff00' : '#ffffff';
-      ctx.fillStyle = spareColor;
-      ctx.drawImage(window.spriteManager.ui.soul, boxX + 30, boxY + 65 - 14, 16, 16);
-      ctx.fillText("* Spare", boxX + 60, boxY + 65);
+      // Spare turns yellow only once Jaydon has been hugged
+      ctx.fillStyle = this.jaydonSparedEligible ? '#ffff00' : '#ffffff';
+      ctx.drawImage(S.ui.soul, boxX + 36, boxY + 34, 16, 16);
+      ctx.fillText("* Spare", boxX + 70, boxY + 34);
 
     } else {
-      // Typewriter Battle Flavour Text
+      // Typewriter battle flavour text
       ctx.fillStyle = '#ffffff';
-      ctx.font = '16px "Press Start 2P", monospace';
-      ctx.textBaseline = 'top';
+      let textStartX = boxX + 28;
+      const textStartY = boxY + 26;
 
-      let textStartX = boxX + 25;
-      let textStartY = boxY + 30;
-
-      // Draw portrait if in Jaydon talk
-      if (this.battleState === 'JAYDON_TALK' && window.spriteManager.portraits[this.jaydonPortrait]) {
-        ctx.drawImage(window.spriteManager.portraits[this.jaydonPortrait], boxX + 20, boxY + 25, 75, 75);
-        textStartX += 90;
+      // Portrait while Jaydon talks (exact 2x: 80 x 80)
+      if (this.battleState === 'JAYDON_TALK' && S.portraits[this.jaydonPortrait]) {
+        ctx.drawImage(S.portraits[this.jaydonPortrait], boxX + 18, boxY + 30, 80, 80);
+        textStartX += 88;
       }
 
       const visible = this.currentText.substring(0, this.textCharIndex);
-      const lines = visible.split('\n');
-      lines.forEach((l, idx) => {
+      visible.split('\n').forEach((l, idx) => {
         ctx.fillText(l, textStartX, textStartY + idx * 26);
       });
     }
 
-    // 3. Status Bar: MALLIKA HP 20/20 | JAYDON HP 12/12 (Clean, aligned Undertale layout)
-    const statusY = 380;
+    // 3. Status rows: MALLIKA HP 20/20 | JAYDON HP 12/12 (clean, aligned, no LV)
     ctx.font = '13px "Press Start 2P", monospace';
-    ctx.fillStyle = '#ffffff';
-
-    // Player Status Row
-    ctx.fillText("MALLIKA", 45, statusY);
-    ctx.fillText("HP", 175, statusY);
-
+    ctx.textBaseline = 'middle';
     const hpBarW = 90;
-    const hpBarH = 12;
-    ctx.fillStyle = '#c72228';
-    ctx.fillRect(210, statusY - 11, hpBarW, hpBarH);
-    ctx.fillStyle = '#ffff00';
-    const filledW = (this.mallikaHp / this.mallikaMaxHp) * hpBarW;
-    ctx.fillRect(210, statusY - 11, filledW, hpBarH);
+    const hpBarH = 14;
+    const row = (label, labelColor, hp, max, fill, y) => {
+      ctx.fillStyle = labelColor;
+      ctx.fillText(label, 40, y);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('HP', 178, y);
+      ctx.fillStyle = '#c72228';
+      ctx.fillRect(214, y - hpBarH / 2, hpBarW, hpBarH);
+      ctx.fillStyle = fill;
+      ctx.fillRect(214, y - hpBarH / 2, Math.round((hp / max) * hpBarW), hpBarH);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(`${hp} / ${max}`, 320, y);
+    };
+    row('MALLIKA', '#ffffff', this.mallikaHp, this.mallikaMaxHp, '#ffff00', 384);
+    row('JAYDON', this.jaydonSparedEligible ? '#ffff00' : '#ffffff', this.jaydonHp, this.jaydonMaxHp, '#00ff66', 406);
 
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(`${this.mallikaHp} / ${this.mallikaMaxHp}`, 315, statusY);
-
-    // Opponent Status Row (Symmetrically aligned)
-    ctx.fillText("JAYDON", 45, statusY + 20);
-    ctx.fillText("HP", 175, statusY + 20);
-
-    ctx.fillStyle = '#c72228';
-    ctx.fillRect(210, statusY + 9, hpBarW, hpBarH);
-    ctx.fillStyle = '#00ff66';
-    const jHpW = (this.jaydonHp / this.jaydonMaxHp) * hpBarW;
-    ctx.fillRect(210, statusY + 9, jHpW, hpBarH);
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(`${this.jaydonHp} / ${this.jaydonMaxHp}`, 315, statusY + 20);
-
-    // 4. Four Main Undertale Action Buttons
-    const btnW = 125;
-    const btnH = 42;
-    const btnY = 420;
-    const startX = 40;
-    const gap = 20;
-
+    // 4. Four main Undertale action buttons
+    const icons = this.getButtonIcons();
+    const btnW = 132;
+    const btnH = 44;
+    const btnY = 426;
+    const gap = 16;
+    const startX = 32;
+    ctx.font = '14px "Press Start 2P", monospace';
+    ctx.textBaseline = 'middle';
     for (let i = 0; i < 4; i++) {
       const bx = startX + i * (btnW + gap);
       const isSelected = (this.battleState === 'SELECT_BUTTON' && this.selectedButton === i);
+      const color = isSelected ? '#ffff00' : '#ff7f27';
 
-      // Button Border
-      ctx.fillStyle = isSelected ? '#ff8800' : '#c7621c';
+      ctx.fillStyle = color;
       ctx.fillRect(bx, btnY, btnW, btnH);
       ctx.fillStyle = '#000000';
       ctx.fillRect(bx + 3, btnY + 3, btnW - 6, btnH - 6);
 
-      // Red Heart cursor placed inside selected button
+      // The SOUL replaces the icon on the highlighted button
       if (isSelected) {
-        ctx.drawImage(window.spriteManager.ui.soul, bx + 10, btnY + 13, 16, 16);
+        ctx.drawImage(S.ui.soul, bx + 12, btnY + 14, 16, 16);
+      } else if (icons[i]) {
+        ctx.drawImage(icons[i], bx + 12, btnY + 14, 16, 16);
       }
-
-      // Button Label
-      ctx.fillStyle = isSelected ? '#ffaa00' : '#e66518';
-      ctx.font = '14px "Press Start 2P", monospace';
-      const labelX = isSelected ? bx + 32 : bx + 22;
-      ctx.fillText(this.buttonNames[i], labelX, btnY + 26);
+      ctx.fillStyle = color;
+      ctx.fillText(this.buttonNames[i], bx + 36, btnY + btnH / 2 + 1);
     }
+    ctx.textBaseline = 'top';
+  }
+
+  // Tiny 8x8 Undertale-style button icons (sword, speech, bag, X), drawn at 2x
+  getButtonIcons() {
+    if (this.buttonIcons) return this.buttonIcons;
+    const S = window.spriteManager;
+    const pats = [
+      ['......OO', '.....OOO', '....OOO.', '.O.OOO..', '..OOO...', '..OO....', '.O..O...', 'O.......'],
+      ['.OOOOOO.', 'O......O', 'O.O.O..O', 'O......O', '.OOOOOO.', '..O.....', '.O......', '........'],
+      ['..OOOO..', '.O....O.', 'OOOOOOOO', 'O......O', 'O..OO..O', 'O......O', 'OOOOOOOO', '........'],
+      ['O......O', '.O....O.', '..O..O..', '...OO...', '...OO...', '..O..O..', '.O....O.', 'O......O']
+    ];
+    this.buttonIcons = pats.map((p) => S.scaleCanvas(S.fromPattern(p, { O: '#ff7f27' }), 2));
+    return this.buttonIcons;
   }
 }
 

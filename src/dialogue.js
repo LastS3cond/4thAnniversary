@@ -74,10 +74,23 @@ class DialogueManager {
     this.currentPortrait = portrait;
   }
 
+  // Shows the prompt text, then a [ YES / NO ] choice on the final page.
+  // Long prompts are paginated so the question itself is never cut off: everything
+  // before the last line-break is shown as normal pages, the question gets the choice.
   startChoice(text, onChoice, portrait = null) {
     const maxChars = portrait ? 24 : 36;
-    const choicePages = this.wrapAndPaginate(text, maxChars, 2);
-    this.pages = [choicePages[0] || text];
+    const segments = text.split('\n');
+    const allLines = this.wrapAndPaginate(text, maxChars, 99)[0].split('\n');
+    let pages;
+    if (allLines.length <= 3) {
+      pages = [allLines.join('\n')];
+    } else {
+      const question = segments.pop();
+      const lead = segments.join('\n');
+      pages = this.wrapAndPaginate(lead, maxChars, 4);
+      pages.push(this.wrapAndPaginate(question, maxChars, 2)[0]);
+    }
+    this.pages = pages;
     this.currentPageIndex = 0;
     this.charIndex = 0;
     this.charTimer = 0;
@@ -85,7 +98,12 @@ class DialogueManager {
     this.isChoiceActive = true;
     this.choiceIndex = 0; // default YES
     this.onChoiceCallback = onChoice;
+    this.onCompleteCallback = null;
     this.currentPortrait = portrait;
+  }
+
+  isOnChoicePage() {
+    return this.isChoiceActive && this.currentPageIndex === this.pages.length - 1;
   }
 
   update(dt, input) {
@@ -110,7 +128,7 @@ class DialogueManager {
     }
 
     // Choice navigation (Left / Right)
-    if (this.isChoiceActive && isFinishedTyping) {
+    if (this.isOnChoicePage() && isFinishedTyping) {
       if (input.wasPressed('ArrowLeft') || input.wasPressed('KeyA')) {
         if (this.choiceIndex !== 0) {
           this.choiceIndex = 0;
@@ -137,8 +155,8 @@ class DialogueManager {
       }
     }
 
-    // Advance dialogue
-    if (!this.isChoiceActive) {
+    // Advance dialogue (choice prompts advance through their lead-in pages first)
+    if (!this.isOnChoicePage()) {
       if (input.wasPressed('KeyZ') || input.wasPressed('Enter')) {
         if (!isFinishedTyping) {
           // Instantly reveal rest of text on press
@@ -163,11 +181,14 @@ class DialogueManager {
   draw(ctx, canvasWidth, canvasHeight) {
     if (!this.isActive) return;
 
-    // Classic Undertale Dialogue Box (bottom of screen)
+    // Classic Undertale Dialogue Box: bottom of the screen, or the top when
+    // Mallika is standing in the lower half (so the box never covers her).
     const boxX = 32;
-    const boxY = canvasHeight - 140;
     const boxW = canvasWidth - 64;
     const boxH = 120;
+    const player = window.game && window.game.player;
+    const atTop = player && window.game.state !== 'BATTLE' && (player.y + 30) > canvasHeight / 2 + 20;
+    const boxY = atTop ? 20 : canvasHeight - 140;
 
     // Outer white border, black interior
     ctx.fillStyle = '#ffffff';
@@ -194,6 +215,7 @@ class DialogueManager {
     ctx.fillStyle = '#ffffff';
     ctx.font = '14px "Press Start 2P", monospace';
     ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
 
     const lines = visibleText.split('\n');
     lines.forEach((line, idx) => {
@@ -201,7 +223,7 @@ class DialogueManager {
     });
 
     // Render Choice buttons if active & finished typing
-    if (this.isChoiceActive && this.charIndex >= fullText.length) {
+    if (this.isOnChoicePage() && this.charIndex >= fullText.length) {
       const choiceY = boxY + boxH - 32;
       const yesX = boxX + boxW / 2 - 80;
       const noX = boxX + boxW / 2 + 50;

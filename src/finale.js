@@ -65,16 +65,14 @@ class FinaleManager {
       window.audioManager.playSaveDing();
     }
 
-    // Initialize gentle star sparkle motes
-    for (let i = 0; i < 25; i++) {
+    // Initialize sparkles that slowly orbit the Save Star
+    for (let i = 0; i < 18; i++) {
       this.particles.push({
-        x: 320 + (Math.random() - 0.5) * 60,
-        y: 180 + (Math.random() - 0.5) * 60,
-        vx: (Math.random() - 0.5) * 0.8,
-        vy: (Math.random() - 0.5) * 0.8,
-        life: Math.random() * 2000,
-        maxLife: 2000 + Math.random() * 2000,
-        size: Math.random() * 3 + 1
+        angle: (i / 18) * Math.PI * 2,
+        radius: 46 + (i % 3) * 18 + Math.random() * 8,
+        speed: 0.35 + (i % 4) * 0.08,
+        phase: Math.random() * Math.PI * 2,
+        size: i % 3 === 0 ? 4 : 2
       });
     }
   }
@@ -87,23 +85,13 @@ class FinaleManager {
       this.fadeAlpha = Math.max(0, this.fadeAlpha - dt * 0.001);
     }
 
-    // Save Star pulsing animation
+    // Save Star pulsing animation (drives the halo + twinkle)
     const time = Date.now() * 0.0025;
     this.starScale = 1.0 + Math.sin(time) * 0.2;
-    this.starAngle += dt * 0.0008;
 
-    // Update sparkle particles
+    // Rotate the sparkle ring around the star
     this.particles.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life += dt;
-      if (p.life > p.maxLife) {
-        p.x = 320 + (Math.random() - 0.5) * 40;
-        p.y = 180 + (Math.random() - 0.5) * 40;
-        p.vx = (Math.random() - 0.5) * 0.8;
-        p.vy = (Math.random() - 0.5) * 0.8;
-        p.life = 0;
-      }
+      p.angle += p.speed * dt * 0.001;
     });
 
     // Advance monologue text
@@ -153,32 +141,39 @@ class FinaleManager {
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    // Golden halo glow around Save Star
-    const glowGradient = ctx.createRadialGradient(320, 180, 5, 320, 180, 100);
-    glowGradient.addColorStop(0, 'rgba(255, 255, 100, 0.4)');
+    // Golden halo glow around Save Star (pulses with the star)
+    const halo = 90 + (this.starScale - 1) * 60;
+    const glowGradient = ctx.createRadialGradient(320, 180, 5, 320, 180, halo);
+    glowGradient.addColorStop(0, 'rgba(255, 255, 100, 0.42)');
     glowGradient.addColorStop(0.5, 'rgba(255, 220, 50, 0.15)');
     glowGradient.addColorStop(1, 'rgba(255, 220, 50, 0)');
     ctx.fillStyle = glowGradient;
     ctx.beginPath();
-    ctx.arc(320, 180, 100, 0, Math.PI * 2);
+    ctx.arc(320, 180, halo, 0, Math.PI * 2);
     ctx.fill();
 
-    // Golden sparkle particles
+    // Golden sparkles orbiting the star (snapped to the 2x pixel grid)
+    const now = Date.now() * 0.004;
     this.particles.forEach(p => {
-      const alpha = 1.0 - (p.life / p.maxLife);
-      ctx.fillStyle = `rgba(255, 255, 180, ${alpha})`;
-      ctx.fillRect(p.x, p.y, p.size, p.size);
+      const px = Math.round((320 + Math.cos(p.angle) * p.radius) / 2) * 2;
+      const py = Math.round((180 + Math.sin(p.angle) * p.radius * 0.8) / 2) * 2;
+      const alpha = 0.35 + (Math.sin(now + p.phase) + 1) * 0.3;
+      ctx.fillStyle = `rgba(255, 250, 190, ${alpha.toFixed(2)})`;
+      ctx.fillRect(px, py, p.size, p.size);
+      if (p.size > 2) {
+        ctx.fillRect(px - 2, py + 1, 2, 2);
+        ctx.fillRect(px + 4, py + 1, 2, 2);
+        ctx.fillRect(px + 1, py - 2, 2, 2);
+        ctx.fillRect(px + 1, py + 4, 2, 2);
+      }
     });
 
-    // Pulsing, rotating Yellow Save Star
+    // Crisp pulsing Yellow Save Star (integer scale keeps the pixels clean)
     if (window.spriteManager && window.spriteManager.ui.saveStar) {
-      ctx.save();
-      ctx.translate(320, 180);
-      ctx.scale(this.starScale * 2.5, this.starScale * 2.5);
-      // Subtle gentle rotation
-      ctx.rotate(this.starAngle);
-      ctx.drawImage(window.spriteManager.ui.saveStar, -8, -8);
-      ctx.restore();
+      const star = window.spriteManager.ui.saveStar;
+      const scale = this.starScale > 1.12 ? 5 : 4;
+      const size = 16 * scale;
+      ctx.drawImage(star, 320 - size / 2, 180 - size / 2, size, size);
     }
 
     // Monologue Dialogue Box
@@ -195,6 +190,7 @@ class FinaleManager {
     ctx.font = '14px "Press Start 2P", monospace';
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
 
     const textToShow = this.isDone
       ? this.monologue[this.monologue.length - 1]
@@ -215,7 +211,9 @@ class FinaleManager {
       const restAlpha = 0.5 + Math.sin(Date.now() * 0.003) * 0.5;
       ctx.fillStyle = `rgba(255, 255, 255, ${restAlpha})`;
       ctx.font = '10px "Press Start 2P", monospace';
-      ctx.fillText("♥ Always & Forever ♥", boxX + boxW / 2 - 95, boxY + boxH - 25);
+      ctx.textAlign = 'center';
+      ctx.fillText("♥ Always & Forever ♥", boxX + boxW / 2, boxY + boxH - 25);
+      ctx.textAlign = 'left';
     }
 
     // Screen Fade Overlay
