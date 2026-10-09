@@ -5,91 +5,104 @@ This document tracks learned preferences, design rules, and behavioral guideline
 ---
 
 ## 🎨 Visual & Aesthetic Design
+
 1. **Undertale Authenticity**: Strictly follow Toby Fox's *Undertale* visual language:
-   - 4:3 CRT letterboxing (native 640×480 canvas).
-   - Crisp pixel art with `imageSmoothingEnabled = false`.
-   - Classic fonts: `"Press Start 2P"`, `"8bitoperator JVE"`, monospace fallbacks.
-   - Distinct high-contrast UI borders (white border `#ffffff`, black fill `#000000`).
-2. **Townhouse Proportions & Scale**:
-   - Keep spaces authentic, compact, and cozy—avoid oversized rooms, gigantic staircases, or overly wide hallways.
-   - Hallways should be narrow corridors (matching stair width, ~70px wide), not cavernous rooms.
-   - Staircases should be compact U-shaped switchbacks (180° turns at an intermediate landing).
-3. **Clutter & Composition**:
-   - Avoid visual clutter on appliances and counters (e.g., remove countertop microwave if it clutters the stove).
-   - High-contrast separation: Never allow doors, furniture, or props to merge visually with adjacent walls. Always use distinct casing, baseboards, or drop shadows.
-   - Top-down perspective consistency: Objects against south walls face north into the room (e.g., sink basin in front, window and backsplash against the wall).
+   - 4:3 CRT letterboxing (native $640 \times 480$ canvas).
+   - Crisp nearest-neighbor pixel art (`ctx.imageSmoothingEnabled = false`).
+   - Authentic retro fonts: `"Press Start 2P"`, monospace fallbacks.
+   - High-contrast UI borders (crisp white `#ffffff` border, black `#000000` fill).
+2. **Startup & Audio Policy**:
+   - Provide an Undertale **`[ ♥ PLAY? ]`** start screen on boot so browser Web Audio API unlocks cleanly on the player's first gesture without autoplay warnings.
+3. **The Void & Boundary Integrity**:
+   - Prefer a pitch-black void (`#000000`) for exterior bounds and removed utility areas (e.g. washer/dryer corner).
+   - Strict colliders must prevent the player from walking onto walls, windows, or off-screen.
+4. **Townhouse Architecture & True Scale**:
+   - **Proportions**: Half-and-half split—the Living Room occupies the left half ($x = 40..325$) and the Kitchen occupies the right half ($x = 325..600$).
+   - **Center Divider Box**: Moved DOWN to be at par with the bathroom box ($y = 200..365$).
+   - **Corridors**: Hallways and staircases should be narrow corridors (~80px wide), not cavernous rooms.
+   - **Walking Clearances**: Maintain clear walking corridors between furniture (e.g., between the couch and TV stand).
+5. **Exterior Facade & Fall Theme**:
+   - **Season**: Fall emulation with autumn leaves drifting across the sky and an autumn-toned lawn.
+   - **Brickwork**: Protruding stairwell bay is 100% full brick. The front door is completely framed in brick.
+   - **White Siding**: Sits strictly directly above the front door, spanning 3 door widths wide (~138px).
+6. **Decluttering & Perspective**:
+   - Kitchen sink is rotated 180° (faucet south pointing into basin) with exterior window removed.
+   - Kitchen stove is rotated 90° (backguard east, oven door west). Countertop microwave is removed to eliminate visual clutter.
+   - Remove unnecessary text labels in the overworld (e.g., remove `[WALL]` label, remove `TURN 180° ►` prompt).
+   - Remove suitcases prop graphic from the second-floor hallway.
 
 ---
 
 ## 🕹️ Gameplay & Interaction Mechanics
+
 1. **Active Choices over Passive Text**:
    - Whenever an observation involves a possible action, turn it into an interactive Undertale choice box `[ YES / NO ]`:
-     - Punching bag: Prompt `Give it a punch?` -> Only punch/play SFX if selected YES.
-     - Dirty dishes in the sink: Prompt `Clean them?` -> Selecting YES gives `There are too many.`
-2. **Smooth Traversal & Ergonomics**:
-   - Every fixture and counter must be easily reachable by the player without narrow choke points blocking movement.
-   - Ensure open walking clearance in front of all cabinets, pantry, sink, and dishwasher.
-   - Staircase navigation must feel natural (e.g., switchback U-shape walking down to the landing, turning 180°, and walking up to the next floor).
-3. **Transition Protection**:
-   - Never allow spawn coordinates to overlap with doorway exit trigger boxes.
-   - Maintain an active `doorCooldown` buffer (800ms) upon room transitions to prevent instant bounce-backs.
-
----
-
-## 📐 Townhouse Architecture (True-to-Life Layout)
-1. **First Floor**:
-   - Foyer / Bottom-left: Coat closet in the corner, shoe rack leaning against the vertical bathroom wall, front door on south wall.
-   - Hallway: Bathroom on the left, storage closet on the right (on the central divider wall).
-   - Kitchen: Stairs immediately right of hallway/foyer; south wall has Pantry, Cabinets, Sink (with crooked blinds window behind), Dishwasher, Cabinets. East wall has Refrigerator, Counter, Stove/Oven.
-   - Living Room: Center red L-couch facing south towards TV; TV stand on south side facing north towards couch; coffee table inside the L with strewn papers, notebook, bowl; vertical folding table with duckling puzzle against east wall; freestanding punching bag with sandbag legs in west brick corner.
-2. **Staircase**:
-   - U-shaped switchback stairwell.
-   - Enter near top of Flight 1, walk down to intermediate landing with window, turn 180°, walk up Flight 2 to the second floor.
-3. **Second Floor**:
-   - Narrow hallway directly connected to the stairs.
-   - Walking south to north:
-     - 1st pair: Bathroom on LEFT, Alex's door on RIGHT (opposite).
-     - 2nd pair: Storage closet (suitcases) on LEFT, Solid Wall on RIGHT (opposite).
-     - 3rd pair (end): Kevin's door on LEFT, Jaydon's door on RIGHT (opposite, Boss Trigger).
+     - Punching bag: Prompt `Give it a punch?` -> Only punch/play hit SFX if YES. Grants +1 ATK bonus.
+     - Dirty dishes in the sink: Prompt `Clean them?` -> `* There are too many.`
+     - Jaydon's door: Prompt `Knock on Jaydon's door?` -> Initiates encounter on YES.
+2. **Ergonomic Traversal & Colliders**:
+   - Maintain active `doorCooldown` buffer (800ms) upon room transitions to prevent instant bounce-backs.
+   - Staircase intermediate landing window must have a solid collider preventing walking onto the glass.
+3. **Typewriter Text Wrapping & Pagination**:
+   - Monospace font at 14px–16px requires strict character wrapping limits:
+     - Overworld dialogue: $\le 36$ characters without portrait, $\le 24$ characters with portrait (up to 4 lines per page).
+     - Combat text box: $\le 26$ characters without portrait, $\le 22$ characters with portrait.
+     - Finale monologue: $\le 28$ characters.
+   - Avoid hanging single-word lines or premature pagination splits.
 
 ---
 
 ## 🧍 Character Sprites & Staging
+
 1. **Jaydon (Overworld & Battle)**:
-   - **Barefoot Indoors**: Wears cozy red plaid pajama pants and a heather grey crewneck, completely barefoot (no socks/shoes).
-   - **Hair Length**: Curly dark brown hair neatly frames temples/crown and terminates at ear level—never cascade curls down past the chin or shoulders.
-   - **Hallway Staging**: When Jaydon steps out of his bedroom into the narrow 2nd-floor hallway, he stands to the side of Mallika rather than directly behind her.
-   - **Battle Sprite Proportions**: Longer torso, bright clear blue eyes visible behind rectangular glasses, and a smaller subtle smile (never overly wide lips).
-   - **Fight Reaction Expression**: When struck in battle, Jaydon has an expressive surprised look with a clean circular 'o' mouth (not a goofy or silly grin).
+   - **Barefoot Indoors**: Wears cozy red-and-black plaid pajama pants and heather grey long-sleeve shirt, completely barefoot (no shoes, no socks).
+   - **Hair Length**: Curly dark brown hair styled neatly around his ears (terminates at ear level; no long chin/shoulder curls).
+   - **Hallway Staging**: When Jaydon steps out into the second-floor hallway, he stands to the side of Mallika rather than behind her.
+   - **Battle Sprite Proportions**: Longer torso, clear bright sky-blue eyes with white sparkle highlights (zero black fill in eyes), soft grey rectangular glasses frames, and subtle smaller lips.
+   - **Arms & Pose**: Distinct long-sleeved arms and hands resting at his sides.
+   - **Fight Reaction Expression**: When struck in combat, his mouth changes to an expressive, clean circular 'o' / surprised look (not a goofy or silly grin).
 2. **Mallika (Protagonist)**:
-   - Denim overalls layered over an olive tube top, barefoot/white socks, natural gait without outward leg sprawling.
+   - Authentic blocky Undertale silhouette.
+   - Denim overalls layered over an olive tube top (tube top underneath), barefoot or white socks indoors.
+   - Straight-forward walking gait—legs do not splay or sprawl outwards.
 
 ---
 
 ## ⚔️ Battle System & Dialogue Flow
-1. **ACT 2x2 Grid Navigation**:
-   - The ACT submenu is rendered as a 2×2 grid (`Check`, `Flirt`, `Smoke`, `Hug`).
-   - Must support intuitive 2D grid navigation: `A`/`D` and `Left`/`Right` switch columns, while `W`/`S` and `Up`/`Down` switch rows.
-2. **Strict Text Wrapping Limits**:
-   - Battle Box (560px wide): Monospace characters at 16px require dynamic wrap limits:
-     - Without portrait: wrap at $\le 26$ characters.
-     - With portrait (75px offset): wrap at $\le 22$ characters.
-   - Finale Monologue Box: Wrap at $\le 28$ characters at 14px font to prevent text bleeding off the screen.
-3. **MERCY & Spared Condition**:
-   - The MERCY menu contains strictly `* Spare` (no instant victory `Date` button).
-   - `* Spare` ONLY turns yellow after giving Jaydon a `Hug`. No other sequence unlocks mercy.
-4. **Dialogue & Flavour Text Nuances**:
+
+1. **Status Bar Layout**:
+   - Remove `LV 1` from the combat status bar for a clean Undertale aesthetic.
+   - Cleanly align player and opponent rows (MALLIKA HP 20/20, JAYDON HP 12/12).
+2. **FIGHT Damage Capping (Max 1 Damage)**:
+   - Jaydon starts at 12 HP.
+   - An attack lowers him to 11 HP (dealing 1 damage).
+   - At 11 HP, attacks deal 0 damage and display: `* Jaydon has pretended enough.`
+   - Ensures the maximum damage Jaydon can ever take throughout the game is exactly 1.
+3. **ACT Submenu Nuances**:
    - **Check**: Jaydon asks `"Do you like it so far?"`.
-   - **Flirt**: Narration notes Jaydon looks back into his bedroom before refocusing on Mallika (`"Whoa... hey there..."`).
-   - **Smoke**: Jaydon coughs and asks if she wants water (`"*cough cough* Do you want some water?"`).
-   - **Hug**: Adapts the warm and steady feeling of their embrace.
-   - **Sticky Toffee Pudding**: Jaydon asks `"Is it as good as the one you made?"`, prompting response `* You let him down easy.`, then cleanly returning to the menu.
-   - **Item Names**: Always capitalize "Dress" (never lowercase "dress").
+   - **Flirt**: Narration notes Jaydon looks back into his bedroom before refocusing on Mallika. Subsequent flirts rotate across 4 distinct responses:
+     1. `"Whoa..."` *(strictly without "hey there")*
+     2. `"Focus, Focus, FOCUS"`
+     3. `"That's not allowed"`
+     4. `"HEY, what are you trying to do here?"`
+   - **Smoke**: Max 2 uses! Deals 5 damage to Mallika and lowers defense (Jaydon takes 0 damage). On 3rd use onward: denied with `* (We are out of joints!)`.
+   - **Hug**: Captures the warm and steady feeling of their embrace. **Only this unlocks yellow Spare**.
+4. **ITEM Submenu**:
+   - **Sticky Toffee Pudding**: Heals to max HP. Jaydon asks `"Is it as good as the one you made?"`, answered by `* You let him down easy.`, then cleanly returning to menu.
+   - **Dress**: Capitalized ("Dress"). Jaydon says `"You're going to look absolutely stunning in it."`
+5. **MERCY System**:
+   - `* Spare` only turns yellow after giving Jaydon a Hug.
+   - Win narration: `* But you gained something more precious.` *(removed "infinitely")*.
 
 ---
 
 ## 💻 Codebase Standards
+
 - **Zero External Dependencies**: Pure vanilla HTML5, Canvas 2D, and Web Audio API.
-- **Audio Autoplay**: Always support instant audio unlock across mouse clicks, touches, and key presses with helpful on-screen cues if suspended.
-- **Documentation**: Keep `README.md` completely up to date with full specifications, room catalogs, and floor plans.
-- **Preferences**: Maintain `preferences.md` continuously as new design feedback is received.
+- **Handoff Documentation**:
+  - `scene.md`: Master specification for character sprite and scene redesigns.
+  - `interactions.md`: Master catalog of all dialogues and overworld/combat mechanics.
+  - `README.md`: Concise high-level project summary linking to both.
+  - `preferences.md`: Continuous record of design rules.
+
+---

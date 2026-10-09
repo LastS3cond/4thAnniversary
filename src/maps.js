@@ -13,187 +13,217 @@ class MapManager {
     // ----------------------------------------------------
     // ROOM 1: EXTERIOR & TOWNHOUSE ENTRYWAY
     // ----------------------------------------------------
+    // ----------------------------------------------------
+    // ROOM 1: TOWNHOUSE EXTERIOR (FALL EMULATION, THINNER ALLEY)
+    // - Width cut by 1/4 on left and right (playable width x: 160..480, 320px)
+    // - Fall emulation: falling autumn leaves in sky/yard, autumn grass lawn
+    // - Facade: 100% full brick around door & stairwell bay, white siding strictly above door
+    // ----------------------------------------------------
     this.rooms['exterior'] = {
       name: 'exterior',
       bgm: 'snowy',
       width: 640,
       height: 480,
-      spawn: { x: 300, y: 380, dir: 'up' },
+      spawn: { x: 310, y: 380, dir: 'up' },
       colliders: [
-        // Exterior brick wall with doorway opening at x: 290-345
-        { x: 0, y: 0, w: 290, h: 220 },
-        { x: 345, y: 0, w: 295, h: 220 },
-        // Protruding stairwell bay feature on right (Photo 3)
-        { x: 345, y: 200, w: 110, h: 35 },
-        // Screen bounds
-        { x: 0, y: 0, w: 60, h: 480 },
-        { x: 580, y: 0, w: 60, h: 480 },
-        { x: 0, y: 440, w: 640, h: 40 }
+        // Thinned boundaries: Cut out first 1/4 (0..160) and last 1/4 (480..640)
+        { x: 0, y: 0, w: 160, h: 480 },   // Left void boundary
+        { x: 480, y: 0, w: 160, h: 480 }, // Right void boundary
+
+        // North townhouse building wall with doorway opening at x: 296..342
+        { x: 160, y: 0, w: 136, h: 220 }, // Left facade
+        { x: 342, y: 0, w: 138, h: 220 }, // Right stairwell bay facade (Full brick!)
+        // Bottom screen boundary
+        { x: 160, y: 440, w: 320, h: 40 }
       ],
       interactables: [
         {
-          x: 290, y: 195, w: 55, h: 30,
+          x: 296, y: 195, w: 46, h: 30,
           isDoor: true,
-          onEnter: () => { window.game.transitionToRoom('first_floor', 155, 375, 'up'); },
-          text: ["* Townhouse 316.", "* You step inside to get out of the cold."]
+          onEnter: () => { window.game.transitionToRoom('first_floor', 175, 380, 'up'); },
+          text: ["* Townhouse 316.", "* You step inside the warm townhouse."]
         },
         {
-          x: 250, y: 155, w: 45, h: 35,
+          x: 260, y: 165, w: 34, h: 25,
           text: ["* The numbers '316' shine against the dark red brick."]
         },
         {
-          x: 350, y: 170, w: 100, h: 60,
-          text: ["* The brick stairwell bay extends outward from the townhouse facade."]
+          x: 348, y: 160, w: 110, h: 60,
+          text: ["* The full-brick stairwell bay extends outward from the facade."]
         },
         {
-          x: 100, y: 300, w: 60, h: 60,
-          text: ["* A clean, quiet blanket of white snow under the dark sky."]
+          x: 170, y: 300, w: 70, h: 70,
+          text: ["* A patch of autumn grass with fallen amber leaves."]
         },
         {
-          x: 480, y: 300, w: 60, h: 60,
-          text: ["* Soft footprints lead up to the front door."]
+          x: 400, y: 300, w: 70, h: 70,
+          text: ["* Golden and crimson leaves rustle softly on the lawn."]
         }
       ],
       draw: (ctx) => {
-        // Dark winter sky
-        ctx.fillStyle = '#0a0d18';
+        // Deep black void outside the alley bounds (0..160 and 480..640)
+        ctx.fillStyle = '#000000';
         ctx.fillRect(0, 0, 640, 480);
 
-        // Falling snowflakes in SKY ONLY (y: 0 to 60) - Snow does NOT fall over the brick building!
-        ctx.fillStyle = '#ffffff';
-        const t = Date.now() * 0.001;
-        for (let i = 0; i < 20; i++) {
-          const sx = ((i * 37) + t * 15) % 640;
-          const sy = ((i * 23) + t * 20) % 60;
-          ctx.fillRect(sx, sy, 2, 2);
-        }
+        // Autumn dusk sky over the alley (x: 160..480, y: 0..60)
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(160, 0, 320, 60);
 
-        // Townhouse Dark Red Brick Facade (Solid wall)
+        // Townhouse Dark Red Brick Facade (Left and around doorway: x: 160..348)
         const brick = window.spriteManager.env.brickWall;
-        for (let x = 60; x < 580; x += 32) {
+        for (let x = 160; x < 348; x += 32) {
           for (let y = 60; y < 220; y += 32) {
             ctx.drawImage(brick, x, y);
           }
         }
 
-        // Roofline trim & Beige Siding above awning (Photo 3)
-        ctx.fillStyle = '#d4ccbd';
-        ctx.fillRect(50, 40, 540, 16);
-        ctx.strokeStyle = '#b0a696';
+        // --- WHITE SECTION: STRICTLY ABOVE THE DOOR (3 door widths wide: 138px, x: 250..388, y: 60..130) ---
+        ctx.fillStyle = '#f1ede4'; // Crisp white architectural siding
+        ctx.fillRect(250, 60, 138, 70);
+        // Horizontal white lap siding shadow lines
+        ctx.strokeStyle = '#d6cfc0';
         ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(50, 48); ctx.lineTo(590, 48);
-        ctx.stroke();
+        for (let sy = 68; sy < 130; sy += 10) {
+          ctx.beginPath();
+          ctx.moveTo(250, sy); ctx.lineTo(388, sy);
+          ctx.stroke();
+        }
+        // White trim border around the white facade
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(248, 58, 142, 3);
+        ctx.fillRect(248, 128, 142, 3);
+        ctx.fillRect(248, 58, 3, 73);
+        ctx.fillRect(387, 58, 3, 73);
 
-        // Shingled Awning Overhang (Photo 3)
+        // Roofline trim & shingled awning across the top
         ctx.fillStyle = '#4a3728';
-        ctx.fillRect(50, 56, 540, 10);
+        ctx.fillRect(160, 52, 320, 10);
 
-        // Recessed Dark Front Doorway (Photo 3)
-        // High-contrast framing cleanly separated from wall
+        // --- 100% FULL BRICK AROUND THE DOORWAY (y: 130..220) ---
+        for (let x = 248; x < 348; x += 32) {
+          for (let y = 130; y < 220; y += 32) {
+            ctx.drawImage(brick, x, y);
+          }
+        }
+
+        // --- RECESSED DARK FRONT DOORWAY (x: 296..342, y: 155..220) ---
+        // Clean brick door frame - NO white part inside!
         ctx.fillStyle = '#110b0a';
         ctx.fillRect(296, 155, 46, 65);
         ctx.strokeStyle = '#1a0d0a';
         ctx.lineWidth = 3;
         ctx.strokeRect(296, 155, 46, 65);
 
-        // Inside the open doorway (Photo 3):
-        // Right side: interior foyer white wall visible inside
-        ctx.fillStyle = '#f5f0e6';
-        ctx.fillRect(314, 158, 26, 60);
-        // White closet louver door visible inside on right
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(322, 162, 16, 54);
-        ctx.strokeStyle = '#d6cdbd';
-        ctx.lineWidth = 1;
-        for (let ly = 168; ly < 212; ly += 5) {
-          ctx.beginPath(); ctx.moveTo(324, ly); ctx.lineTo(336, ly); ctx.stroke();
-        }
+        // Dark open doorway interior
+        ctx.fillStyle = '#1a1210';
+        ctx.fillRect(298, 158, 42, 60);
 
-        // Left side: Dark front door opened inward (Photo 3)
-        // Distinct dark wood door panel swung open to the left with silver hinges
+        // Mahogany front door opened inward to the left
         ctx.fillStyle = '#26150e';
-        ctx.fillRect(298, 158, 16, 60);
-        ctx.fillStyle = '#180d09';
-        ctx.fillRect(299, 160, 13, 56);
-        ctx.fillStyle = '#d0d0d0';
-        ctx.fillRect(297, 164, 2, 4);
-        ctx.fillRect(297, 185, 2, 4);
-        ctx.fillRect(297, 206, 2, 4);
-        // Deep shadow cast by door inside opening separating it from interior wall
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-        ctx.fillRect(310, 158, 6, 60);
+        ctx.fillRect(298, 158, 14, 60);
+        ctx.fillStyle = '#150c08';
+        ctx.fillRect(300, 160, 10, 56);
+        // Brass hinges
+        ctx.fillStyle = '#d4af37';
+        ctx.fillRect(297, 166, 2, 4);
+        ctx.fillRect(297, 188, 2, 4);
+        ctx.fillRect(297, 210, 2, 4);
+        // Interior shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.fillRect(312, 158, 28, 60);
         // Door threshold stone at bottom
         ctx.fillStyle = '#444444';
         ctx.fillRect(296, 218, 46, 4);
 
-        // --- PROTRUDING FEATURE: BRICK STAIRWELL BAY (Photo 3) ---
-        // Extends forward on the right of the door where the stairs are
-        ctx.fillStyle = '#54171a'; // Protruding front brick face
-        ctx.fillRect(348, 50, 110, 180);
-        for (let bx = 348; bx < 458; bx += 32) {
-          for (let by = 60; by < 230; by += 32) {
+        // --- PROTRUDING FEATURE: FULL BRICK STAIRWELL BAY (x: 348..460) ---
+        // 100% Full dark red brick facade from roofline to ground!
+        ctx.fillStyle = '#54171a';
+        ctx.fillRect(348, 50, 112, 180);
+        for (let bx = 348; bx < 460; bx += 32) {
+          for (let by = 56; by < 230; by += 32) {
             ctx.drawImage(brick, bx, by);
           }
         }
-        // Shadow cast by protruding bay onto recessed door on the left
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        // Shadow cast by protruding bay onto recessed facade on left
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
         ctx.fillRect(340, 60, 8, 165);
-        // Corner pillar trim on protruding bay
+        // Corner pillar trim
         ctx.fillStyle = '#3a1114';
         ctx.fillRect(348, 50, 4, 180);
-        ctx.fillRect(454, 50, 4, 180);
-        // Awning segment protruding forward
-        ctx.fillStyle = '#3b2b1f';
-        ctx.fillRect(344, 52, 118, 12);
+        ctx.fillRect(456, 50, 4, 180);
 
-        // --- CLEAR, HIGH-CONTRAST "316" PLAQUE (Photo 3) ---
-        // Mounted directly on the brick next to front door
+        // --- CLEAR "316" PLAQUE ON BRICK BESIDE DOOR (Photo 3) ---
         ctx.fillStyle = '#000000';
-        ctx.fillRect(260, 155, 34, 16);
+        ctx.fillRect(258, 166, 34, 16);
         ctx.strokeStyle = '#e6c860';
         ctx.lineWidth = 2;
-        ctx.strokeRect(260, 155, 34, 16);
-        // Crisp, bold gold numbers "316"
+        ctx.strokeRect(258, 166, 34, 16);
         ctx.fillStyle = '#ffd700';
         ctx.font = 'bold 10px monospace';
         ctx.textBaseline = 'middle';
-        ctx.fillText('316', 266, 164);
+        ctx.fillText('316', 264, 175);
 
         // Warm porch lantern glow above door
         ctx.fillStyle = 'rgba(255, 230, 140, 0.25)';
         ctx.beginPath();
-        ctx.arc(318, 145, 45, 0, Math.PI * 2);
+        ctx.arc(319, 145, 45, 0, Math.PI * 2);
         ctx.fill();
 
-        // Snow ground
-        const snow = window.spriteManager.env.snow;
-        for (let x = 60; x < 580; x += 32) {
-          for (let y = 220; y < 440; y += 32) {
-            ctx.drawImage(snow, x, y);
+        // --- FALL EMULATION: AUTUMN GRASS LAWN (y: 220..440) ---
+        ctx.fillStyle = '#3f5d2b'; // Autumn olive-green grass
+        ctx.fillRect(160, 220, 320, 220);
+
+        // Grass texture specks
+        ctx.fillStyle = '#4c6e34';
+        for (let gx = 165; gx < 475; gx += 14) {
+          for (let gy = 225; gy < 435; gy += 16) {
+            ctx.fillRect(gx + ((gy * 7) % 11), gy, 2, 3);
           }
         }
 
-        // Snow path walkway leading to door
-        ctx.fillStyle = 'rgba(210, 225, 240, 0.6)';
-        ctx.fillRect(288, 220, 60, 200);
-
-        // Front step stone
-        ctx.fillStyle = '#7a7a7a';
-        ctx.fillRect(292, 218, 52, 8);
-
-        // Falling snowflakes ON GROUND ONLY (y: 220 to 480)
-        ctx.fillStyle = '#ffffff';
-        for (let i = 0; i < 30; i++) {
-          const sx = ((i * 43) + t * 18) % 640;
-          const sy = 220 + (((i * 31) + t * 25) % 240);
-          ctx.fillRect(sx, sy, 2, 2);
+        // Stone flagstone paver walkway leading to door (x: 290..348, y: 220..440)
+        ctx.fillStyle = '#6b5a4d';
+        ctx.fillRect(290, 220, 58, 220);
+        ctx.strokeStyle = '#4a3b30';
+        ctx.lineWidth = 1.5;
+        for (let py = 220; py < 440; py += 18) {
+          ctx.beginPath();
+          ctx.moveTo(290, py); ctx.lineTo(348, py);
+          ctx.stroke();
         }
+
+        // Door entrance step stone
+        ctx.fillStyle = '#7a7a7a';
+        ctx.fillRect(292, 218, 54, 8);
+
+        // --- FALLING AUTUMN LEAVES (Fluttering across sky & yard) ---
+        const leafColors = ['#d97706', '#b45309', '#dc2626', '#f59e0b', '#78350f'];
+        const t = Date.now() * 0.001;
+        for (let i = 0; i < 28; i++) {
+          const lx = 165 + ((i * 31) + t * 20 + Math.sin(t * 2 + i) * 14) % 310;
+          const ly = ((i * 27) + t * 30) % 440;
+          ctx.fillStyle = leafColors[i % leafColors.length];
+          ctx.fillRect(lx, ly, 3, 2);
+        }
+
+        // Alley side borders (high-contrast frame separating void)
+        ctx.fillStyle = '#1c1c1c';
+        ctx.fillRect(158, 0, 2, 480);
+        ctx.fillRect(480, 0, 2, 480);
       }
     };
 
     // ----------------------------------------------------
     // ROOM 2: FIRST FLOOR (ACCURATE TOWNHOUSE ARCHITECTURE)
+    // - Pitch black void for exterior/unused space
+    // - Living room is left half of house (x: 40..325)
+    // - Dividing wall between living room and kitchen/fridge (x: 325, y: 60..180)
+    // - Middle divider box moved DOWN at par with bathroom box (y: 200..365)
+    // - Couch & TV stand centered in middle of living room with walking corridor
+    // - Punching bag, coat closet, and folding table bigger
+    // - Folding table against right wall where fridge leaves off
+    // - Shoe rack in pocket to the left of front door
+    // - Sink rotated 180° without window; stove rotated 90° on east wall
     // ----------------------------------------------------
     this.rooms['first_floor'] = {
       name: 'first_floor',
@@ -203,66 +233,68 @@ class MapManager {
       spawn: { x: 175, y: 380, dir: 'up' },
       colliders: [
         // Perimeter outer walls
-        { x: 0, y: 0, w: 640, h: 60 },   // Top wall
-        { x: 0, y: 440, w: 640, h: 40 }, // Bottom wall
-        { x: 0, y: 0, w: 40, h: 480 },   // Left wall
-        { x: 600, y: 0, w: 40, h: 480 }, // Right wall
+        { x: 0, y: 0, w: 640, h: 60 },   // Top perimeter wall
+        { x: 0, y: 440, w: 640, h: 40 }, // Bottom perimeter wall
+        { x: 0, y: 0, w: 40, h: 480 },   // Left perimeter wall
+        { x: 600, y: 0, w: 40, h: 480 }, // Right perimeter wall
 
-        // Center Interior Dividing Wall (warm drywall partition behind TV)
-        // Kept compact so there is wide open walking space to all bottom kitchen cabinets!
-        { x: 215, y: 180, w: 160, h: 105 },
+        // Living Room / Kitchen Dividing Wall (x: 325, y: 60..180)
+        { x: 325, y: 60, w: 8, h: 120 },
 
-        // Bathroom Block on Left of Hallway
+        // Center Interior Dividing Wall (Moved down at par with bathroom box: y: 200..365)
+        { x: 215, y: 200, w: 105, h: 165 },
+
+        // Bathroom Block on Left of Hallway (y: 200..365)
         { x: 40, y: 200, w: 95, h: 165 },
 
         // Bottom Wall (South Wall) Fixtures:
-        // Bottom-left corner: coat closet
-        { x: 40, y: 385, w: 35, h: 55 },
-        // Shoe rack leaning against the vertical bathroom wall
-        { x: 135, y: 330, w: 24, h: 36 },
+        // Bigger Coat Closet in bottom-left corner
+        { x: 40, y: 370, w: 55, h: 70 },
+        // Shoe rack in the pocket to the left of the door
+        { x: 115, y: 390, w: 26, h: 40 },
         // Kitchen South Wall: Pantry, Cabinets, Sink, Dishwasher, More Cabinets
         { x: 270, y: 395, w: 275, h: 45 },
 
-        // Kitchen East Wall (Right Wall): Fridge, Cabinet, Stove (Microwave removed)
+        // Kitchen East Wall (Right Wall): Fridge, Counter, Rotated Stove
         { x: 545, y: 195, w: 55, h: 195 },
 
         // Living Room Furniture:
-        // Freestanding heavy punching bag station on left brick corner
-        { x: 50, y: 68, w: 40, h: 55 },
-        // Red L-Couch on north side in the middle facing south
-        { x: 180, y: 72, w: 105, h: 58 },
-        // Coffee table inside the L of the couch
-        { x: 210, y: 105, w: 45, h: 28 },
-        // TV stand directly opposite couch on south side facing north
-        { x: 175, y: 142, w: 115, h: 36 },
-        // Plastic long folding table rotated 90 degrees (vertical against wall) & bench
-        { x: 345, y: 65, w: 48, h: 84 }
+        // Bigger freestanding heavy punching bag station
+        { x: 45, y: 65, w: 48, h: 70 },
+        // Clear L-Couch in middle of living room
+        { x: 135, y: 68, w: 76, h: 56 },
+        // Coffee table inside the L
+        { x: 165, y: 92, w: 40, h: 26 },
+        // TV stand directly opposite couch facing north (space between couch and TV for walking!)
+        { x: 130, y: 148, w: 86, h: 24 },
+        // Bigger plastic folding table against right living room wall
+        { x: 280, y: 65, w: 36, h: 96 }
       ],
       interactables: [
-        // 1. Bottom-Left Coat Closet
+        // 1. Bigger Bottom-Left Coat Closet
         {
-          x: 40, y: 385, w: 35, h: 55,
-          text: ["* Just some coats hanging."]
+          x: 40, y: 370, w: 55, h: 70,
+          text: ["* Just some warm coats hanging."]
         },
-        // 2. White Shoe Rack (Leaning against the bathroom wall)
+        // 2. White Shoe Rack in the pocket to the left of the door
         {
-          x: 135, y: 330, w: 25, h: 40,
-          text: ["* A familiar row of New Balances leaning against the bathroom wall."]
+          x: 115, y: 390, w: 26, h: 40,
+          text: ["* A familiar row of New Balances resting in the foyer pocket."]
         },
         // 3. Front Door (Exit back outside)
         {
           x: 155, y: 434, w: 45, h: 12,
           isDoor: true,
-          onEnter: () => { window.game.transitionToRoom('exterior', 318, 240, 'down'); }
+          onEnter: () => { window.game.transitionToRoom('exterior', 310, 240, 'down'); }
         },
         // 4. Hallway Left: First-Floor Bathroom
         {
-          x: 130, y: 245, w: 15, h: 45,
+          x: 130, y: 250, w: 15, h: 45,
           text: ["* You don't have to use the bathroom right now."]
         },
         // 5. Hallway Right: Middle Closet Door
         {
-          x: 215, y: 215, w: 15, h: 45,
+          x: 215, y: 235, w: 15, h: 45,
           text: ["* A hallway storage closet. It's packed full."]
         },
         // 6. Stairs (Right of front door & hallway) - Leads to U-shaped staircase
@@ -282,19 +314,19 @@ class MapManager {
           x: 305, y: 395, w: 45, h: 45,
           text: ["* Dark wood cabinetry filled with plates and mugs."]
         },
-        // 9. Kitchen South Wall: Sink & Crooked Blinds (Interactive choice to clean!)
+        // 9. Kitchen South Wall: Sink (Rotated 180°, no window; interactive clean prompt!)
         {
-          x: 350, y: 385, w: 45, h: 55,
+          x: 350, y: 400, w: 36, h: 35,
           triggerSink: true
         },
         // 10. Kitchen South Wall: Dishwasher
         {
-          x: 395, y: 395, w: 35, h: 45,
+          x: 390, y: 395, w: 30, h: 45,
           text: ["* Never figured out how it worked."]
         },
         // 11. Kitchen South Wall: More Cabinets
         {
-          x: 430, y: 395, w: 115, h: 45,
+          x: 422, y: 395, w: 123, h: 45,
           text: ["* More dark wood cabinets with bowls and spices."]
         },
         // 12. Kitchen Right Wall: Refrigerator (Top)
@@ -307,7 +339,7 @@ class MapManager {
           x: 545, y: 255, w: 55, h: 60,
           text: ["* A kitchen counter with spices and cutting boards."]
         },
-        // 14. Kitchen Right Wall: Oven with Warm Stove (Bottom) (Photo 1)
+        // 14. Kitchen Right Wall: Rotated Oven with Warm Stove (Bottom)
         {
           x: 545, y: 315, w: 55, h: 70,
           text: [
@@ -316,56 +348,63 @@ class MapManager {
         },
         // 15. Living Room: Punching Bag (Interactive punch choice)
         {
-          x: 50, y: 68, w: 40, h: 60,
+          x: 45, y: 65, w: 48, h: 70,
           triggerPunchingBag: true
         },
         // 16. Living Room: Screen Door (Sliding glass door)
         {
           x: 95, y: 45, w: 55, h: 30,
-          text: ["* It's cold outside."]
+          text: ["* It's chilly outside."]
         },
-        // 17. Living Room: BIG Red L-Couch in the middle
+        // 17. Living Room: Clear Red L-Couch in the middle
         {
-          x: 180, y: 72, w: 105, h: 58,
-          text: ["* The red couch in the center of the room. Perfect for playing Switch (which is sitting right there)."]
+          x: 135, y: 68, w: 76, h: 56,
+          text: ["* The red sectional couch in the center of the room. Warm and inviting."]
         },
         // 18. Living Room: Coffee Table Inside the L
         {
-          x: 210, y: 105, w: 45, h: 30,
+          x: 165, y: 92, w: 40, h: 26,
           text: ["* Papers just strewn about."]
         },
-        // 19. Living Room: BIG TV Stand & TV directly opposite couch
+        // 19. Living Room: TV Stand directly opposite couch (facing north)
         {
-          x: 175, y: 142, w: 115, h: 36,
+          x: 130, y: 148, w: 86, h: 24,
           text: ["* The TV is quiet. A cozy reflection fills the screen."]
         },
-        // 20. Living Room: Plastic Long Folding Table & Bench (Duckling puzzle & cups)
+        // 20. Living Room: Bigger Plastic Folding Table against right wall
         {
-          x: 345, y: 65, w: 48, h: 84,
+          x: 280, y: 65, w: 36, h: 96,
           text: ["* A cute puzzle of ducklings and flowers."]
         }
       ],
       draw: (ctx) => {
+        // Deep black void outside the townhouse
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, 640, 480);
+
         // --- FLOOR BASE ---
-        // Light blonde hardwood flooring (Photo 4)
+        // Light blonde hardwood flooring across the living room and kitchen
         ctx.fillStyle = '#caa478';
         ctx.fillRect(40, 60, 560, 380);
 
-        // --- CENTER INTERIOR DIVIDING WALL (Photo 1) ---
-        // Finished warm interior drywall behind TV, compact so kitchen has wide open access
+        // --- WALL BETWEEN LIVING ROOM AND KITCHEN/FRIDGE (x: 325, y: 60..180) ---
         ctx.fillStyle = '#eae3d2';
-        ctx.fillRect(215, 180, 160, 105);
+        ctx.fillRect(325, 60, 8, 120);
+        ctx.fillStyle = '#3d281a';
+        ctx.fillRect(324, 60, 2, 120); // West baseboard
+        ctx.fillRect(332, 60, 2, 120); // East baseboard
+
+        // --- CENTER INTERIOR DIVIDING WALL (Moved DOWN at par with bathroom box: y: 200..365) ---
+        ctx.fillStyle = '#eae3d2';
+        ctx.fillRect(215, 200, 105, 165);
         // Baseboard molding along outer edges
         ctx.fillStyle = '#3d281a';
-        ctx.fillRect(215, 281, 160, 4); // South baseboard
-        ctx.fillRect(215, 180, 160, 4); // North baseboard (behind TV)
-        ctx.fillRect(215, 180, 4, 105); // West baseboard (hallway)
-        ctx.fillRect(371, 180, 4, 105); // East baseboard (kitchen)
-        // Subtle wall edge shading
-        ctx.fillStyle = 'rgba(0,0,0,0.06)';
-        ctx.fillRect(219, 184, 152, 97);
+        ctx.fillRect(215, 361, 105, 4); // South baseboard
+        ctx.fillRect(215, 200, 105, 4); // North baseboard
+        ctx.fillRect(215, 200, 4, 165); // West baseboard (hallway)
+        ctx.fillRect(316, 200, 4, 165); // East baseboard (kitchen)
 
-        // --- BATHROOM ROOM BLOCK (Left of hallway) ---
+        // --- BATHROOM ROOM BLOCK (Left of hallway: y: 200..365) ---
         ctx.fillStyle = '#eae3d2';
         ctx.fillRect(40, 200, 95, 165);
         ctx.fillStyle = '#3d281a';
@@ -373,21 +412,21 @@ class MapManager {
         ctx.fillRect(131, 200, 4, 165); // East baseboard facing hallway
         // Bathroom Door facing hallway
         ctx.fillStyle = '#3d2b20';
-        ctx.fillRect(130, 245, 8, 45);
+        ctx.fillRect(130, 250, 8, 45);
         ctx.fillStyle = '#ffd700';
-        ctx.fillRect(132, 267, 3, 3); // knob
+        ctx.fillRect(132, 272, 3, 3); // knob
         ctx.fillStyle = '#ffffff';
         ctx.font = '6px "Press Start 2P", monospace';
-        ctx.fillText("BATH", 85, 272);
+        ctx.fillText("BATH", 85, 275);
 
         // --- CLOSET DOOR ON RIGHT OF HALLWAY (on center wall) ---
         ctx.fillStyle = '#3d2b20';
-        ctx.fillRect(215, 215, 8, 45);
+        ctx.fillRect(215, 235, 8, 45);
         ctx.fillStyle = '#ffd700';
-        ctx.fillRect(217, 237, 3, 3);
+        ctx.fillRect(217, 257, 3, 3);
         ctx.fillStyle = '#333333';
         ctx.font = '6px "Press Start 2P", monospace';
-        ctx.fillText("CLOSET", 228, 242);
+        ctx.fillText("CLOSET", 228, 255);
 
         // --- HALLWAY FLOOR RUNNER ---
         ctx.fillStyle = '#b59068';
@@ -405,45 +444,40 @@ class MapManager {
         ctx.fillStyle = '#3d281a';
         ctx.fillRect(40, 436, 560, 4);
 
-        // --- ONLY A SMALL LINE OF BRICKS ON LEFT WALL (Photo 4 & 5) ---
-        // Removed bricks from everywhere else in the room!
+        // --- ONLY A SMALL LINE OF BRICKS ON LEFT WALL ---
         const brick = window.spriteManager.env.brickWall;
         for (let by = 60; by < 190; by += 32) {
           ctx.drawImage(brick, 40, by, 20, 32);
         }
 
-        // --- BOTTOM-LEFT CORNER: CLOSET, SHOE RACK, FOYER LANDING ---
-        // Entry Foyer Tile Landing in front of shoe rack & closet
+        // --- BOTTOM-LEFT CORNER: BIGGER COAT CLOSET ---
         ctx.fillStyle = '#d6cdbd';
-        ctx.fillRect(40, 365, 100, 75);
+        ctx.fillRect(40, 370, 110, 70); // Foyer tile landing
         ctx.strokeStyle = '#b8ad9b';
-        ctx.strokeRect(40, 365, 100, 75);
+        ctx.strokeRect(40, 370, 110, 70);
 
-        // Coat Closet on far left
+        // Bigger Coat Closet on far left
         ctx.fillStyle = '#3d2b20';
-        ctx.fillRect(40, 385, 35, 55);
+        ctx.fillRect(40, 370, 55, 70);
         ctx.fillStyle = '#ffd700';
-        ctx.fillRect(70, 412, 3, 3);
+        ctx.fillRect(90, 405, 3, 3);
         ctx.fillStyle = '#ffffff';
-        ctx.font = '5px "Press Start 2P", monospace';
-        ctx.fillText("COATS", 42, 402);
+        ctx.font = '6px "Press Start 2P", monospace';
+        ctx.fillText("COATS", 44, 405);
 
-        // White Shoe Rack Leaning Against the Bathroom Wall (Photo 3/5)
-        ctx.drawImage(window.spriteManager.env.shoeRack, 136, 330, 24, 36);
+        // White Shoe Rack in the pocket to the left of the door
+        ctx.drawImage(window.spriteManager.env.shoeRack, 116, 390, 24, 36);
 
         // --- FRONT DOOR (South Wall Entryway) ---
-        // High contrast dark casing clearly separated from wall & baseboard
         ctx.fillStyle = '#1c0f0a';
         ctx.fillRect(156, 430, 46, 14);
         ctx.fillStyle = '#2c1a12';
         ctx.fillRect(158, 432, 42, 12);
-        // Dark door leaf / threshold
         ctx.fillStyle = '#150c08';
         ctx.fillRect(160, 434, 38, 10);
-        // Brass door threshold trim
         ctx.fillStyle = '#c5a059';
         ctx.fillRect(160, 433, 38, 2);
-        // Coir Welcome Mat in front of door
+        // Coir Welcome Mat
         ctx.fillStyle = '#5c432d';
         ctx.fillRect(158, 416, 42, 16);
         ctx.strokeStyle = '#7c5c3f';
@@ -451,7 +485,7 @@ class MapManager {
         ctx.strokeRect(159, 417, 40, 14);
 
         // --- KITCHEN SOUTH WALL (STAIRS, PANTRY, CABINETS, SINK, DISHWASHER, MORE CABINETS) ---
-        // 1. Staircase Landing & Stairs going up (to the right of hallway)
+        // 1. Staircase Landing & Stairs going up
         ctx.fillStyle = '#c7b299';
         ctx.fillRect(215, 405, 50, 35);
         ctx.strokeStyle = '#a8947c';
@@ -475,79 +509,63 @@ class MapManager {
         ctx.fillStyle = '#4a2c1a';
         ctx.fillRect(305, 395, 45, 45);
 
-        // 4. Sink & Crooked Blinds Window (Photo 2)
-        ctx.drawImage(window.spriteManager.env.sink, 350, 385, 45, 55);
+        // 4. Sink (Rotated 180°, Window REMOVED!)
+        ctx.drawImage(window.spriteManager.env.sink, 350, 405, 36, 28);
 
-        // 5. Dishwasher (Photo 2: black front with silver dial)
-        ctx.drawImage(window.spriteManager.env.dishwasher, 395, 395, 35, 45);
+        // 5. Dishwasher
+        ctx.drawImage(window.spriteManager.env.dishwasher, 390, 395, 28, 36);
 
         // 6. More Dark Wood Cabinets right of dishwasher
         ctx.fillStyle = '#4a2c1a';
-        ctx.fillRect(430, 395, 115, 45);
+        ctx.fillRect(422, 395, 123, 45);
 
-        // --- KITCHEN EAST WALL (RIGHT WALL: FRIDGE, CABINET, OVEN W/ MICROWAVE) ---
+        // --- KITCHEN EAST WALL (RIGHT WALL: FRIDGE, CABINET, ROTATED OVEN) ---
         // 1. Refrigerator (Top)
         ctx.fillStyle = '#e0e0e0';
         ctx.fillRect(545, 195, 55, 60);
         ctx.fillStyle = '#cccccc';
-        ctx.fillRect(545, 225, 55, 2); // fridge door split
+        ctx.fillRect(545, 225, 55, 2);
         ctx.fillStyle = '#888888';
-        ctx.fillRect(548, 205, 3, 12); // handles
+        ctx.fillRect(548, 205, 3, 12);
         ctx.fillRect(548, 235, 3, 12);
 
         // 2. Kitchen Cabinet counter (Middle)
         ctx.fillStyle = '#4a2c1a';
         ctx.fillRect(545, 255, 55, 60);
 
-        // 3. Oven with Microwave on top (Bottom) (Photo 1)
-        ctx.drawImage(window.spriteManager.env.stove, 545, 315, 55, 70);
+        // 3. Oven Rotated 90 Degrees (Bottom)
+        ctx.drawImage(window.spriteManager.env.stove, 545, 320, 55, 45);
 
-        // --- LIVING ROOM (NORTH) ---
-        // Vibrant Green LED ceiling perimeter strip!
-        ctx.drawImage(window.spriteManager.env.greenLed, 40, 58, 200, 6);
-        ctx.drawImage(window.spriteManager.env.greenLed, 240, 58, 200, 6);
-        ctx.drawImage(window.spriteManager.env.greenLed, 440, 58, 160, 6);
+        // --- LIVING ROOM (NORTH HALF OF HOUSE: x: 40..325) ---
+        // Emerald LED ceiling perimeter strip
+        ctx.drawImage(window.spriteManager.env.greenLed, 40, 58, 285, 6);
         ctx.fillStyle = 'rgba(0, 255, 68, 0.08)';
-        ctx.fillRect(40, 60, 560, 40);
+        ctx.fillRect(40, 60, 285, 40);
 
-        // Screen Door (Sliding glass door looking into cold)
+        // Screen Door
         ctx.drawImage(window.spriteManager.env.slidingDoor, 95, 45, 55, 35);
 
-        // Freestanding Heavy Punching Bag Station with sandbag legs in brick corner
-        ctx.drawImage(window.spriteManager.env.punchBag, 50, 68, 40, 60);
+        // Bigger Freestanding Heavy Punching Bag Station in brick corner
+        ctx.drawImage(window.spriteManager.env.punchBag, 45, 65, 48, 70);
 
-        // --- SWAPPED: COUCH ON NORTH, TV STAND ON SOUTH (Photo 1) ---
-        // BIG Red L-Couch in the middle facing south
-        ctx.drawImage(window.spriteManager.env.redCouch, 180, 72, 105, 58);
+        // Centered Clear L-Couch in middle of living room (x: 135, y: 68)
+        ctx.drawImage(window.spriteManager.env.redCouch, 135, 68, 76, 56);
 
-        // Coffee Table INSIDE THE L of the couch (Photo 1)
-        ctx.drawImage(window.spriteManager.env.coffeeTable, 210, 105, 45, 28);
+        // Coffee Table inside the L
+        ctx.drawImage(window.spriteManager.env.coffeeTable, 165, 92, 40, 26);
 
-        // BIG TV Stand & TV directly opposite the couch facing north (Photo 1)
+        // TV Stand directly opposite couch with clear walking space between them
         ctx.fillStyle = '#3a2618';
-        ctx.fillRect(175, 154, 115, 18); // wooden TV stand
+        ctx.fillRect(130, 158, 86, 14); // wooden TV stand
         ctx.fillStyle = '#111111';
-        ctx.fillRect(180, 138, 105, 22); // TV screen facing north
+        ctx.fillRect(135, 146, 76, 18); // TV screen facing north
         ctx.fillStyle = '#1e1e1e';
-        ctx.fillRect(182, 140, 101, 18); // screen face
+        ctx.fillRect(137, 148, 72, 14);
         ctx.fillStyle = '#444444';
-        ctx.fillRect(228, 156, 9, 4);   // TV pedestal base
-        // Rainbow foil streamer next to TV draping down wall (Photo 1)
-        ctx.strokeStyle = '#c0d8f0';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(295, 140);
-        ctx.quadraticCurveTo(305, 158, 298, 172);
-        ctx.stroke();
+        ctx.fillRect(170, 160, 6, 4);   // Pedestal
 
-        // White Long Folding Table Rotated 90 Degrees (Vertical, Longer: 32x84)
-        ctx.drawImage(window.spriteManager.env.puzzleTable, 345, 65, 32, 84);
-        // Folding bench alongside table
-        ctx.fillStyle = '#dcdcdc';
-        ctx.fillRect(380, 70, 8, 74);
-        ctx.fillStyle = '#888888';
-        ctx.fillRect(382, 68, 4, 4);
-        ctx.fillRect(382, 140, 4, 4);
+        // Bigger White Long Folding Table against right living room wall (where fridge leaves off)
+        ctx.drawImage(window.spriteManager.env.puzzleTable, 280, 65, 36, 96);
       }
     };
 
@@ -568,6 +586,8 @@ class MapManager {
         { x: 375, y: 0, w: 265, h: 480 }, // Right of shaft
         { x: 0, y: 0, w: 640, h: 50 },    // Top bounds (except doorway openings)
         { x: 0, y: 390, w: 640, h: 90 },  // Bottom bounds below landing
+        // Landing window collider (prevents walking onto window)
+        { x: 235, y: 350, w: 140, h: 40 },
         // Central wall / handrail dividing Flight 1 and Flight 2
         { x: 295, y: 40, w: 20, h: 250 }
       ],
@@ -677,7 +697,6 @@ class MapManager {
         ctx.fillStyle = '#ffffff';
         ctx.font = '6px "Press Start 2P", monospace';
         ctx.fillText("▼ 7 STEPS DOWN", 236, 75);
-        ctx.fillText("TURN 180° ►", 270, 315);
         ctx.fillText("▲ 7 STEPS UP", 316, 75);
       }
     };
@@ -794,19 +813,11 @@ class MapManager {
         // --- PAIR 2 (y: 180) ---
         // Left: Storage Closet
         drawDoor(254, 180, "STORAGE", false);
-        // Suitcases graphic inside nook next to closet
-        ctx.fillStyle = '#1e3852';
-        ctx.fillRect(234, 192, 16, 12);
-        ctx.fillStyle = '#7a3128';
-        ctx.fillRect(237, 206, 14, 14);
         // Right (opposite): Solid Wall (warm interior drywall with baseboard)
         ctx.fillStyle = '#eae3d2';
         ctx.fillRect(362, 175, 45, 56);
         ctx.fillStyle = '#3d281a';
         ctx.fillRect(362, 228, 45, 3);
-        ctx.fillStyle = '#999999';
-        ctx.font = '5px "Press Start 2P", monospace';
-        ctx.fillText("[WALL]", 366, 205);
 
         // --- PAIR 3 AT END OF HALLWAY (y: 80) ---
         // Left: Kevin's Door

@@ -28,6 +28,9 @@ class InputManager {
       if (window.audioManager) {
         window.audioManager.ensureAudio();
       }
+      if (window.game && window.game.state === 'TITLE') {
+        window.game.startGameFromTitle();
+      }
     };
     window.addEventListener('pointerdown', triggerAudio, { passive: true });
     window.addEventListener('click', triggerAudio, { passive: true });
@@ -59,8 +62,8 @@ class Game {
 
     this.input = new InputManager();
 
-    // Game States: 'OVERWORLD', 'DIALOGUE', 'ENCOUNTER_FLASH', 'BATTLE', 'FINALE'
-    this.state = 'OVERWORLD';
+    // Game States: 'TITLE', 'OVERWORLD', 'DIALOGUE', 'ENCOUNTER_FLASH', 'BATTLE', 'FINALE'
+    this.state = 'TITLE';
 
     // Player (Mallika)
     this.player = {
@@ -110,11 +113,18 @@ class Game {
     this.player.y = currentRoom.spawn.y;
     this.player.dir = currentRoom.spawn.dir;
 
-    // Start exterior snow BGM
-    window.audioManager.playBgm('snowy');
-
-    // Start game loop
+    // Start game loop (audio begins on first interaction / PLAY? press)
     requestAnimationFrame((t) => this.loop(t));
+  }
+
+  startGameFromTitle() {
+    if (this.state !== 'TITLE') return;
+    if (window.audioManager) {
+      window.audioManager.ensureAudio();
+      window.audioManager.playMenuSelect();
+      window.audioManager.playBgm('snowy');
+    }
+    this.state = 'OVERWORLD';
   }
 
   loop(currentTime) {
@@ -132,6 +142,18 @@ class Game {
   // UPDATE LOGIC
   // ==========================================
   update(dt) {
+    // 0. Title Screen
+    if (this.state === 'TITLE') {
+      if (
+        this.input.wasPressed('KeyZ') ||
+        this.input.wasPressed('Enter') ||
+        this.input.wasPressed('Space')
+      ) {
+        this.startGameFromTitle();
+      }
+      return;
+    }
+
     // 1. Encounter 3-flash transition sequence
     if (this.state === 'ENCOUNTER_FLASH') {
       this.flashTimer += dt;
@@ -518,6 +540,11 @@ class Game {
   draw() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+    if (this.state === 'TITLE') {
+      this.drawTitleScreen();
+      return;
+    }
+
     if (this.state === 'BATTLE') {
       window.battleManager.draw(this.ctx, this.canvas.width, this.canvas.height);
       return;
@@ -572,6 +599,53 @@ class Game {
       this.ctx.fillText('[ Click anywhere or press any key for audio ♫ ]', 320, 24);
       this.ctx.textAlign = 'left';
     }
+  }
+
+  drawTitleScreen() {
+    // Pitch Black Void Background
+    this.ctx.fillStyle = '#000000';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Title: UNDERTALE
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.font = '28px "Press Start 2P", monospace';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText("UNDERTALE", this.canvas.width / 2, 160);
+
+    // Subtitle: 4th Anniversary
+    this.ctx.fillStyle = '#aaaaaa';
+    this.ctx.font = '12px "Press Start 2P", monospace';
+    this.ctx.fillText("-- 4th Anniversary --", this.canvas.width / 2, 205);
+
+    // Prompt Box: [ ♥ PLAY? ]
+    const boxW = 200;
+    const boxH = 46;
+    const boxX = (this.canvas.width - boxW) / 2;
+    const boxY = 270;
+
+    this.ctx.strokeStyle = '#ffffff';
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+    // Pulsing Red Soul Cursor
+    const pulse = Math.sin(Date.now() * 0.005) * 2;
+    if (window.spriteManager && window.spriteManager.ui.soul) {
+      this.ctx.drawImage(window.spriteManager.ui.soul, boxX + 24, boxY + 14 + pulse, 18, 18);
+    }
+
+    this.ctx.fillStyle = '#ffff55';
+    this.ctx.font = '16px "Press Start 2P", monospace';
+    this.ctx.textAlign = 'left';
+    this.ctx.fillText("PLAY?", boxX + 58, boxY + 30);
+
+    // Click / Key hint
+    this.ctx.fillStyle = '#888888';
+    this.ctx.font = '10px "Press Start 2P", monospace';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText("Press [Z] or Click to Start", this.canvas.width / 2, 360);
+
+    // Reset textAlign for rest of game
+    this.ctx.textAlign = 'left';
   }
 
   drawOverworldMenu() {

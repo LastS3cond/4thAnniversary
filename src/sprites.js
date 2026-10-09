@@ -377,8 +377,8 @@ class SpriteManager {
 
   // ==========================================
   // JAYDON BATTLE SPRITE (Large Undertale style, ~144x192 px)
-  // Curly hair stopping at ear level, blue eyes behind glasses,
-  // smaller refined smile, longer torso, red plaid pajama pants, barefoot!
+  // Curly hair stopping at ear level, clear blue eyes (no black),
+  // arms resting naturally at sides, longer torso, red plaid pants, barefoot!
   // ==========================================
   generateJaydonBattleSprite() {
     const scale = 3;
@@ -390,10 +390,10 @@ class SpriteManager {
       'h': '#442e23', // Curly hair curls
       'S': '#f6cbb0', // Skin
       's': '#deaf93', // Skin contour
-      'G': '#1a1a1a', // Rectangular glasses
+      'G': '#4b5563', // Soft steel grey glasses frame (no harsh black)
       'g': '#ffffff', // Glass shine
-      'E': '#3b82f6', // Bright blue eyes
-      'e': '#1d4ed8', // Blue eye shading
+      'E': '#3b82f6', // Bright clear blue eyes
+      'e': '#60a5fa', // Blue eye highlight
       'M': '#6a2a2e', // Small gentle smile
       'T': '#b8bac0', // Heather grey long sleeve
       't': '#9ea1a7', // Shirt shading
@@ -410,27 +410,26 @@ class SpriteManager {
       "          HHhhHHHHHHHHHHHHHHHHHHhhhhHH          ",
       "          HhhHSSSSSSSSSSSSSSSSSSShhhHH          ",
       "          HhhHSSGGGGGgSSSSGGGGGgShhhHH          ",
-      "          HhhHSGGgEEgGSSSSGGgEEgGShhHH          ",
-      "          HhhHSSGGEEGSSSSSGGEEGgShhhHH          ", // Hair stops around ear
+      "          HhhHSgEEEEgSSSSgEEEEgSShhHH           ", // Clear bright blue eyes (no black)
+      "          HhhHSSgEEgSSSSSSgEEgSShhhHH           ", // Hair stops around ear
       "               SSSSSSSSSSSSSSSS                 ",
       "               SSSSssSSssSSSSSS                 ",
       "               SSSSSSMMMMSSSSSS                 ", // Smaller lips
       "               SSSSSSSMMSSSSSSS                 ",
       "                SSSSSSSSSSSSSS                  ",
       "                 SSSSSSSSSSSS                   ",
-      "             TTTTTTTTTTTTTTTTTTTT               ", // Longer torso starts
-      "           TTTTTTTTTTTTTTTTTTTTTTTT             ",
-      "         TTTTTTTTTTTTCTTTTTTTTTTTTTTT           ",
-      "        TTTTTTTTTTTTCCCTTTTTTTTTTTTTTT          ",
-      "       TTTTTTTTTTTTTTCTTTTTTTTTTTTTTTTT         ",
-      "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
-      "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
-      "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
-      "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
-      "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
-      "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
-      "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
-      "       tttttttttttttttttttttttttttttttt         ",
+      "             TTTTTTTTTTTTTTTTTTTT               ",
+      "          TT TTTTTTTTTTTTTTTTTTTT TT            ", // Distinct arms starting at shoulders
+      "         TTT TTTTTTTTCTTTTTTTTTTT TTT           ",
+      "        TTTT TTTTTTTCCCTTTTTTTTTT TTTT          ",
+      "        TTTT TTTTTTTTCTTTTTTTTTTT TTTT          ",
+      "        TTTT TTTTTTTTTTTTTTTTTTTT TTTT          ",
+      "        tttt TTTTTTTTTTTTTTTTTTTT tttt          ", // Elbows
+      "        tttt TTTTTTTTTTTTTTTTTTTT tttt          ",
+      "        tttt TTTTTTTTTTTTTTTTTTTT tttt          ", // Forearms
+      "        SSSS TTTTTTTTTTTTTTTTTTTT SSSS          ", // Hands resting naturally at sides
+      "        SSSS tttttttttttttttttttt SSSS          ",
+      "        ssss RKRKRKRKRKRKRKRKRKRK ssss          ",
       "         RKRKRKRKRKRKRKRKRKRKRKRKRKR            ",
       "         KRKRKRKRKRKRKRKRKRKRKRKRKRK            ",
       "         RKRKRKRKRKRKRKRKRKRKRKRKRKR            ",
@@ -680,166 +679,153 @@ class SpriteManager {
     srCtx.fillRect(15, 19, 2, 1);
     this.env.shoeRack = shoeRack;
 
-    // 5. White Long Folding Table Rotated 90 Degrees (Vertical, Longer: 32x84)
-    const { canvas: puzzleTable, ctx: ptCtx } = this.createCanvas(32, 84);
-    // White plastic folding tabletop (longer, oriented vertically)
+    // 5. White Long Folding Table Rotated 90 Degrees - BIGGER (36x96)
+    const { canvas: puzzleTable, ctx: ptCtx } = this.createCanvas(36, 96);
+    // White plastic folding tabletop (longer & wider, oriented vertically)
     ptCtx.fillStyle = '#f5f5f5';
-    ptCtx.fillRect(2, 2, 28, 80);
+    ptCtx.fillRect(2, 2, 32, 92);
     ptCtx.fillStyle = '#dcdcdc'; // Beveled edge trim
-    ptCtx.strokeRect(2, 2, 28, 80);
+    ptCtx.strokeRect(2, 2, 32, 92);
     // Folding metal leg hinges visible at top and bottom
     ptCtx.fillStyle = '#999999';
-    ptCtx.fillRect(0, 6, 2, 8);
-    ptCtx.fillRect(30, 6, 2, 8);
-    ptCtx.fillRect(0, 70, 2, 8);
-    ptCtx.fillRect(30, 70, 2, 8);
+    ptCtx.fillRect(0, 6, 2, 10);
+    ptCtx.fillRect(34, 6, 2, 10);
+    ptCtx.fillRect(0, 80, 2, 10);
+    ptCtx.fillRect(34, 80, 2, 10);
 
     // --- TOP HALF OF TABLE: CUTE PUZZLE OF DUCKLINGS & FLOWERS ---
     ptCtx.fillStyle = '#224a37'; // Pond water backing
-    ptCtx.fillRect(4, 4, 24, 36);
+    ptCtx.fillRect(4, 4, 28, 42);
     ptCtx.strokeStyle = '#183829';
     ptCtx.lineWidth = 1;
-    ptCtx.strokeRect(4, 4, 24, 36);
+    ptCtx.strokeRect(4, 4, 28, 42);
 
     // Lily pads
     ptCtx.fillStyle = '#488b48';
-    ptCtx.fillRect(7, 8, 8, 6);
-    ptCtx.fillRect(15, 22, 9, 6);
-    ptCtx.fillRect(6, 28, 7, 5);
+    ptCtx.fillRect(7, 8, 9, 7);
+    ptCtx.fillRect(17, 24, 10, 7);
+    ptCtx.fillRect(6, 32, 8, 6);
 
     // Cute yellow baby ducklings!
     // Duckling 1 (Top)
     ptCtx.fillStyle = '#ffd13b';
-    ptCtx.fillRect(15, 10, 6, 5); // Body
-    ptCtx.fillRect(19, 8, 4, 4);  // Head
+    ptCtx.fillRect(17, 10, 7, 6); // Body
+    ptCtx.fillRect(21, 8, 5, 5);  // Head
     ptCtx.fillStyle = '#ff7700';  // Beak
-    ptCtx.fillRect(23, 9, 2, 2);
+    ptCtx.fillRect(26, 9, 3, 2);
     ptCtx.fillStyle = '#111111';  // Eye
-    ptCtx.fillRect(20, 8, 1, 1);
+    ptCtx.fillRect(23, 8, 1, 1);
 
     // Duckling 2 (Middle)
     ptCtx.fillStyle = '#ffd13b';
-    ptCtx.fillRect(9, 18, 5, 5);  // Body
-    ptCtx.fillRect(7, 16, 4, 4);  // Head
+    ptCtx.fillRect(9, 20, 6, 6);  // Body
+    ptCtx.fillRect(7, 18, 5, 5);  // Head
     ptCtx.fillStyle = '#ff7700';
-    ptCtx.fillRect(5, 17, 2, 2);
+    ptCtx.fillRect(4, 19, 3, 2);
     ptCtx.fillStyle = '#111111';
-    ptCtx.fillRect(8, 16, 1, 1);
+    ptCtx.fillRect(8, 18, 1, 1);
 
     // Flowers (Pink water lilies & white blossoms)
-    ptCtx.fillStyle = '#ff88aa';  // Pink water lily
-    ptCtx.fillRect(8, 10, 4, 4);
+    ptCtx.fillStyle = '#ff88aa';
+    ptCtx.fillRect(8, 10, 5, 5);
     ptCtx.fillStyle = '#ffffff';
-    ptCtx.fillRect(9, 11, 2, 2);
+    ptCtx.fillRect(10, 11, 2, 2);
 
-    ptCtx.fillStyle = '#ffffff';  // White flower
-    ptCtx.fillRect(17, 24, 4, 4);
-    ptCtx.fillStyle = '#ffd700';  // Yellow center
-    ptCtx.fillRect(18, 25, 2, 2);
+    ptCtx.fillStyle = '#ffffff';
+    ptCtx.fillRect(19, 26, 5, 5);
+    ptCtx.fillStyle = '#ffd700';
+    ptCtx.fillRect(20, 27, 2, 2);
 
     // --- BOTTOM HALF OF TABLE: CLUTTER, BLUE CUPS & PENS ---
-    // Tall blue plastic cup (Photo 1)
+    // Tall blue plastic cups
     ptCtx.fillStyle = '#1b56a3';
-    ptCtx.fillRect(10, 46, 8, 12);
+    ptCtx.fillRect(12, 54, 10, 14);
     ptCtx.fillStyle = '#3a79d0';
-    ptCtx.fillRect(11, 47, 6, 3);
+    ptCtx.fillRect(13, 55, 8, 3);
 
-    // Second blue cup
     ptCtx.fillStyle = '#1b56a3';
-    ptCtx.fillRect(12, 64, 7, 10);
+    ptCtx.fillRect(14, 74, 9, 12);
     ptCtx.fillStyle = '#3a79d0';
-    ptCtx.fillRect(13, 65, 5, 2);
+    ptCtx.fillRect(15, 75, 7, 2);
 
     // Pens and pencils lying on table
-    ptCtx.fillStyle = '#111111';  // Black pen
-    ptCtx.fillRect(21, 50, 2, 14);
-    ptCtx.fillStyle = '#d9333f';  // Red pen
-    ptCtx.fillRect(6, 56, 2, 12);
+    ptCtx.fillStyle = '#111111';
+    ptCtx.fillRect(25, 58, 2, 16);
+    ptCtx.fillStyle = '#d9333f';
+    ptCtx.fillRect(7, 66, 2, 14);
     this.env.puzzleTable = puzzleTable;
 
-    // 6. Kitchen Stove with Warm Oven (36x44) (Photo 1) - Microwave removed to reduce clutter
-    const { canvas: stove, ctx: stCtx } = this.createCanvas(36, 44);
-    // Backguard panel with control dials
-    stCtx.fillStyle = '#e8e8e8';
-    stCtx.fillRect(0, 0, 36, 12);
-    stCtx.fillStyle = '#222222';
-    stCtx.fillRect(12, 2, 12, 6); // digital clock/timer display
-    stCtx.fillStyle = '#00ff44';
-    stCtx.fillRect(14, 3, 8, 4);  // clock digits
-    // Burner control knobs
-    stCtx.fillStyle = '#444444';
-    stCtx.fillRect(3, 4, 3, 4);
-    stCtx.fillRect(7, 4, 3, 4);
-    stCtx.fillRect(26, 4, 3, 4);
-    stCtx.fillRect(30, 4, 3, 4);
-
-    // Stovetop surface
+    // 6. Kitchen Stove with Warm Oven - ROTATED 90 DEGREES (44x36)
+    // Sits against East wall; backguard is on East, oven door faces West into room!
+    const { canvas: stove, ctx: stCtx } = this.createCanvas(44, 36);
+    // Oven body / countertop surface
     stCtx.fillStyle = '#f5f5f5';
-    stCtx.fillRect(0, 12, 36, 16);
-    // 4 coil burners
-    stCtx.fillStyle = '#222222';
-    stCtx.fillRect(4, 14, 6, 6);
-    stCtx.fillRect(18, 14, 6, 6);
-    stCtx.fillRect(4, 21, 6, 6);
-    stCtx.fillRect(18, 21, 6, 6);
-    // Warm red burner glow (aroma of brown sugar and dates!)
-    stCtx.fillStyle = '#ff4422';
-    stCtx.fillRect(5, 15, 4, 4);
+    stCtx.fillRect(0, 0, 44, 36);
 
-    // Oven body & door
+    // Backguard panel on EAST side (right wall) with clock and dials
     stCtx.fillStyle = '#e0e0e0';
-    stCtx.fillRect(0, 28, 36, 16);
-    // Oven handle
+    stCtx.fillRect(34, 0, 10, 36);
+    stCtx.fillStyle = '#222222';
+    stCtx.fillRect(36, 12, 6, 12); // digital clock
+    stCtx.fillStyle = '#00ff44';
+    stCtx.fillRect(37, 14, 4, 8);  // timer glow
+    // Burner knobs along backguard
+    stCtx.fillStyle = '#444444';
+    stCtx.fillRect(36, 4, 4, 3);
+    stCtx.fillRect(36, 28, 4, 3);
+
+    // 4 Coil burners in the middle
+    stCtx.fillStyle = '#222222';
+    stCtx.fillRect(18, 4, 6, 6);
+    stCtx.fillRect(26, 4, 6, 6);
+    stCtx.fillRect(18, 24, 6, 6);
+    stCtx.fillRect(26, 24, 6, 6);
+    // Warm red burner glow
+    stCtx.fillStyle = '#ff4422';
+    stCtx.fillRect(19, 5, 4, 4);
+
+    // Oven door facing WEST (into kitchen room)
     stCtx.fillStyle = '#333333';
-    stCtx.fillRect(4, 29, 28, 2);
-    // Tinted oven glass window
-    stCtx.fillStyle = '#2a1a10';
-    stCtx.fillRect(5, 33, 26, 9);
-    // Warm oven light glow inside
-    stCtx.fillStyle = 'rgba(255, 170, 50, 0.4)';
-    stCtx.fillRect(7, 35, 22, 6);
+    stCtx.fillRect(0, 0, 4, 36);   // West edge border
+    stCtx.fillStyle = '#2a1a10';  // Tinted oven glass window
+    stCtx.fillRect(4, 6, 8, 24);
+    stCtx.fillStyle = 'rgba(255, 170, 50, 0.4)'; // Warm oven light inside
+    stCtx.fillRect(5, 8, 6, 20);
+    // Oven handle
+    stCtx.fillStyle = '#cccccc';
+    stCtx.fillRect(2, 4, 2, 28);
     this.env.stove = stove;
 
-    // 7. Kitchen Sink with Crooked Mini-Blind Window - FLIPPED 180° (36x42) (Photo 2)
-    // Counter/basin is in front (North facing room), window/crooked blinds behind against wall (South)
-    const { canvas: sink, ctx: skCtx } = this.createCanvas(36, 42);
-    // Front counter facing the room
+    // 7. Kitchen Sink - Window REMOVED, Rotated 180° (36x28) (Photo 2)
+    // Sits against South wall; faucet on South side pointing into basin!
+    const { canvas: sink, ctx: skCtx } = this.createCanvas(36, 28);
+    // Dark laminate counter
     skCtx.fillStyle = '#242424';
-    skCtx.fillRect(0, 0, 36, 20);
-    // Stainless steel sink basin with dishes
+    skCtx.fillRect(0, 0, 36, 28);
+
+    // Stainless steel basin
     skCtx.fillStyle = '#778899';
-    skCtx.fillRect(6, 3, 24, 14);
+    skCtx.fillRect(6, 4, 24, 18);
     skCtx.fillStyle = '#5c6d7e';
-    skCtx.fillRect(8, 5, 20, 10);
+    skCtx.fillRect(8, 6, 20, 14);
+
     // Dirty dishes stacked in basin
     skCtx.fillStyle = '#e6e6e6';
-    skCtx.fillRect(9, 7, 7, 6); // small plate
+    skCtx.fillRect(9, 8, 7, 6); // small plate
     skCtx.fillStyle = '#ffffff';
-    skCtx.fillRect(17, 6, 9, 8); // big plate
-    // Chrome faucet facing into basin
-    skCtx.fillStyle = '#cccccc';
-    skCtx.fillRect(17, 0, 3, 5);
-    // Blue Dawn dish soap bottle (Photo 2)
-    skCtx.fillStyle = '#0088ff';
-    skCtx.fillRect(31, 2, 3, 7);
-    // Pink cleaning gloves hanging on left
-    skCtx.fillStyle = '#ff5588';
-    skCtx.fillRect(1, 4, 3, 8);
+    skCtx.fillRect(17, 8, 9, 8); // big plate
 
-    // Window mounted on the south wall behind the counter
-    skCtx.fillStyle = '#4a3528'; // window frame
-    skCtx.fillRect(4, 20, 28, 22);
-    skCtx.fillStyle = '#0a101d'; // night sky through glass
-    skCtx.fillRect(6, 22, 24, 18);
-    // Iconic Crooked mini blinds at steep 45° angle (Photo 2)!
-    skCtx.strokeStyle = '#ffffff';
-    skCtx.lineWidth = 1.5;
-    skCtx.beginPath();
-    skCtx.moveTo(8, 24);
-    skCtx.lineTo(28, 36); // Sharp crooked slant!
-    skCtx.moveTo(8, 28);
-    skCtx.lineTo(28, 40);
-    skCtx.stroke();
+    // Chrome faucet on SOUTH side pointing North into basin (faucet rotated 180°)
+    skCtx.fillStyle = '#cccccc';
+    skCtx.fillRect(17, 20, 3, 6);
+    skCtx.fillRect(16, 24, 5, 2);
+
+    // Blue Dawn dish soap bottle on right
+    skCtx.fillStyle = '#0088ff';
+    skCtx.fillRect(31, 16, 3, 7);
+    // Pink cleaning gloves on left
+    skCtx.fillStyle = '#ff5588';
+    skCtx.fillRect(2, 14, 3, 8);
     this.env.sink = sink;
 
     // 7b. Dishwasher (Photo 2: Black front with silver control dial)
@@ -858,26 +844,28 @@ class SpriteManager {
     dwCtx.fill();
     this.env.dishwasher = dishwasher;
 
-    // 8. Deep Red L-Couch - BIGGER! (64x50) (Photo 3)
-    const { canvas: couch, ctx: cCtx } = this.createCanvas(64, 50);
-    // Rich red/maroon fabric
+    // 8. Deep Red L-Couch - CLEAR L-SHAPE, NO SWITCH! (76x56) (Photo 3)
+    const { canvas: couch, ctx: cCtx } = this.createCanvas(76, 56);
+    // Maroon backrest along top
     cCtx.fillStyle = '#6e141a';
-    cCtx.fillRect(0, 0, 64, 15); // Backrest along top
-    cCtx.fillRect(0, 0, 18, 50); // L-section extending down left
+    cCtx.fillRect(0, 0, 76, 14);
+    // Left armrest running down full height
+    cCtx.fillRect(0, 0, 10, 56);
+    // Right armrest along top half
+    cCtx.fillRect(68, 0, 8, 36);
+
+    // Main horizontal seating
     cCtx.fillStyle = '#8c1f26';
-    cCtx.fillRect(18, 15, 46, 33); // Main seat cushion
-    cCtx.fillRect(0, 15, 18, 33);  // L seat cushion
-    // Cushion seam dividers
+    cCtx.fillRect(10, 14, 58, 22);
+
+    // L-Chaise section extending DOWNWARD on the left
+    cCtx.fillRect(10, 36, 26, 18);
+
+    // Deep cushion seams
     cCtx.fillStyle = '#550d12';
-    cCtx.fillRect(38, 15, 2, 33);
-    cCtx.fillRect(18, 15, 2, 33);
-    // Nintendo Switch on seat (Red & Blue Joy-Cons!)
-    cCtx.fillStyle = '#111111'; // Switch screen
-    cCtx.fillRect(44, 25, 10, 7);
-    cCtx.fillStyle = '#00aaff'; // Blue joycon
-    cCtx.fillRect(42, 25, 2, 7);
-    cCtx.fillStyle = '#ff3b3b'; // Red joycon
-    cCtx.fillRect(54, 25, 2, 7);
+    cCtx.fillRect(36, 14, 2, 22);
+    cCtx.fillRect(10, 35, 26, 2);
+    cCtx.fillRect(36, 36, 2, 18);
     this.env.redCouch = couch;
 
     // 9. Brown Coffee Table with Notebook, Papers Just Strewn About & Bowl (Photo 1)
@@ -903,14 +891,12 @@ class SpriteManager {
     cfCtx.fillRect(4, 5, 1, 12);
 
     // Papers just strewn about (Loose overlapping sheets with scribbles)
-    // Sheet 1 (Angled/shifted cream paper)
     cfCtx.fillStyle = '#f0ece1';
     cfCtx.fillRect(16, 5, 11, 9);
     cfCtx.fillStyle = '#8a857b';
     cfCtx.fillRect(18, 7, 7, 1);
     cfCtx.fillRect(18, 10, 6, 1);
 
-    // Sheet 2 (Overlapping white paper)
     cfCtx.fillStyle = '#ffffff';
     cfCtx.fillRect(14, 11, 13, 10);
     cfCtx.fillStyle = '#7a7a7a';
@@ -921,73 +907,58 @@ class SpriteManager {
     // Red pen resting across the papers
     cfCtx.fillStyle = '#d9333f';
     cfCtx.fillRect(17, 8, 8, 2);
-    cfCtx.fillStyle = '#cccccc'; // Silver tip
+    cfCtx.fillStyle = '#cccccc';
     cfCtx.fillRect(16, 8, 1, 2);
 
-    // White soup/cereal bowl with spoon (Photo 1)
+    // White soup/cereal bowl with spoon
     cfCtx.fillStyle = '#ffffff';
     cfCtx.beginPath();
     cfCtx.arc(32, 13, 4, 0, Math.PI * 2);
     cfCtx.fill();
     cfCtx.fillStyle = '#aaaaaa';
-    cfCtx.fillRect(33, 11, 4, 1); // spoon handle
+    cfCtx.fillRect(33, 11, 4, 1);
     this.env.coffeeTable = coffeeTable;
 
-    // 10. Freestanding Punching Bag Contraption with Sandbag Legs (40x60)
-    const { canvas: punchBag, ctx: pbCtx } = this.createCanvas(40, 60);
+    // 10. Freestanding Punching Bag Contraption with Sandbag Legs - BIGGER (48x70)
+    const { canvas: punchBag, ctx: pbCtx } = this.createCanvas(48, 70);
     // Heavy tubular steel frame
-    // Upright main pole
     pbCtx.fillStyle = '#222222';
-    pbCtx.fillRect(6, 6, 4, 48);
+    pbCtx.fillRect(8, 6, 5, 56);
     pbCtx.fillStyle = '#444444';
-    pbCtx.fillRect(8, 6, 2, 48); // metal highlight
+    pbCtx.fillRect(10, 6, 2, 56);
     // Overhead cantilever arched arm
     pbCtx.fillStyle = '#222222';
-    pbCtx.fillRect(6, 4, 18, 4);
-    pbCtx.fillRect(20, 6, 4, 6);
+    pbCtx.fillRect(8, 4, 24, 5);
+    pbCtx.fillRect(28, 6, 4, 6);
     // Steel hanging chain & swivel
     pbCtx.strokeStyle = '#aaaaaa';
     pbCtx.lineWidth = 1.5;
     pbCtx.beginPath();
-    pbCtx.moveTo(22, 10);
-    pbCtx.lineTo(22, 18);
+    pbCtx.moveTo(30, 9);
+    pbCtx.lineTo(26, 17);
+    pbCtx.moveTo(30, 9);
+    pbCtx.lineTo(34, 17);
     pbCtx.stroke();
-    // Heavy black punching bag
-    pbCtx.fillStyle = '#141414';
-    pbCtx.fillRect(15, 18, 14, 28);
-    pbCtx.fillStyle = '#2a2a2a';
-    pbCtx.fillRect(17, 18, 4, 28); // bag sheen
-    pbCtx.fillStyle = '#d9333f'; // Red reinforced collar strap
-    pbCtx.fillRect(15, 19, 14, 2);
 
-    // --- FREESTANDING BASE CONTRAPTION LEGS ---
-    // Metal support legs extending diagonally on the floor
-    pbCtx.fillStyle = '#1c1c1c';
-    pbCtx.fillRect(2, 52, 12, 4);  // Left support foot
-    pbCtx.fillRect(6, 54, 28, 4);  // Center/right cross brace foot
-    pbCtx.fillRect(28, 52, 10, 4); // Far right stabilizing foot
+    // Heavy leather cylinder punching bag (thicker, taller)
+    pbCtx.fillStyle = '#8b1e22'; // Deep red leather bag
+    pbCtx.fillRect(21, 18, 18, 40);
+    pbCtx.fillStyle = '#111111'; // Black reinforced bottom
+    pbCtx.fillRect(21, 52, 18, 6);
+    pbCtx.fillStyle = '#222222'; // Black hanging straps
+    pbCtx.fillRect(23, 18, 3, 6);
+    pbCtx.fillRect(34, 18, 3, 6);
 
-    // --- HEAVY SANDBAGS RESTING ON BASE LEGS TO KEEP IT UPRIGHT ---
-    // Sandbag 1 (Left leg sandbag)
-    pbCtx.fillStyle = '#c5b382'; // Canvas tan sandbag
-    pbCtx.fillRect(1, 48, 12, 7);
-    pbCtx.fillStyle = '#9e8d5f'; // Sandbag shadow & tied seams
-    pbCtx.fillRect(1, 54, 12, 2);
-    pbCtx.fillRect(0, 50, 2, 3); // tied end knot
-
-    // Sandbag 2 (Right leg sandbag)
-    pbCtx.fillStyle = '#c5b382';
-    pbCtx.fillRect(25, 48, 13, 7);
-    pbCtx.fillStyle = '#9e8d5f';
-    pbCtx.fillRect(25, 54, 13, 2);
-    pbCtx.fillRect(37, 50, 2, 3);
-
-    // Sandbag 3 (Center stack)
-    pbCtx.fillStyle = '#bfa975';
-    pbCtx.fillRect(5, 45, 10, 6);
-    pbCtx.fillStyle = '#8f7e53';
-    pbCtx.fillRect(5, 50, 10, 1);
-
+    // Support legs weighed down with heavy canvas sandbags
+    pbCtx.fillStyle = '#222222';
+    pbCtx.fillRect(4, 60, 40, 4); // Steel base spreaders
+    // Heavy canvas sandbags
+    pbCtx.fillStyle = '#bda27e'; // Tan burlap canvas
+    pbCtx.fillRect(2, 58, 14, 8);
+    pbCtx.fillRect(32, 58, 14, 8);
+    pbCtx.fillStyle = '#8c7558'; // Sandbag stitching
+    pbCtx.strokeRect(2, 58, 14, 8);
+    pbCtx.strokeRect(32, 58, 14, 8);
     this.env.punchBag = punchBag;
 
     // 11. Sliding Glass Door (32x48)

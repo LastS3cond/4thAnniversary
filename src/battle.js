@@ -10,12 +10,14 @@ class BattleManager {
     // Combatant Stats
     this.mallikaHp = 20;
     this.mallikaMaxHp = 20;
-    this.jaydonHp = 20;
-    this.jaydonMaxHp = 20;
+    this.jaydonHp = 12;
+    this.jaydonMaxHp = 12;
     this.jaydonAtk = 1;
     this.jaydonDef = 999;
     this.jaydonSparedEligible = false;
     this.actsCompletedCount = 0;
+    this.smokeCount = 0;
+    this.flirtCount = 0;
 
     // Main Buttons: 0: FIGHT, 1: ACT, 2: ITEM, 3: MERCY
     this.selectedButton = 0;
@@ -62,12 +64,14 @@ class BattleManager {
     this.isActive = true;
     this.mallikaHp = 20;
     this.mallikaMaxHp = 20;
-    this.jaydonHp = 20;
-    this.jaydonMaxHp = 20;
+    this.jaydonHp = 12;
+    this.jaydonMaxHp = 12;
     this.jaydonAtk = 1;
     this.jaydonDef = 999;
     this.jaydonSparedEligible = false;
     this.actsCompletedCount = 0;
+    this.smokeCount = 0;
+    this.flirtCount = 0;
     this.selectedButton = 0;
     this.battleState = 'SELECT_BUTTON';
     this.jaydonPortrait = 'neutral';
@@ -182,20 +186,30 @@ class BattleManager {
         this.slashTimer += dt;
         if (this.slashTimer >= 500) {
           this.slashTimer = 0;
-          this.jaydonHp = Math.max(1, this.jaydonHp - 1);
-          this.jaydonPortrait = 'surprised';
-          const punchMsg = (window.game && window.game.hasPunchedBag)
-            ? "* Jaydon gasps and dramatically pretends to take 1 extra damage from that punching bag workout!"
-            : "* Jaydon gasps and dramatically pretends to take 1 damage anyway.";
-          const reactionMsg = (window.game && window.game.hasPunchedBag)
-            ? "Whoa! Ow, ow! Those strong core muscles are really paying off!"
-            : "Whoa! Ow, ow, critical hit!";
-          this.setMultipleMessages([
-            "* You try to attack, but you can't bring yourself to do it.",
-            punchMsg
-          ], () => {
-            this.jaydonTurnReaction(reactionMsg);
-          });
+          if (this.jaydonHp <= 11) {
+            this.jaydonPortrait = 'neutral';
+            this.setMultipleMessages([
+              "* You try to attack, but you can't bring yourself to do it.",
+              "* Jaydon has pretended enough."
+            ], () => {
+              this.jaydonTurnReaction("Hey, take it easy!");
+            });
+          } else {
+            this.jaydonHp = 11;
+            this.jaydonPortrait = 'surprised';
+            const punchMsg = (window.game && window.game.hasPunchedBag)
+              ? "* Jaydon gasps and dramatically pretends to take 1 extra damage from that punching bag workout!"
+              : "* Jaydon gasps and dramatically pretends to take 1 damage anyway.";
+            const reactionMsg = (window.game && window.game.hasPunchedBag)
+              ? "Whoa! Ow, ow! Those strong core muscles are really paying off!"
+              : "Whoa! Ow, ow, critical hit!";
+            this.setMultipleMessages([
+              "* You try to attack, but you can't bring yourself to do it.",
+              punchMsg
+            ], () => {
+              this.jaydonTurnReaction(reactionMsg);
+            });
+          }
         }
         break;
 
@@ -317,27 +331,44 @@ class BattleManager {
           this.jaydonTurnReaction("Do you like it so far?");
         });
       } else if (this.actIndex === 1) {
-        // Flirt
+        // Flirt (Rotating responses)
+        this.flirtCount++;
         this.jaydonPortrait = 'blush';
         this.jaydonDef = 0;
+        const flirtResponses = [
+          "Whoa...",
+          "Focus, Focus, FOCUS",
+          "That's not allowed",
+          "HEY, what are you trying to do here?"
+        ];
+        const reactionText = flirtResponses[Math.min(this.flirtCount - 1, 3)];
         this.setMultipleMessages([
           "* You give Jaydon that familiar look.",
           "* Jaydon blushes bright red! His defense dropped to 0.",
           "* Jaydon looks back into his bedroom before refocusing on you."
         ], () => {
-          this.jaydonTurnReaction("Whoa... hey there...");
+          this.jaydonTurnReaction(reactionText);
         });
       } else if (this.actIndex === 2) {
-        // Smoke
+        // Smoke (Max 2 uses, then out of joints; no damage to Jaydon so max damage is 1)
+        if (this.smokeCount >= 2) {
+          this.setMultipleMessages([
+            "* (We are out of joints!)"
+          ], () => {
+            this.battleState = 'SELECT_BUTTON';
+            this.setBattleText("* (Why is he in pajama pants?)");
+          });
+          return;
+        }
+        this.smokeCount++;
         this.jaydonPortrait = 'cough';
         this.mallikaHp = Math.max(1, this.mallikaHp - 5);
-        this.jaydonHp = Math.max(1, this.jaydonHp - 5);
         this.jaydonDef = Math.max(0, this.jaydonDef - 50);
         if (window.audioManager) window.audioManager.playHit();
         this.setMultipleMessages([
           "* You both share a joint.",
           "* *Cough cough*",
-          "* (Deals 5 damage to both of you! Defense lowered!)"
+          "* (Deals 5 damage to Mallika! Defense lowered!)"
         ], () => {
           this.jaydonTurnReaction("*cough cough* Do you want some water?");
         });
@@ -418,7 +449,7 @@ class BattleManager {
         this.setMultipleMessages([
           "* You chose to SPARE Jaydon.",
           "* YOU WON! You earned 0 EXP and lots of LOVE.",
-          "* But you gained something infinitely more precious."
+          "* But you gained something more precious."
         ], () => {
           this.triggerVictoryFinale();
         });
@@ -554,36 +585,38 @@ class BattleManager {
       });
     }
 
-    // 3. Status Bar: MALLIKA LV 1 HP 20/20 | JAYDON HP 20/20
+    // 3. Status Bar: MALLIKA HP 20/20 | JAYDON HP 12/12 (Clean, aligned Undertale layout)
     const statusY = 380;
     ctx.font = '13px "Press Start 2P", monospace';
     ctx.fillStyle = '#ffffff';
 
-    // Player Status
-    ctx.fillText("MALLIKA   LV 1", 45, statusY);
-    ctx.fillText("HP", 260, statusY);
+    // Player Status Row
+    ctx.fillText("MALLIKA", 45, statusY);
+    ctx.fillText("HP", 175, statusY);
 
-    // HP Bar: Red background, Yellow filled
-    const hpBarW = 100;
-    const hpBarH = 14;
+    const hpBarW = 90;
+    const hpBarH = 12;
     ctx.fillStyle = '#c72228';
-    ctx.fillRect(295, statusY - 12, hpBarW, hpBarH);
+    ctx.fillRect(210, statusY - 11, hpBarW, hpBarH);
     ctx.fillStyle = '#ffff00';
     const filledW = (this.mallikaHp / this.mallikaMaxHp) * hpBarW;
-    ctx.fillRect(295, statusY - 12, filledW, hpBarH);
+    ctx.fillRect(210, statusY - 11, filledW, hpBarH);
 
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(`${this.mallikaHp} / ${this.mallikaMaxHp}`, 410, statusY);
+    ctx.fillText(`${this.mallikaHp} / ${this.mallikaMaxHp}`, 315, statusY);
 
-    // Opponent Status
-    ctx.fillText("JAYDON HP", 45, statusY + 20);
+    // Opponent Status Row (Symmetrically aligned)
+    ctx.fillText("JAYDON", 45, statusY + 20);
+    ctx.fillText("HP", 175, statusY + 20);
+
     ctx.fillStyle = '#c72228';
-    ctx.fillRect(160, statusY + 8, 80, 10);
+    ctx.fillRect(210, statusY + 9, hpBarW, hpBarH);
     ctx.fillStyle = '#00ff66';
-    const jHpW = (this.jaydonHp / this.jaydonMaxHp) * 80;
-    ctx.fillRect(160, statusY + 8, jHpW, 10);
+    const jHpW = (this.jaydonHp / this.jaydonMaxHp) * hpBarW;
+    ctx.fillRect(210, statusY + 9, jHpW, hpBarH);
+
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(`${this.jaydonHp}/20`, 255, statusY + 18);
+    ctx.fillText(`${this.jaydonHp} / ${this.jaydonMaxHp}`, 315, statusY + 20);
 
     // 4. Four Main Undertale Action Buttons
     const btnW = 125;

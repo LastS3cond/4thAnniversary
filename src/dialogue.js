@@ -20,7 +20,7 @@ class DialogueManager {
     this.onChoiceCallback = null;
   }
 
-  wrapAndPaginate(text, maxChars = 30, maxLines = 3) {
+  wrapAndPaginate(text, maxChars = 36, maxLines = 4) {
     const rawLines = text.split('\n');
     const wrappedLines = [];
     for (let line of rawLines) {
@@ -51,18 +51,18 @@ class DialogueManager {
     return pages.length > 0 ? pages : [''];
   }
 
-  wrapText(text, maxChars = 30) {
-    return this.wrapAndPaginate(text, maxChars, 3).join('\n');
+  wrapText(text, maxChars = 36) {
+    return this.wrapAndPaginate(text, maxChars, 4).join('\n');
   }
 
   start(pages, onComplete = null, portrait = null) {
     if (typeof pages === 'string') {
       pages = [pages];
     }
-    const maxChars = portrait ? 22 : 30;
+    const maxChars = portrait ? 24 : 36;
     const allPages = [];
     for (let p of pages) {
-      allPages.push(...this.wrapAndPaginate(p, maxChars, 3));
+      allPages.push(...this.wrapAndPaginate(p, maxChars, 4));
     }
     this.pages = allPages;
     this.currentPageIndex = 0;
@@ -75,7 +75,7 @@ class DialogueManager {
   }
 
   startChoice(text, onChoice, portrait = null) {
-    const maxChars = portrait ? 22 : 30;
+    const maxChars = portrait ? 24 : 36;
     const choicePages = this.wrapAndPaginate(text, maxChars, 2);
     this.pages = [choicePages[0] || text];
     this.currentPageIndex = 0;
@@ -176,7 +176,7 @@ class DialogueManager {
     ctx.fillRect(boxX + 4, boxY + 4, boxW - 8, boxH - 8);
 
     let textStartX = boxX + 24;
-    const textStartY = boxY + 36;
+    const textStartY = boxY + 20;
     let maxTextWidth = boxW - 48;
 
     // Draw Portrait if present
@@ -192,7 +192,7 @@ class DialogueManager {
     const visibleText = fullText.substring(0, this.charIndex);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = '16px "Press Start 2P", monospace';
+    ctx.font = '14px "Press Start 2P", monospace';
     ctx.textBaseline = 'top';
 
     const lines = visibleText.split('\n');
