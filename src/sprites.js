@@ -730,68 +730,89 @@ class SpriteManager {
     ptCtx.fillRect(6, 56, 2, 12);
     this.env.puzzleTable = puzzleTable;
 
-    // 6. Kitchen Stove with Warm Oven & Microwave on top (36x48)
-    const { canvas: stove, ctx: stCtx } = this.createCanvas(36, 48);
-    // Microwave mounted on top
-    stCtx.fillStyle = '#f0f0f0';
-    stCtx.fillRect(2, 0, 32, 16);
-    stCtx.fillStyle = '#222222';
-    stCtx.fillRect(4, 3, 20, 10); // microwave door window
-    stCtx.fillStyle = '#555555';
-    stCtx.fillRect(26, 3, 6, 10); // keypad
-    stCtx.fillStyle = '#00ff44';
-    stCtx.fillRect(27, 4, 4, 2);  // green clock display
-    // White Stove body below
+    // 6. Kitchen Stove with Warm Oven (36x44) (Photo 1) - Microwave removed to reduce clutter
+    const { canvas: stove, ctx: stCtx } = this.createCanvas(36, 44);
+    // Backguard panel with control dials
     stCtx.fillStyle = '#e8e8e8';
-    stCtx.fillRect(0, 16, 36, 32);
-    // Black coil burners
+    stCtx.fillRect(0, 0, 36, 12);
     stCtx.fillStyle = '#222222';
-    stCtx.fillRect(4, 18, 7, 7);
-    stCtx.fillRect(18, 18, 7, 7);
-    stCtx.fillRect(4, 27, 7, 7);
-    stCtx.fillRect(18, 27, 7, 7);
-    // Red warm burner glow (brown sugar & dates aroma!)
+    stCtx.fillRect(12, 2, 12, 6); // digital clock/timer display
+    stCtx.fillStyle = '#00ff44';
+    stCtx.fillRect(14, 3, 8, 4);  // clock digits
+    // Burner control knobs
+    stCtx.fillStyle = '#444444';
+    stCtx.fillRect(3, 4, 3, 4);
+    stCtx.fillRect(7, 4, 3, 4);
+    stCtx.fillRect(26, 4, 3, 4);
+    stCtx.fillRect(30, 4, 3, 4);
+
+    // Stovetop surface
+    stCtx.fillStyle = '#f5f5f5';
+    stCtx.fillRect(0, 12, 36, 16);
+    // 4 coil burners
+    stCtx.fillStyle = '#222222';
+    stCtx.fillRect(4, 14, 6, 6);
+    stCtx.fillRect(18, 14, 6, 6);
+    stCtx.fillRect(4, 21, 6, 6);
+    stCtx.fillRect(18, 21, 6, 6);
+    // Warm red burner glow (aroma of brown sugar and dates!)
     stCtx.fillStyle = '#ff4422';
-    stCtx.fillRect(5, 19, 5, 5);
-    // Oven glass door
-    stCtx.fillStyle = '#332211';
-    stCtx.fillRect(4, 37, 28, 9);
+    stCtx.fillRect(5, 15, 4, 4);
+
+    // Oven body & door
+    stCtx.fillStyle = '#e0e0e0';
+    stCtx.fillRect(0, 28, 36, 16);
+    // Oven handle
+    stCtx.fillStyle = '#333333';
+    stCtx.fillRect(4, 29, 28, 2);
+    // Tinted oven glass window
+    stCtx.fillStyle = '#2a1a10';
+    stCtx.fillRect(5, 33, 26, 9);
+    // Warm oven light glow inside
+    stCtx.fillStyle = 'rgba(255, 170, 50, 0.4)';
+    stCtx.fillRect(7, 35, 22, 6);
     this.env.stove = stove;
 
-    // 7. Kitchen Sink with Crooked Mini-Blind Window (Photo 2)
+    // 7. Kitchen Sink with Crooked Mini-Blind Window - FLIPPED 180° (36x42) (Photo 2)
+    // Counter/basin is in front (North facing room), window/crooked blinds behind against wall (South)
     const { canvas: sink, ctx: skCtx } = this.createCanvas(36, 42);
-    // Dark wood cabinet on left
-    skCtx.fillStyle = '#4e2f1d';
-    skCtx.fillRect(0, 0, 6, 26);
-    // Pink cleaning gloves hanging from cabinet! (Photo 2)
+    // Front counter facing the room
+    skCtx.fillStyle = '#242424';
+    skCtx.fillRect(0, 0, 36, 20);
+    // Stainless steel sink basin with dishes
+    skCtx.fillStyle = '#778899';
+    skCtx.fillRect(6, 3, 24, 14);
+    skCtx.fillStyle = '#5c6d7e';
+    skCtx.fillRect(8, 5, 20, 10);
+    // Dirty dishes stacked in basin
+    skCtx.fillStyle = '#e6e6e6';
+    skCtx.fillRect(9, 7, 7, 6); // small plate
+    skCtx.fillStyle = '#ffffff';
+    skCtx.fillRect(17, 6, 9, 8); // big plate
+    // Chrome faucet facing into basin
+    skCtx.fillStyle = '#cccccc';
+    skCtx.fillRect(17, 0, 3, 5);
+    // Blue Dawn dish soap bottle (Photo 2)
+    skCtx.fillStyle = '#0088ff';
+    skCtx.fillRect(31, 2, 3, 7);
+    // Pink cleaning gloves hanging on left
     skCtx.fillStyle = '#ff5588';
-    skCtx.fillRect(4, 16, 3, 7);
-    // Window frame
-    skCtx.fillStyle = '#4a3528';
-    skCtx.fillRect(6, 2, 28, 22);
-    skCtx.fillStyle = '#0a101d'; // Night sky
-    skCtx.fillRect(8, 4, 24, 18);
+    skCtx.fillRect(1, 4, 3, 8);
+
+    // Window mounted on the south wall behind the counter
+    skCtx.fillStyle = '#4a3528'; // window frame
+    skCtx.fillRect(4, 20, 28, 22);
+    skCtx.fillStyle = '#0a101d'; // night sky through glass
+    skCtx.fillRect(6, 22, 24, 18);
     // Iconic Crooked mini blinds at steep 45° angle (Photo 2)!
     skCtx.strokeStyle = '#ffffff';
     skCtx.lineWidth = 1.5;
     skCtx.beginPath();
-    skCtx.moveTo(10, 5);
-    skCtx.lineTo(30, 16); // Sharp crooked slant!
-    skCtx.moveTo(10, 9);
-    skCtx.lineTo(30, 20);
+    skCtx.moveTo(8, 24);
+    skCtx.lineTo(28, 36); // Sharp crooked slant!
+    skCtx.moveTo(8, 28);
+    skCtx.lineTo(28, 40);
     skCtx.stroke();
-    // Sink counter
-    skCtx.fillStyle = '#222222';
-    skCtx.fillRect(0, 24, 36, 18);
-    // Metal sink basin
-    skCtx.fillStyle = '#778899';
-    skCtx.fillRect(8, 26, 22, 14);
-    // Faucet
-    skCtx.fillStyle = '#dddddd';
-    skCtx.fillRect(18, 23, 3, 5);
-    // Blue Dawn dish soap bottle! (Photo 2)
-    skCtx.fillStyle = '#0088ff';
-    skCtx.fillRect(31, 23, 3, 5);
     this.env.sink = sink;
 
     // 7b. Dishwasher (Photo 2: Black front with silver control dial)

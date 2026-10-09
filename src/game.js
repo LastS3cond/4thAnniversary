@@ -396,6 +396,12 @@ class Game {
           return;
         }
 
+        // Dirty Dishes Sink Interaction (Choice to clean)
+        if (item.triggerSink) {
+          this.triggerSinkInteraction();
+          return;
+        }
+
         // Standard Dialogue Text
         if (item.text) {
           window.dialogueManager.start(item.text, item.onComplete || null);
@@ -403,6 +409,26 @@ class Game {
         }
       }
     }
+  }
+
+  // Kitchen Sink Dirty Dishes Interaction Sequence
+  triggerSinkInteraction() {
+    window.dialogueManager.startChoice(
+      "* There are dirty dishes piled in the sink.\n* Clean them?",
+      (choice) => {
+        if (choice === 'YES') {
+          window.dialogueManager.start([
+            "* There are too many.",
+            "* Above the sink, the blinds hang completely crooked."
+          ]);
+        } else {
+          window.dialogueManager.start([
+            "* You decide to leave them for later.",
+            "* Above the sink, the blinds hang completely crooked."
+          ]);
+        }
+      }
+    );
   }
 
   // Punching Bag Interaction Sequence

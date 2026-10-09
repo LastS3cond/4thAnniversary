@@ -208,8 +208,9 @@ class MapManager {
         { x: 0, y: 0, w: 40, h: 480 },   // Left wall
         { x: 600, y: 0, w: 40, h: 480 }, // Right wall
 
-        // Center Interior Dividing Wall (warm drywall partition, NOT a black void)
-        { x: 215, y: 190, w: 240, h: 155 },
+        // Center Interior Dividing Wall (warm drywall partition behind TV)
+        // Kept compact so there is wide open walking space to all bottom kitchen cabinets!
+        { x: 215, y: 180, w: 160, h: 105 },
 
         // Bathroom Block on Left of Hallway
         { x: 40, y: 200, w: 95, h: 165 },
@@ -222,7 +223,7 @@ class MapManager {
         // Kitchen South Wall: Pantry, Cabinets, Sink, Dishwasher, More Cabinets
         { x: 270, y: 395, w: 275, h: 45 },
 
-        // Kitchen East Wall (Right Wall): Fridge, Cabinet, Stove/Microwave
+        // Kitchen East Wall (Right Wall): Fridge, Cabinet, Stove (Microwave removed)
         { x: 545, y: 195, w: 55, h: 195 },
 
         // Living Room Furniture:
@@ -261,15 +262,15 @@ class MapManager {
         },
         // 5. Hallway Right: Middle Closet Door
         {
-          x: 215, y: 245, w: 15, h: 45,
+          x: 215, y: 215, w: 15, h: 45,
           text: ["* A hallway storage closet. It's packed full."]
         },
-        // 6. Stairs (Right of front door & hallway)
+        // 6. Stairs (Right of front door & hallway) - Leads to U-shaped staircase
         {
           x: 215, y: 405, w: 50, h: 35,
           isDoor: true,
-          onEnter: () => { window.game.transitionToRoom('staircase', 120, 380, 'up'); },
-          text: ["* You head up the carpeted stairs..."]
+          onEnter: () => { window.game.transitionToRoom('staircase', 255, 90, 'down'); },
+          text: ["* You head into the stairs..."]
         },
         // 7. Kitchen South Wall: Pantry
         {
@@ -281,14 +282,10 @@ class MapManager {
           x: 305, y: 395, w: 45, h: 45,
           text: ["* Dark wood cabinetry filled with plates and mugs."]
         },
-        // 9. Kitchen South Wall: Sink & Crooked Blinds
+        // 9. Kitchen South Wall: Sink & Crooked Blinds (Interactive choice to clean!)
         {
           x: 350, y: 385, w: 45, h: 55,
-          text: [
-            "* There are dirty dishes.",
-            "* (Clean them? -> There are too many.)",
-            "* Above the sink, the blinds hang completely crooked."
-          ]
+          triggerSink: true
         },
         // 10. Kitchen South Wall: Dishwasher
         {
@@ -310,12 +307,11 @@ class MapManager {
           x: 545, y: 255, w: 55, h: 60,
           text: ["* A kitchen counter with spices and cutting boards."]
         },
-        // 14. Kitchen Right Wall: Oven with Microwave on top (Bottom)
+        // 14. Kitchen Right Wall: Oven with Warm Stove (Bottom) (Photo 1)
         {
           x: 545, y: 315, w: 55, h: 70,
           text: [
-            "* The oven is warm. A rich aroma of brown sugar and dates fills the kitchen.",
-            "* A microwave sits right on top."
+            "* The oven is warm. A rich aroma of brown sugar and dates fills the kitchen."
           ]
         },
         // 15. Living Room: Punching Bag (Interactive punch choice)
@@ -356,18 +352,18 @@ class MapManager {
         ctx.fillRect(40, 60, 560, 380);
 
         // --- CENTER INTERIOR DIVIDING WALL (Photo 1) ---
-        // Finished warm interior drywall replacing the previous black void
+        // Finished warm interior drywall behind TV, compact so kitchen has wide open access
         ctx.fillStyle = '#eae3d2';
-        ctx.fillRect(215, 190, 240, 155);
-        // Baseboard molding along bottom and sides
+        ctx.fillRect(215, 180, 160, 105);
+        // Baseboard molding along outer edges
         ctx.fillStyle = '#3d281a';
-        ctx.fillRect(215, 341, 240, 4); // South baseboard
-        ctx.fillRect(215, 190, 240, 4); // North baseboard (behind TV)
-        ctx.fillRect(215, 190, 4, 155); // West baseboard (hallway)
-        ctx.fillRect(451, 190, 4, 155); // East baseboard (kitchen)
+        ctx.fillRect(215, 281, 160, 4); // South baseboard
+        ctx.fillRect(215, 180, 160, 4); // North baseboard (behind TV)
+        ctx.fillRect(215, 180, 4, 105); // West baseboard (hallway)
+        ctx.fillRect(371, 180, 4, 105); // East baseboard (kitchen)
         // Subtle wall edge shading
         ctx.fillStyle = 'rgba(0,0,0,0.06)';
-        ctx.fillRect(219, 194, 232, 147);
+        ctx.fillRect(219, 184, 152, 97);
 
         // --- BATHROOM ROOM BLOCK (Left of hallway) ---
         ctx.fillStyle = '#eae3d2';
@@ -386,12 +382,12 @@ class MapManager {
 
         // --- CLOSET DOOR ON RIGHT OF HALLWAY (on center wall) ---
         ctx.fillStyle = '#3d2b20';
-        ctx.fillRect(215, 245, 8, 45);
+        ctx.fillRect(215, 215, 8, 45);
         ctx.fillStyle = '#ffd700';
-        ctx.fillRect(217, 267, 3, 3);
+        ctx.fillRect(217, 237, 3, 3);
         ctx.fillStyle = '#333333';
         ctx.font = '6px "Press Start 2P", monospace';
-        ctx.fillText("CLOSET", 228, 272);
+        ctx.fillText("CLOSET", 228, 242);
 
         // --- HALLWAY FLOOR RUNNER ---
         ctx.fillStyle = '#b59068';
@@ -557,44 +553,44 @@ class MapManager {
 
     // ----------------------------------------------------
     // ROOM 3: THE STAIRCASE & LANDING TRANSITION
-    // Ascend 7 steps, turn 180 on landing with window, ascend 7 steps!
+    // Compact U-shaped switchback staircase!
+    // Start near top of Flight 1, walk down to landing, turn 180°, walk up Flight 2!
     // ----------------------------------------------------
     this.rooms['staircase'] = {
       name: 'staircase',
       bgm: 'home',
       width: 640,
       height: 480,
-      spawn: { x: 120, y: 380, dir: 'up' },
+      spawn: { x: 255, y: 90, dir: 'down' },
       colliders: [
-        // Walls around the staircase shaft with flight 2 opening (x: 450-560)
-        { x: 0, y: 0, w: 450, h: 50 },
-        { x: 560, y: 0, w: 80, h: 50 },
-        { x: 0, y: 0, w: 70, h: 480 },
-        { x: 570, y: 0, w: 70, h: 480 },
-        { x: 0, y: 440, w: 640, h: 40 },
-        // Central wall divider between flight 1 and flight 2
-        { x: 280, y: 190, w: 80, h: 250 }
+        // Shaft boundary outer walls
+        { x: 0, y: 0, w: 235, h: 480 },   // Left of shaft
+        { x: 375, y: 0, w: 265, h: 480 }, // Right of shaft
+        { x: 0, y: 0, w: 640, h: 50 },    // Top bounds (except doorway openings)
+        { x: 0, y: 390, w: 640, h: 90 },  // Bottom bounds below landing
+        // Central wall / handrail dividing Flight 1 and Flight 2
+        { x: 295, y: 40, w: 20, h: 250 }
       ],
       interactables: [
-        // Landing Window overlooking outside snow
+        // Intermediate Landing Window (Photo 2 & 5) overlooking outside snow
         {
-          x: 270, y: 50, w: 100, h: 70,
+          x: 270, y: 345, w: 70, h: 45,
           text: [
             "* You pause at the intermediate landing.",
-            "* Outside, snow falls peacefully through the dark winter night."
+            "* Outside the window, snowflakes drift through the quiet winter night."
           ]
         },
-        // Bottom stairs exit back to First Floor
+        // Flight 1 Top Doorway: Exit back down to First Floor
         {
-          x: 90, y: 420, w: 80, h: 30,
+          x: 235, y: 40, w: 60, h: 25,
           isDoor: true,
           onEnter: () => { window.game.transitionToRoom('first_floor', 235, 360, 'down'); }
         },
-        // Top stairs exit into Second Floor Hallway
+        // Flight 2 Top Doorway: Exit into Second Floor Hallway
         {
-          x: 460, y: 50, w: 100, h: 40,
+          x: 315, y: 40, w: 60, h: 25,
           isDoor: true,
-          onEnter: () => { window.game.transitionToRoom('second_floor', 480, 380, 'up'); }
+          onEnter: () => { window.game.transitionToRoom('second_floor', 320, 375, 'up'); }
         }
       ],
       draw: (ctx) => {
@@ -602,133 +598,151 @@ class MapManager {
         ctx.fillStyle = '#1c1618';
         ctx.fillRect(0, 0, 640, 480);
 
-        // Intermediate Landing Floor (Upper area)
-        ctx.fillStyle = '#bfa588'; // Beige carpet
-        ctx.fillRect(80, 100, 480, 90);
+        // Stair shaft enclosure walls (warm interior drywall)
+        ctx.fillStyle = '#261c20';
+        ctx.fillRect(0, 0, 235, 480);
+        ctx.fillRect(375, 0, 265, 480);
+        ctx.fillRect(0, 390, 640, 90);
 
-        // Landing Window framing the outside snow
+        // Intermediate Landing Floor at the bottom (connecting Flight 1 & Flight 2)
+        ctx.fillStyle = '#bfa588'; // Beige carpet landing
+        ctx.fillRect(235, 290, 140, 100);
+
+        // Landing Window on bottom wall framing the outside snow (Photo 5)
         ctx.fillStyle = '#3a2820'; // Window frame
-        ctx.fillRect(260, 50, 120, 65);
+        ctx.fillRect(270, 350, 70, 40);
         ctx.fillStyle = '#0a101d'; // Sky
-        ctx.fillRect(266, 56, 108, 53);
+        ctx.fillRect(274, 354, 62, 32);
 
         // Snow falling outside window
         ctx.fillStyle = '#ffffff';
         const t = Date.now() * 0.001;
-        for (let i = 0; i < 15; i++) {
-          const wx = 268 + ((i * 17 + t * 10) % 100);
-          const wy = 58 + ((i * 23 + t * 18) % 48);
+        for (let i = 0; i < 12; i++) {
+          const wx = 276 + ((i * 17 + t * 10) % 58);
+          const wy = 356 + ((i * 23 + t * 18) % 28);
           ctx.fillRect(wx, wy, 2, 2);
         }
-
-        // Window mullions
+        // Window cross mullions
         ctx.strokeStyle = '#3a2820';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(320, 56); ctx.lineTo(320, 109);
-        ctx.moveTo(266, 82); ctx.lineTo(374, 82);
+        ctx.moveTo(305, 354); ctx.lineTo(305, 386);
+        ctx.moveTo(274, 370); ctx.lineTo(336, 370);
         ctx.stroke();
 
-        // Central divider wall
-        ctx.fillStyle = '#2a1e20';
-        ctx.fillRect(280, 190, 80, 250);
+        // Central divider wall / newel post between flight 1 and flight 2
+        ctx.fillStyle = '#352428';
+        ctx.fillRect(295, 40, 20, 250);
+        ctx.fillStyle = '#4a343a';
+        ctx.fillRect(297, 40, 16, 250);
 
-        // --- FLIGHT 1: 7 STEPS ASCENDING (Left side, from bottom up to landing) ---
-        ctx.fillStyle = '#c8b299';
-        ctx.fillRect(90, 190, 170, 250);
+        // --- FLIGHT 1: 7 STEPS DESCENDING TO LANDING (Left side, x: 235..295) ---
+        ctx.fillStyle = '#c8b299'; // Beige carpet steps
+        ctx.fillRect(235, 60, 60, 230);
         ctx.strokeStyle = '#9e8770';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
         for (let i = 1; i <= 7; i++) {
-          const sy = 440 - i * 35;
+          const sy = 60 + i * 32;
           ctx.beginPath();
-          ctx.moveTo(90, sy);
-          ctx.lineTo(260, sy);
-          ctx.stroke();
-          // Step number indicator / carpet shading
-          ctx.fillStyle = 'rgba(0,0,0,0.15)';
-          ctx.fillRect(90, sy, 170, 8);
+          ctx.moveTo(235, sy); ctx.lineTo(295, sy); ctx.stroke();
+          ctx.fillStyle = 'rgba(0,0,0,0.12)';
+          ctx.fillRect(235, sy - 6, 60, 6);
         }
 
-        // --- FLIGHT 2: 7 STEPS ASCENDING (Right side, from landing up to 2nd floor) ---
+        // --- FLIGHT 2: 7 STEPS ASCENDING TO 2ND FLOOR (Right side, x: 315..375) ---
         ctx.fillStyle = '#c8b299';
-        ctx.fillRect(380, 70, 170, 200);
+        ctx.fillRect(315, 60, 60, 230);
         for (let i = 1; i <= 7; i++) {
-          const sy = 250 - i * 25;
+          const sy = 290 - i * 32;
           ctx.beginPath();
-          ctx.moveTo(380, sy);
-          ctx.lineTo(550, sy);
-          ctx.stroke();
-          ctx.fillStyle = 'rgba(0,0,0,0.15)';
-          ctx.fillRect(380, sy, 170, 6);
+          ctx.moveTo(315, sy); ctx.lineTo(375, sy); ctx.stroke();
+          ctx.fillStyle = 'rgba(0,0,0,0.12)';
+          ctx.fillRect(315, sy, 60, 6);
         }
 
         // Wooden Handrails
         ctx.strokeStyle = '#5a3825';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(85, 440); ctx.lineTo(85, 100);
-        ctx.lineTo(275, 100);
-        ctx.moveTo(365, 100); ctx.lineTo(555, 100);
+        // Left handrail
+        ctx.moveTo(237, 60); ctx.lineTo(237, 290);
+        // Center handrails
+        ctx.moveTo(294, 60); ctx.lineTo(294, 290);
+        ctx.moveTo(316, 60); ctx.lineTo(316, 290);
+        // Right handrail
+        ctx.moveTo(373, 60); ctx.lineTo(373, 290);
         ctx.stroke();
 
         // Directional guides
         ctx.fillStyle = '#ffffff';
-        ctx.font = '8px "Press Start 2P", monospace';
-        ctx.fillText("▲ 7 STEPS UP", 110, 380);
-        ctx.fillText("TURN 180° ►", 270, 150);
-        ctx.fillText("▲ 7 STEPS TO 2ND FLOOR", 370, 160);
+        ctx.font = '6px "Press Start 2P", monospace';
+        ctx.fillText("▼ 7 STEPS DOWN", 236, 75);
+        ctx.fillText("TURN 180° ►", 270, 315);
+        ctx.fillText("▲ 7 STEPS UP", 316, 75);
       }
     };
 
     // ----------------------------------------------------
-    // ROOM 4: SECOND FLOOR HALLWAY
-    // Alex's Room, Kevin's Room, Suitcases, Bathroom, Jaydon's Room!
+    // ROOM 4: SECOND FLOOR HALLWAY (NARROW TOWNHOUSE CORRIDOR)
+    // Layout from South to North:
+    // - Stairs lead directly into the hallway
+    // - 1st pair: Bathroom on LEFT, Alex's door OPPOSITE (right)
+    // - 2nd pair: Storage closet on LEFT, Wall OPPOSITE (right)
+    // - 3rd pair: Kevin's door on LEFT, Jaydon's door OPPOSITE (right, Boss Trigger)
     // ----------------------------------------------------
     this.rooms['second_floor'] = {
       name: 'second_floor',
       bgm: 'home',
       width: 640,
       height: 480,
-      spawn: { x: 480, y: 380, dir: 'up' },
+      spawn: { x: 320, y: 375, dir: 'up' },
       colliders: [
-        // Hallway boundaries (Narrow carpeted corridor)
-        { x: 0, y: 0, w: 640, h: 70 },
-        { x: 0, y: 0, w: 220, h: 480 },  // Left rooms/walls
-        { x: 420, y: 0, w: 220, h: 360 }, // Right rooms/walls (except stair opening)
-        { x: 550, y: 360, w: 90, h: 120 },
-        { x: 0, y: 440, w: 640, h: 40 }
+        // Hallway boundaries: Thin corridor matching stair width (x: 280..360, width 80)
+        { x: 0, y: 0, w: 280, h: 480 },   // Left rooms / walls
+        { x: 360, y: 0, w: 280, h: 480 }, // Right rooms / walls
+        { x: 280, y: 0, w: 80, h: 65 },   // Top north wall
+        // Bottom walls around stairs opening (x: 280..360)
+        { x: 0, y: 440, w: 280, h: 40 },
+        { x: 360, y: 440, w: 280, h: 40 }
       ],
       interactables: [
-        // 1. Alex's Door (Far Left)
+        // 1. FIRST PAIR (y: 270..325)
+        // Left: Second-Floor Bathroom
         {
-          x: 200, y: 80, w: 40, h: 50,
-          text: ["* You hear yelling and furious typing. Must be playing a game."]
-        },
-        // 2. Storage Closet (Left, middle)
-        {
-          x: 200, y: 180, w: 40, h: 50,
-          text: ["* There are some suitcases in here."]
-        },
-        // 3. Second-Floor Bathroom (Left, near front)
-        {
-          x: 200, y: 280, w: 40, h: 50,
+          x: 255, y: 280, w: 30, h: 48,
           text: ["* You don't have to use the bathroom right now."]
         },
-        // 4. Kevin's Door (Right, near stairs)
+        // Opposite (Right): Alex's Door
         {
-          x: 400, y: 280, w: 40, h: 50,
+          x: 355, y: 280, w: 30, h: 48,
+          text: ["* You hear yelling and furious typing. Must be playing a game."]
+        },
+
+        // 2. SECOND PAIR (y: 175..230)
+        // Left: Storage Closet with suitcases
+        {
+          x: 255, y: 180, w: 30, h: 48,
+          text: ["* There are some suitcases in here."]
+        },
+        // Opposite (Right): Solid Wall (No door!)
+
+        // 3. THIRD PAIR AT END OF HALLWAY (y: 80..135)
+        // Left: Kevin's Door
+        {
+          x: 255, y: 80, w: 30, h: 48,
           text: ["* You hear him speaking very formally, must be interviewing."]
         },
-        // 5. Stairs back down to Landing
+        // Opposite (Right): Jaydon's Door (Boss Encounter Trigger!)
         {
-          x: 430, y: 415, w: 110, h: 30,
-          isDoor: true,
-          onEnter: () => { window.game.transitionToRoom('staircase', 480, 100, 'down'); }
-        },
-        // 6. JAYDON'S BEDROOM DOOR (Boss Encounter Trigger!)
-        {
-          x: 200, y: 20, w: 80, h: 60,
+          x: 355, y: 80, w: 30, h: 48,
           triggerBoss: true
+        },
+
+        // 4. STAIRS EXIT (Bottom of hallway directly back to staircase)
+        {
+          x: 285, y: 435, w: 70, h: 25,
+          isDoor: true,
+          onEnter: () => { window.game.transitionToRoom('staircase', 335, 80, 'down'); }
         }
       ],
       draw: (ctx) => {
@@ -736,73 +750,83 @@ class MapManager {
         ctx.fillStyle = '#231b20';
         ctx.fillRect(0, 0, 640, 480);
 
-        // Hallway Carpet
+        // Thin Hallway Carpet (x: 280..360, width 80px)
         ctx.fillStyle = '#a68c76';
-        ctx.fillRect(220, 60, 200, 390);
+        ctx.fillRect(280, 65, 80, 375);
 
         // Carpet runner pattern
         ctx.fillStyle = '#8f745e';
-        ctx.fillRect(240, 60, 160, 390);
+        ctx.fillRect(290, 65, 60, 375);
         ctx.strokeStyle = '#c9b29b';
         ctx.lineWidth = 1;
-        ctx.strokeRect(240, 60, 160, 390);
+        ctx.strokeRect(290, 65, 60, 375);
 
-        // --- DOORS ---
-        const drawDoor = (x, y, label, isKnobLeft = false) => {
-          ctx.fillStyle = '#42281a';
-          ctx.fillRect(x, y, 32, 50);
-          ctx.fillStyle = '#2e1b12';
-          ctx.fillRect(x + 2, y + 2, 28, 22);
-          ctx.fillRect(x + 2, y + 26, 28, 22);
+        // Baseboard moldings along hallway walls
+        ctx.fillStyle = '#3d281a';
+        ctx.fillRect(278, 65, 3, 375);
+        ctx.fillRect(359, 65, 3, 375);
+        ctx.fillRect(280, 64, 80, 3); // top baseboard
+
+        // Helper function to draw crisp bedroom doors
+        const drawDoor = (x, y, label, isKnobLeft = false, isGold = false) => {
+          ctx.fillStyle = isGold ? '#593220' : '#42281a';
+          ctx.fillRect(x, y, 26, 46);
+          ctx.fillStyle = isGold ? '#3d2012' : '#2e1b12';
+          ctx.fillRect(x + 2, y + 2, 22, 20);
+          ctx.fillRect(x + 2, y + 24, 22, 20);
           // Brass knob
           ctx.fillStyle = '#ffd700';
-          const knobX = isKnobLeft ? x + 4 : x + 25;
-          ctx.fillRect(knobX, y + 26, 3, 4);
+          const knobX = isKnobLeft ? x + 3 : x + 20;
+          ctx.fillRect(knobX, y + 24, 3, 4);
           // Label
-          ctx.fillStyle = '#ffffff';
+          ctx.fillStyle = isGold ? '#ffff55' : '#ffffff';
           ctx.font = '6px "Press Start 2P", monospace';
-          ctx.fillText(label, x - 10, y - 5);
+          const lx = isKnobLeft ? x - 4 : x + 4;
+          ctx.fillText(label, lx - (isKnobLeft ? 26 : 0), y - 4);
         };
 
-        // Alex's Door (Left wall, far end)
-        drawDoor(195, 80, "ALEX", false);
+        // --- PAIR 1 (y: 280) ---
+        // Left: Bathroom Door
+        drawDoor(254, 280, "BATH", false);
+        // Right (opposite): Alex's Door
+        drawDoor(360, 280, "ALEX", true);
 
-        // Storage Closet with suitcases (Left wall, middle)
-        drawDoor(195, 180, "STORAGE", false);
-        // Suitcases graphic inside nook
+        // --- PAIR 2 (y: 180) ---
+        // Left: Storage Closet
+        drawDoor(254, 180, "STORAGE", false);
+        // Suitcases graphic inside nook next to closet
         ctx.fillStyle = '#1e3852';
-        ctx.fillRect(170, 190, 18, 12);
+        ctx.fillRect(234, 192, 16, 12);
         ctx.fillStyle = '#7a3128';
-        ctx.fillRect(173, 204, 15, 14);
+        ctx.fillRect(237, 206, 14, 14);
+        // Right (opposite): Solid Wall (warm interior drywall with baseboard)
+        ctx.fillStyle = '#eae3d2';
+        ctx.fillRect(362, 175, 45, 56);
+        ctx.fillStyle = '#3d281a';
+        ctx.fillRect(362, 228, 45, 3);
+        ctx.fillStyle = '#999999';
+        ctx.font = '5px "Press Start 2P", monospace';
+        ctx.fillText("[WALL]", 366, 205);
 
-        // 2nd Floor Bathroom (Left wall, front)
-        drawDoor(195, 280, "BATH", false);
+        // --- PAIR 3 AT END OF HALLWAY (y: 80) ---
+        // Left: Kevin's Door
+        drawDoor(254, 80, "KEVIN", false);
+        // Right (opposite): Jaydon's Door (Boss Trigger!)
+        drawDoor(360, 80, "JAYDON", true, true);
 
-        // Kevin's Door (Right wall, front)
-        drawDoor(415, 280, "KEVIN", true);
-
-        // JAYDON'S ROOM DOOR (Encounter Trigger - Left end of back wall)
-        ctx.fillStyle = '#593220';
-        ctx.fillRect(225, 20, 45, 50);
-        ctx.fillStyle = '#ffd700';
-        ctx.fillRect(260, 45, 4, 4);
-        ctx.fillStyle = '#ffff55';
-        ctx.font = '7px "Press Start 2P", monospace';
-        ctx.fillText("JAYDON'S ROOM", 210, 12);
-
-        // Stairs opening at bottom right
+        // --- STAIRS DIRECTLY CONNECTING TO BOTTOM OF HALLWAY ---
         ctx.fillStyle = '#c7b299';
-        ctx.fillRect(450, 410, 80, 40);
-        for (let sy = 410; sy <= 450; sy += 7) {
-          ctx.beginPath(); ctx.moveTo(450, sy); ctx.lineTo(530, sy); ctx.stroke();
+        ctx.fillRect(285, 420, 70, 35);
+        for (let sy = 420; sy <= 455; sy += 7) {
+          ctx.beginPath(); ctx.moveTo(285, sy); ctx.lineTo(355, sy); ctx.stroke();
         }
         ctx.fillStyle = '#ffffff';
-        ctx.font = '7px "Press Start 2P", monospace';
-        ctx.fillText("▼ STAIRS", 455, 400);
+        ctx.font = '6px "Press Start 2P", monospace';
+        ctx.fillText("▼ STAIRS", 295, 412);
 
         // If Jaydon stepped out into the hallway before battle
         if (window.game && window.game.isJaydonInHallway) {
-          ctx.drawImage(window.spriteManager.jaydonOverworld, 240, 75);
+          ctx.drawImage(window.spriteManager.jaydonOverworld, 305, 80);
         }
       }
     };

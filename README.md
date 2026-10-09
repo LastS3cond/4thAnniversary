@@ -182,11 +182,16 @@ The first floor functions as a continuous rectangular loop connecting the Foyer,
      - *Flavor text*: `* The pantry is closed.`
    - **Dark Wood Cabinets** (`x: 305, y: 395, w: 45, h: 45`): Left of sink.
      - *Flavor text*: `* Dark wood cabinetry filled with plates and mugs.`
-   - **Kitchen Sink & Crooked Blinds Window** (`x: 350, y: 385, w: 45, h: 55`): (Photo 2) Dark wood upper cabinet with hanging pink cleaning gloves, stainless steel basin, bottle of blue Dawn dish soap, and a window looking outside where the mini-blinds hang at a steep 45° crooked slant.
-     - *Flavor text*:
+   - **Kitchen Sink & Crooked Blinds Window (Flipped 180°)** (`x: 350, y: 385, w: 45, h: 55`): (Photo 2) Flipped 180° so the stainless steel basin, faucet, blue Dawn dish soap, and pink cleaning gloves face forward into the room, with the window and crooked mini-blinds mounted on the south wall behind it.
+     - *Interactive Prompt*: `* There are dirty dishes piled in the sink. Clean them? [ YES / NO ]`
+     - Selecting **YES**:
        ```text
-       * There are dirty dishes.
-       * (Clean them? -> There are too many.)
+       * There are too many.
+       * Above the sink, the blinds hang completely crooked.
+       ```
+     - Selecting **NO**:
+       ```text
+       * You decide to leave them for later.
        * Above the sink, the blinds hang completely crooked.
        ```
    - **Dishwasher** (`x: 395, y: 395, w: 35, h: 45`): (Photo 2) Black front panel with silver dial knob.
@@ -197,14 +202,10 @@ The first floor functions as a continuous rectangular loop connecting the Foyer,
 5. **Kitchen East Wall (Right Wall: Top to Bottom)**:
    - **Refrigerator** (`x: 545, y: 195, w: 55, h: 60`): Light grey two-door fridge with silver handles.
      - *Flavor text*: `* I'm not particularly hungry.`
-   - **Cabinet Counter** (`x: 545, y: 255, w: 55, h: 60`): Middle counter surface.
+   - **Cabinet Counter** (`x: 545, y: 255, w: 55, h: 60`): Middle counter surface with cutting boards and spices.
      - *Flavor text*: `* A kitchen counter with spices and cutting boards.`
-   - **White Coil Stove & Microwave** (`x: 545, y: 315, w: 55, h: 70`): (Photo 1) Microwave mounted on top with glowing green digital clock; white coil-top stove below with warm red burner glow.
-     - *Flavor text*:
-       ```text
-       * The oven is warm. A rich aroma of brown sugar and dates fills the kitchen.
-       * A microwave sits right on top.
-       ```
+   - **Kitchen Stove & Oven** (`x: 545, y: 315, w: 55, h: 70`): (Photo 1) Freestanding range with backguard clock display, four coil burners with warm red burner glow, and oven below (microwave removed to reduce visual clutter).
+     - *Flavor text*: `* The oven is warm. A rich aroma of brown sugar and dates fills the kitchen.`
 
 6. **The Living Room (North Area)**:
    - **Green Ceiling LED Perimeter Strip**: (Photo 1) Vibrant emerald LED lights running along the ceiling moulding (`x: 40..600, y: 58`) casting an ambient green glow.
@@ -235,77 +236,84 @@ The first floor functions as a continuous rectangular loop connecting the Foyer,
 
 ### 3. The Staircase & Landing Transition
 
-Ascending the stairs requires taking 7 steps up, turning 180° at an intermediate landing with a scenic window, and taking 7 steps up into the second-floor hallway.
+A compact, authentic U-shaped switchback staircase connecting the first and second floors.
 
 ```
 +-------------------------------------------------------------------+
-|                  [INTERMEDIATE LANDING WINDOW]                    |
-|             (Falling snowflakes outside the night sky)            |
+|      [DOOR: TO FIRST FLOOR]   | WALL |   [DOOR: TO 2ND FLOOR]     |
+|      (Top of Flight 1)        | DIV  |   (Top of Flight 2)        |
+|                               |      |                            |
+|      [FLIGHT 1: 7 STEPS DOWN] | [295 |   [FLIGHT 2: 7 STEPS UP]   |
+|      (Walk South down stairs) | .315]|   (Walk North up stairs)   |
+|      Handrail (#5a3825)       |      |   Handrail (#5a3825)       |
 |                                                                   |
-|   [FLIGHT 1: 7 STEPS UP]    [WALL DIVIDER]   [FLIGHT 2: 7 STEPS]  |
-|   ▲ Bottom Stair Entry      [280..360]       ▲ Exit to 2nd Floor  |
-|   (From First Floor)                         (To Upstairs Hall)   |
-|   Handrails (#5a3825)                        Handrails (#5a3825)  |
+|      [INTERMEDIATE LANDING: CARPETED U-TURN (x: 235..375)]        |
+|      (Turn 180° around the center divider into Flight 2)          |
+|      [LANDING WINDOW: Snowflakes drifting through the night sky]  |
 +-------------------------------------------------------------------+
 ```
 
-- **Colliders & Mechanics**:
-  - Flight 1: Ascends from `y: 440` to `y: 190` on the left.
-  - Landing: Spacious carpeted walkway (`y: 100..190`) with wooden handrails.
-  - Landing Window (`x: 270, y: 50, w: 100, h: 70`):
+- **Colliders & Switchback Mechanics**:
+  - **U-Shape Traversal**: Entering from the first floor places the player near the top of Flight 1 (`spawn: { x: 255, y: 90, dir: 'down' }`). The player moves south down 7 steps to the intermediate landing (`y: 290..390`), pauses by the scenic snowy window, turns 180° around the center divider, and walks north up 7 steps on Flight 2 to the top doorway.
+  - **Landing Window** (`x: 270, y: 345, w: 70, h: 45`):
     - *Flavor text*:
       ```text
       * You pause at the intermediate landing.
-      * Outside, snow falls peacefully through the dark winter night.
+      * Outside the window, snowflakes drift through the quiet winter night.
       ```
-  - Flight 2: Ascends from `y: 190` to `y: 70` on the right.
-  - Exit Trigger (`x: 460, y: 50, w: 100, h: 40`): Seamlessly transitions into `second_floor` at `x: 480, y: 380, dir: 'up'`.
+  - **Flight 2 Exit Trigger** (`x: 315, y: 40, w: 60, h: 25`): Directly connects to the second floor hallway at `x: 320, y: 375, dir: 'up'`.
 
 ---
 
-### 4. Second Floor Hallway
+### 4. Second Floor Hallway (Narrow Residential Corridor)
 
-A quiet, carpeted residential hallway running front-to-back lined with closed roommate doors.
+A cozy, narrow residential hallway (80px wide, matching the staircase) directly connected to the stairs, with doors arranged in true-to-life pairs.
 
 ```
 +-------------------------------------------------------------------+
-|  [JAYDON'S ROOM: ENCOUNTER TRIGGER]  |                            |
-|  (Door with click interaction)       |  SOLID WALL                |
-|                                      |                            |
-|  [ALEX'S DOOR]                       |                            |
-|  (Furious typing & yelling)          |                            |
-|                                      |  CARPETED CORRIDOR         |
-|  [STORAGE CLOSET]                    |  (Run & walk area)         |
-|  (Suitcases stacked)                 |                            |
-|                                      |                            |
-|  [BATHROOM DOOR]                     |  [KEVIN'S DOOR]            |
-|  ("Don't need to use")               |  (Formal interview voice)  |
-|                                      |                            |
-|  SOLID WALL                          |  [STAIRS DOWN TO LANDING]  |
+|                  [NORTH END WALL: BASEBOARDS]                     |
+|                                                                   |
+|   [KEVIN'S DOOR]              |       |   [JAYDON'S ROOM]         |
+|   (Left: Interview voice)     |       |   (Opposite: Boss Trigger)|
+|                               |       |                           |
+|   [STORAGE CLOSET]            |THIN 80|   [SOLID DRY WALL]        |
+|   (Left: Suitcases)           |PIXEL  |   (Opposite: Baseboard)   |
+|                               |CORRI- |                           |
+|   [BATHROOM]                  |DOR    |   [ALEX'S DOOR]           |
+|   (Left: 2nd floor bath)      |       |   (Opposite: Typing/game) |
+|                               |       |                           |
+|                               |   ▲   |                           |
+|                               [STAIRS ]                           |
+|                               (Directly connected to hallway)     |
 +-------------------------------------------------------------------+
 ```
 
-- **Interactables & Roommate Lore**:
-  - **Alex's Door** (`x: 200, y: 80, w: 40, h: 50`):
-    - *Flavor text*: `* You hear yelling and furious typing. Must be playing a game.`
-  - **Storage Closet** (`x: 200, y: 180, w: 40, h: 50`):
-    - *Flavor text*: `* There are some suitcases in here.`
-  - **Second-Floor Bathroom** (`x: 200, y: 280, w: 40, h: 50`):
-    - *Flavor text*: `* You don't have to use the bathroom right now.`
-  - **Kevin's Door** (`x: 400, y: 280, w: 40, h: 50`):
-    - *Flavor text*: `* You hear him speaking very formally, must be interviewing.`
-  - **Jaydon's Bedroom Door (The Climax Trigger)** (`x: 200, y: 20, w: 80, h: 60`):
-    - *Prompt*: `* Knock on Jaydon's door? [ YES / NO ]`
-    - If **NO**: `* You decide to wait a moment.`
-    - If **YES**:
-      1. Plays authentic door open latch sound.
-      2. Jaydon's overworld sprite steps into the hallway wearing dark glasses, a long-sleeve crewneck, and red plaid pajama pants.
-      3. Dialogue plays:
-         ```text
-         * The door opens with a gentle click.
-         * Jaydon steps into the hallway wearing glasses, a long-sleeve shirt, and red plaid pajama pants.
-         ```
-      4. Screen flashes black and white 3 times with the iconic Undertale encounter SFX burst, launching the battle!
+- **Interactables & True-to-Life Room Sequence**:
+  - **Stairs Entrance** (`x: 285, y: 435, w: 70, h: 25`): Opens directly into the bottom of the hallway. Spawns incoming players safely at `y: 375` (above the trigger with an 800ms cooldown buffer, preventing any accidental exit loops).
+  - **First Pair (Front)**:
+    - **Bathroom (Left)** (`x: 255, y: 280, w: 30, h: 48`): Second-floor bathroom.
+      - *Flavor text*: `* You don't have to use the bathroom right now.`
+    - **Alex's Door (Opposite / Right)** (`x: 355, y: 280, w: 30, h: 48`):
+      - *Flavor text*: `* You hear yelling and furious typing. Must be playing a game.`
+  - **Second Pair (Middle)**:
+    - **Storage Closet (Left)** (`x: 255, y: 180, w: 30, h: 48`): Storage closet with suitcases visible.
+      - *Flavor text*: `* There are some suitcases in here.`
+    - **Solid Wall (Opposite / Right)**: Warm finished drywall with baseboards, no door.
+  - **Third Pair (End of Hallway)**:
+    - **Kevin's Door (Left)** (`x: 255, y: 80, w: 30, h: 48`):
+      - *Flavor text*: `* You hear him speaking very formally, must be interviewing.`
+    - **Jaydon's Bedroom Door (Opposite / Right - The Climax Trigger)** (`x: 355, y: 80, w: 30, h: 48`):
+      - *Prompt*: `* Knock on Jaydon's door? [ YES / NO ]`
+      - If **NO**: `* You decide to wait a moment.`
+      - If **YES**:
+        1. Plays authentic door open latch sound.
+        2. Jaydon's overworld sprite steps into the hallway wearing dark glasses, a long-sleeve crewneck, and red plaid pajama pants.
+        3. Dialogue plays:
+           ```text
+           * The door opens with a gentle click.
+           * Jaydon steps into the hallway wearing glasses, a long-sleeve shirt, and red plaid pajama pants.
+           ```
+        4. Screen flashes black and white 3 times with the iconic Undertale encounter SFX burst, launching the battle!
 
 ---
 
