@@ -11,17 +11,43 @@ class FinaleManager {
     this.starAngle = 0;
     this.particles = [];
 
-    // Monologue pages
-    this.monologue = [
+    // Monologue pages with word wrap
+    this.rawMonologue = [
       "* (Knowing how much love, laughter, and adventures you share...)",
       "* (...it fills you with DETERMINATION.)",
       "* Happy Anniversary, Mallika. I love you."
     ];
+    this.monologue = this.rawMonologue.map(p => this.wrapText(p, 28));
     this.pageIndex = 0;
     this.charIndex = 0;
     this.charTimer = 0;
     this.textSpeed = 35;
     this.isDone = false;
+  }
+
+  wrapText(text, maxChars = 28) {
+    const rawLines = text.split('\n');
+    const result = [];
+    for (let line of rawLines) {
+      if (line.length <= maxChars) {
+        result.push(line);
+      } else {
+        const words = line.split(' ');
+        let cur = '';
+        for (let w of words) {
+          if (!cur) {
+            cur = w;
+          } else if ((cur + ' ' + w).length <= maxChars) {
+            cur += ' ' + w;
+          } else {
+            result.push(cur);
+            cur = w;
+          }
+        }
+        if (cur) result.push(cur);
+      }
+    }
+    return result.join('\n');
   }
 
   startFinale() {
@@ -166,7 +192,7 @@ class FinaleManager {
     ctx.fillStyle = '#000000';
     ctx.fillRect(boxX + 4, boxY + 4, boxW - 8, boxH - 8);
 
-    ctx.font = '15px "Press Start 2P", monospace';
+    ctx.font = '14px "Press Start 2P", monospace';
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline = 'top';
 
@@ -181,7 +207,7 @@ class FinaleManager {
 
     const lines = textToShow.split('\n');
     lines.forEach((l, idx) => {
-      ctx.fillText(l, boxX + 30, boxY + 45 + idx * 30);
+      ctx.fillText(l, boxX + 30, boxY + 35 + idx * 26);
     });
 
     // Resting prompt

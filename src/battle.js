@@ -41,7 +41,7 @@ class BattleManager {
     // Items inventory
     this.items = [
       { name: 'Sticky Toffee Pudding', used: false },
-      { name: 'dress', used: false }
+      { name: 'Dress', used: false }
     ];
 
     // Current battle text display
@@ -74,7 +74,7 @@ class BattleManager {
 
     this.items = [
       { name: 'Sticky Toffee Pudding', used: false },
-      { name: 'dress', used: false }
+      { name: 'Dress', used: false }
     ];
 
     this.setBattleText("* (Why is he in pajama pants?)");
@@ -84,7 +84,7 @@ class BattleManager {
     }
   }
 
-  wrapText(text, maxChars = 34) {
+  wrapText(text, maxChars = 26) {
     const rawLines = text.split('\n');
     const result = [];
     for (let line of rawLines) {
@@ -109,8 +109,9 @@ class BattleManager {
     return result.join('\n');
   }
 
-  setBattleText(text, onDone = null) {
-    this.currentText = this.wrapText(text, 34);
+  setBattleText(text, onDone = null, maxChars = null) {
+    const limit = maxChars || (this.battleState === 'JAYDON_TALK' ? 22 : 26);
+    this.currentText = this.wrapText(text, limit);
     this.textCharIndex = 0;
     this.textTimer = 0;
     this.onMessageDoneCallback = onDone;
@@ -182,13 +183,13 @@ class BattleManager {
         if (this.slashTimer >= 500) {
           this.slashTimer = 0;
           this.jaydonHp = Math.max(1, this.jaydonHp - 1);
-          this.jaydonPortrait = 'laugh';
+          this.jaydonPortrait = 'surprised';
           const punchMsg = (window.game && window.game.hasPunchedBag)
-            ? "* Jaydon laughs and dramatically pretends to take 1 extra damage from that punching bag workout!"
-            : "* Jaydon laughs and dramatically pretends to take 1 damage anyway.";
+            ? "* Jaydon gasps and dramatically pretends to take 1 extra damage from that punching bag workout!"
+            : "* Jaydon gasps and dramatically pretends to take 1 damage anyway.";
           const reactionMsg = (window.game && window.game.hasPunchedBag)
-            ? "Haha! Ow, ow! Those strong core muscles are really paying off!"
-            : "Haha! Ow, ow, critical hit!";
+            ? "Whoa! Ow, ow! Those strong core muscles are really paying off!"
+            : "Whoa! Ow, ow, critical hit!";
           this.setMultipleMessages([
             "* You try to attack, but you can't bring yourself to do it.",
             punchMsg
@@ -214,6 +215,10 @@ class BattleManager {
         if (input.wasPressed('KeyZ') || input.wasPressed('Enter')) {
           if (this.textCharIndex < this.currentText.length) {
             this.textCharIndex = this.currentText.length;
+          } else if (this.onMessageDoneCallback) {
+            const cb = this.onMessageDoneCallback;
+            this.onMessageDoneCallback = null;
+            cb();
           } else {
             // Return to player's turn
             this.battleState = 'SELECT_BUTTON';
@@ -281,14 +286,15 @@ class BattleManager {
 
   // --- ACT SUBMENU ---
   handleActSubmenu(input) {
-    const actOptions = ['Check', 'Flirt', 'Smoke', 'Hold Hands'];
-
-    if (input.wasPressed('ArrowUp') || input.wasPressed('KeyW')) {
-      this.actIndex = (this.actIndex + actOptions.length - 1) % actOptions.length;
+    // 2x2 grid navigation:
+    // [0: Check]   [1: Flirt]
+    // [2: Smoke]   [3: Hug]
+    if (input.wasPressed('ArrowLeft') || input.wasPressed('KeyA') || input.wasPressed('ArrowRight') || input.wasPressed('KeyD')) {
+      this.actIndex = this.actIndex ^ 1;
       if (window.audioManager) window.audioManager.playMenuMove();
     }
-    if (input.wasPressed('ArrowDown') || input.wasPressed('KeyS')) {
-      this.actIndex = (this.actIndex + 1) % actOptions.length;
+    if (input.wasPressed('ArrowUp') || input.wasPressed('KeyW') || input.wasPressed('ArrowDown') || input.wasPressed('KeyS')) {
+      this.actIndex = this.actIndex ^ 2;
       if (window.audioManager) window.audioManager.playMenuMove();
     }
 
@@ -300,10 +306,6 @@ class BattleManager {
 
     if (input.wasPressed('KeyZ') || input.wasPressed('Enter')) {
       if (window.audioManager) window.audioManager.playMenuSelect();
-      this.actsCompletedCount++;
-      if (this.actsCompletedCount >= 2) {
-        this.jaydonSparedEligible = true;
-      }
 
       if (this.actIndex === 0) {
         // Check
@@ -312,7 +314,7 @@ class BattleManager {
           "* JAYDON - ATK 1 DEF 999",
           "* Currently trying his best to give you the sweetest anniversary possible."
         ], () => {
-          this.jaydonTurnReaction("I mean, I really am trying my best here!");
+          this.jaydonTurnReaction("Do you like it so far?");
         });
       } else if (this.actIndex === 1) {
         // Flirt
@@ -320,9 +322,10 @@ class BattleManager {
         this.jaydonDef = 0;
         this.setMultipleMessages([
           "* You give Jaydon that familiar look.",
-          "* Jaydon blushes bright red! His defense dropped to 0."
+          "* Jaydon blushes bright red! His defense dropped to 0.",
+          "* Jaydon looks back into his bedroom before refocusing on you."
         ], () => {
-          this.jaydonTurnReaction("Whoa... hey there... is it warm in here, or is it just you?");
+          this.jaydonTurnReaction("Whoa... hey there...");
         });
       } else if (this.actIndex === 2) {
         // Smoke
@@ -336,18 +339,18 @@ class BattleManager {
           "* *Cough cough*",
           "* (Deals 5 damage to both of you! Defense lowered!)"
         ], () => {
-          this.jaydonTurnReaction("*cough cough* Totally worth it though.");
+          this.jaydonTurnReaction("*cough cough* Do you want some water?");
         });
       } else if (this.actIndex === 3) {
-        // Hold Hands
+        // Hug (Only this makes Jaydon spare eligible!)
         this.jaydonPortrait = 'neutral';
         this.jaydonSparedEligible = true;
         this.setMultipleMessages([
-          "* You take Jaydon's hand.",
-          "* It feels warm and steady.",
+          "* You wrap your arms around Jaydon in a warm hug.",
+          "* His embrace feels warm and steady.",
           "* Jaydon's name turns YELLOW on the Mercy menu!"
         ], () => {
-          this.jaydonTurnReaction("You have no idea how much I love holding your hand.");
+          this.jaydonTurnReaction("You give the best hugs in the world.");
         });
       }
     }
@@ -374,17 +377,23 @@ class BattleManager {
         this.mallikaHp = this.mallikaMaxHp;
         if (window.audioManager) window.audioManager.playHeal();
         this.setMultipleMessages([
-          "* You shared the freshly baked Sticky Toffee Pudding!",
-          "* It was made with love. Fully restores HP!"
+          "* You shared the freshly baked Sticky Toffee Pudding! (HP Maxed)"
         ], () => {
-          this.jaydonPortrait = 'laugh';
-          this.jaydonTurnReaction("Mmm, dates and brown sugar... best pudding ever!");
+          this.jaydonPortrait = 'neutral';
+          this.jaydonTurnReaction("Is it as good as the one you made?", () => {
+            this.setMultipleMessages([
+              "* You let him down easy."
+            ], () => {
+              this.battleState = 'SELECT_BUTTON';
+              this.setBattleText("* (Why is he in pajama pants?)");
+            });
+          });
         });
-      } else if (item.name === 'dress') {
+      } else if (item.name === 'Dress') {
         this.jaydonPortrait = 'blush';
         this.setMultipleMessages([
           "* You inspect the package...",
-          "* It's a new pretty dress! Mallika's style increased by 100!"
+          "* It's a new pretty Dress! Mallika's style increased by 100!"
         ], () => {
           this.jaydonTurnReaction("You're going to look absolutely stunning in it.");
         });
@@ -394,11 +403,6 @@ class BattleManager {
 
   // --- MERCY SUBMENU ---
   handleMercySubmenu(input) {
-    if (input.wasPressed('ArrowUp') || input.wasPressed('KeyW') || input.wasPressed('ArrowDown') || input.wasPressed('KeyS')) {
-      this.mercyIndex = (this.mercyIndex + 1) % 2;
-      if (window.audioManager) window.audioManager.playMenuMove();
-    }
-
     if (input.wasPressed('KeyX') || input.wasPressed('ShiftLeft')) {
       this.battleState = 'SELECT_BUTTON';
       if (window.audioManager) window.audioManager.playMenuCancel();
@@ -408,41 +412,29 @@ class BattleManager {
     if (input.wasPressed('KeyZ') || input.wasPressed('Enter')) {
       if (window.audioManager) window.audioManager.playMenuSelect();
 
-      if (this.mercyIndex === 0) {
-        // SPARE
-        if (this.jaydonSparedEligible) {
-          this.jaydonPortrait = 'laugh';
-          this.setMultipleMessages([
-            "* You chose to SPARE Jaydon.",
-            "* YOU WON! You earned 0 EXP and lots of LOVE.",
-            "* But you gained something infinitely more precious."
-          ], () => {
-            this.triggerVictoryFinale();
-          });
-        } else {
-          this.setMultipleMessages([
-            "* Jaydon isn't ready to be spared yet.",
-            "* Try taking his hand or showing some love first!"
-          ]);
-        }
-      } else if (this.mercyIndex === 1) {
-        // DATE (Always available, instant victory!)
+      // SPARE (Only yellow and eligible after giving Jaydon a Hug)
+      if (this.jaydonSparedEligible) {
         this.jaydonPortrait = 'laugh';
         this.setMultipleMessages([
-          "* You chose to DATE Jaydon!",
-          "* An absolute critical hit of pure joy straight to his heart!",
-          "* Jaydon says: 'YES! A thousand times yes!'"
+          "* You chose to SPARE Jaydon.",
+          "* YOU WON! You earned 0 EXP and lots of LOVE.",
+          "* But you gained something infinitely more precious."
         ], () => {
           this.triggerVictoryFinale();
         });
+      } else {
+        this.setMultipleMessages([
+          "* Jaydon isn't ready to be spared yet.",
+          "* Try giving him a hug first!"
+        ]);
       }
     }
   }
 
   // --- JAYDON'S REACTION TURN ---
-  jaydonTurnReaction(text) {
+  jaydonTurnReaction(text, onDone = null) {
     this.battleState = 'JAYDON_TALK';
-    this.setBattleText(`* Jaydon: "${text}"`);
+    this.setBattleText(`* Jaydon: "${text}"`, onDone, 22);
   }
 
   // --- VICTORY & FINALE TRIGGER ---
@@ -508,7 +500,7 @@ class BattleManager {
       ctx.fillRect(this.fightMeterX + 3, boxY + 10, 4, boxH - 20);
 
     } else if (this.battleState === 'SUBMENU_ACT') {
-      const acts = ['* Check', '* Flirt', '* Smoke', '* Hold Hands'];
+      const acts = ['* Check', '* Flirt', '* Smoke', '* Hug'];
       ctx.fillStyle = '#ffffff';
       ctx.font = '16px "Press Start 2P", monospace';
       acts.forEach((act, idx) => {
@@ -534,20 +526,11 @@ class BattleManager {
 
     } else if (this.battleState === 'SUBMENU_MERCY') {
       ctx.font = '16px "Press Start 2P", monospace';
-      // Spare option (yellow if eligible)
+      // Spare option (yellow only if eligible via Hug!)
       const spareColor = this.jaydonSparedEligible ? '#ffff00' : '#ffffff';
       ctx.fillStyle = spareColor;
-      if (this.mercyIndex === 0) {
-        ctx.drawImage(window.spriteManager.ui.soul, boxX + 30, boxY + 45 - 14, 16, 16);
-      }
-      ctx.fillText("* Spare", boxX + 60, boxY + 45);
-
-      // Date option (always bright yellow/orange!)
-      ctx.fillStyle = '#ffaa00';
-      if (this.mercyIndex === 1) {
-        ctx.drawImage(window.spriteManager.ui.soul, boxX + 30, boxY + 95 - 14, 16, 16);
-      }
-      ctx.fillText("* Date (Instant Victory)", boxX + 60, boxY + 95);
+      ctx.drawImage(window.spriteManager.ui.soul, boxX + 30, boxY + 65 - 14, 16, 16);
+      ctx.fillText("* Spare", boxX + 60, boxY + 65);
 
     } else {
       // Typewriter Battle Flavour Text

@@ -317,8 +317,10 @@ class SpriteManager {
   }
 
   // ==========================================
+  // ==========================================
   // JAYDON OVERWORLD SPRITE (Steps out of bedroom)
-  // Curly hair, glasses, grey crewneck, red plaid pajama pants!
+  // Curly hair stopping at ear level, glasses, grey crewneck,
+  // red plaid pajama pants, and barefoot (no shoes)!
   // ==========================================
   generateJaydonOverworld() {
     const scale = 2;
@@ -332,13 +334,12 @@ class SpriteManager {
       's': '#d8a483', // Skin shading
       'G': '#111111', // Black rectangular glasses
       'g': '#ffffff', // Glasses reflection
+      'E': '#3b82f6', // Blue eyes
       'T': '#a8abb0', // Heather grey long sleeve
       't': '#8e9196', // Seams
       'C': '#ffea75', // Chest crest/logo
       'R': '#c72228', // Red plaid base
-      'K': '#48080c', // Black/dark plaid criss-cross grid
-      'W': '#ffffff', // White socks
-      'w': '#cccccc'
+      'K': '#48080c'  // Black/dark plaid criss-cross grid
     };
 
     const pattern = [
@@ -346,11 +347,11 @@ class SpriteManager {
       "    HhhHHhhhhHH     ",
       "   HhhHHHhhhhhhH    ",
       "   HhSSSSSSSSShH    ",
-      "   HhGGgSssGGghH    ",
-      "   HhGGSsssGGShH    ",
-      "   HhSSSSSSSSShH    ",
-      "   HhhSSSSSSShHH    ",
-      "    hhTTTTTTTth     ",
+      "   HhGGgE ssGGgh    ",
+      "   HhGGSsssGGSh     ", // Hair ends at ear level
+      "    SSSSSSSSSSS     ",
+      "     SSSSSSSSS      ",
+      "    TTTTTTTTTTT     ",
       "   TTTTTTTTTTTTT    ",
       "  TTTTTTCCTTTTTTT   ",
       "  TTTTTTTTTTTTTTT   ",
@@ -365,8 +366,8 @@ class SpriteManager {
       "    KRKR   KRKR     ",
       "    RKRK   RKRK     ",
       "    KRKR   KRKR     ",
-      "    WWWW   WWWW     ",
-      "    wwww   wwww     "
+      "    SSSS   SSSS     ", // Barefoot (no shoes!)
+      "    ssss   ssss     "
     ];
 
     const { canvas, ctx } = this.createCanvas(w, h);
@@ -375,14 +376,14 @@ class SpriteManager {
   }
 
   // ==========================================
-  // JAYDON BATTLE SPRITE (Large Undertale style, ~140x170 px)
-  // Curly hair, glasses with glint, warm grin, grey long sleeve,
-  // iconic RED PLAID PAJAMA PANTS!
+  // JAYDON BATTLE SPRITE (Large Undertale style, ~144x192 px)
+  // Curly hair stopping at ear level, blue eyes behind glasses,
+  // smaller refined smile, longer torso, red plaid pajama pants, barefoot!
   // ==========================================
   generateJaydonBattleSprite() {
     const scale = 3;
     const w = 48 * scale;
-    const h = 58 * scale;
+    const h = 64 * scale;
 
     const colors = {
       'H': '#2b1a13', // Deep brown curly hair
@@ -391,14 +392,14 @@ class SpriteManager {
       's': '#deaf93', // Skin contour
       'G': '#1a1a1a', // Rectangular glasses
       'g': '#ffffff', // Glass shine
-      'M': '#6a2a2e', // Warm smile
+      'E': '#3b82f6', // Bright blue eyes
+      'e': '#1d4ed8', // Blue eye shading
+      'M': '#6a2a2e', // Small gentle smile
       'T': '#b8bac0', // Heather grey long sleeve
       't': '#9ea1a7', // Shirt shading
       'C': '#ecd466', // Shirt chest logo
       'R': '#cc1e24', // Red plaid pajama base
-      'K': '#3e060a', // Dark plaid crosshatch
-      'F': '#e0e0e0', // Socks
-      'O': '#111111'  // Outlines
+      'K': '#3e060a'  // Dark plaid crosshatch
     };
 
     const pattern = [
@@ -409,19 +410,23 @@ class SpriteManager {
       "          HHhhHHHHHHHHHHHHHHHHHHhhhhHH          ",
       "          HhhHSSSSSSSSSSSSSSSSSSShhhHH          ",
       "          HhhHSSGGGGGgSSSSGGGGGgShhhHH          ",
-      "          HhhHSGGGGGGgSSSSGGGGGGgShhHH          ",
-      "          HhhHSSGGGGGGSSSSGGGGGGShhhHH          ",
-      "          HhhHSSSSSssSSssSSSSSSSShhhHH          ",
-      "          HhhhSSSSSssssssSSSSSSSShhhHH          ",
-      "           HhhSSSSSMMMMMMSSSSSSSShhH            ",
-      "           HHhhSSSSSMMMMSSSSSSSShhHH            ",
-      "            HHhhhSSSSSSSSSSSSShhhHH             ",
-      "              HHHhhhhhhhhhhhhHHH                ",
-      "             TTTTTTTTTTTTTTTTTTTT               ",
+      "          HhhHSGGgEEgGSSSSGGgEEgGShhHH          ",
+      "          HhhHSSGGEEGSSSSSGGEEGgShhhHH          ", // Hair stops around ear
+      "               SSSSSSSSSSSSSSSS                 ",
+      "               SSSSssSSssSSSSSS                 ",
+      "               SSSSSSMMMMSSSSSS                 ", // Smaller lips
+      "               SSSSSSSMMSSSSSSS                 ",
+      "                SSSSSSSSSSSSSS                  ",
+      "                 SSSSSSSSSSSS                   ",
+      "             TTTTTTTTTTTTTTTTTTTT               ", // Longer torso starts
       "           TTTTTTTTTTTTTTTTTTTTTTTT             ",
       "         TTTTTTTTTTTTCTTTTTTTTTTTTTTT           ",
       "        TTTTTTTTTTTTCCCTTTTTTTTTTTTTTT          ",
       "       TTTTTTTTTTTTTTCTTTTTTTTTTTTTTTTT         ",
+      "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
+      "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
+      "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
+      "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
       "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
       "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
       "       TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT         ",
@@ -438,8 +443,8 @@ class SpriteManager {
       "         KRKRKRKRKRK   RKRKRKRKRKRKR            ",
       "         RKRKRKRKRKR   KRKRKRKRKRKRK            ",
       "         KRKRKRKRKRK   RKRKRKRKRKRKR            ",
-      "          FFFFFFFFF     FFFFFFFFF               ",
-      "          FFFFFFFFF     FFFFFFFFF               "
+      "          SSSSSSSSS     SSSSSSSSS               ", // Barefoot (no shoes!)
+      "          sssssssss     sssssssss               "
     ];
 
     const { canvas, ctx } = this.createCanvas(w, h);
@@ -448,8 +453,8 @@ class SpriteManager {
   }
 
   // ==========================================
-  // JAYDON DIALOGUE PORTRAITS (Neutral, Blush, Laugh, Smoke/Cough)
-  // Displayed in battle dialogue box with typewriter sound!
+  // JAYDON DIALOGUE PORTRAITS (Neutral, Blush, Laugh, Surprised, Smoke/Cough)
+  // Displayed in battle dialogue box with blue eyes & ear-length hair!
   // ==========================================
   generateJaydonPortraits() {
     this.portraits = {};
@@ -464,29 +469,32 @@ class SpriteManager {
       's': '#deaf93',
       'G': '#111111',
       'g': '#ffffff',
+      'E': '#3b82f6', // Blue eyes
+      'e': '#1d4ed8',
       'M': '#6a2a2e',
       'B': '#ff4766', // Bright blush pink
       'W': '#ffffff',
-      'C': '#cccccc'
+      'C': '#cccccc',
+      'T': '#a8abb0'
     };
 
-    // 1. NEUTRAL PORTRAIT
+    // 1. NEUTRAL PORTRAIT (Blue eyes, hair stops at ear, small smile)
     const neutralPattern = [
       "        HHHHHHHHHHHHH        ",
       "      HHhhhhhHHhhhhhhHH      ",
       "     HhhhhhhhhhhhhhhhhhH     ",
       "    HHhhHHHHHHHHHHHHhhhhH    ",
       "    HhhHSSSSSSSSSSSSShhhH    ",
-      "    HhhHSSGGGGgSSGGGGgShH    ",
-      "    HhhHSGGGGGgSGGGGGgShH    ",
-      "    HhhHSSGGGGSSGGGGSSShH    ",
-      "    HhhSSSSSssSSssSSSSShH    ",
-      "    HhhSSSSSssssssSSSSShH    ",
-      "    HHhSSSSSMMMMMMSSSSShH    ",
-      "     HhhSSSSSMMMMSSSSShhH    ",
-      "      HhhhSSSSSSSSSSShhH     ",
-      "        HHhhhhhhhhhhHH       ",
-      "         TTTTTTTTTTTT        "
+      "    HhhHSSGGgEEgSSGGgEEgSh   ",
+      "    HhhHSGGGEEGgSGGGEEGgSh   ",
+      "    HhhHSSGGGGgSSGGGGgShh    ",
+      "        SSSSSSSSSSSSSSSS     ",
+      "        SSSSSssSSssSSSSS     ",
+      "        SSSSSsMMMMsSSSSS     ",
+      "         SSSSSSMMSSSSSS      ",
+      "          SSSSSSSSSSSS       ",
+      "           SSSSSSSSSS        ",
+      "          TTTTTTTTTTTT       "
     ];
 
     // 2. BLUSH PORTRAIT (Flirt action: Cheeks bright red, shy cute smile)
@@ -496,38 +504,57 @@ class SpriteManager {
       "     HhhhhhhhhhhhhhhhhhH     ",
       "    HHhhHHHHHHHHHHHHhhhhH    ",
       "    HhhHSSSSSSSSSSSSShhhH    ",
-      "    HhhHSSGGGGgSSGGGGgShH    ",
-      "    HhhHSGGGGGgSGGGGGgShH    ",
-      "    HhhHSSGGGGSSGGGGSSShH    ",
-      "    HhhSSBBssSSssBBSSSShH    ",
-      "    HhhSBBBBsssssBBBBSSShH   ",
-      "    HHhSSSSSsMMMMsSSSSShH    ",
-      "     HhhSSSSSSSSSSSSShhH     ",
-      "      HhhhSSSSSSSSSSShhH     ",
-      "        HHhhhhhhhhhhHH       ",
-      "         TTTTTTTTTTTT        "
+      "    HhhHSSGGgEEgSSGGgEEgSh   ",
+      "    HhhHSGGGEEGgSGGGEEGgSh   ",
+      "    HhhHSSGGGGgSSGGGGgShh    ",
+      "        SSBBssSSssBBSSSS     ",
+      "        SBBBBsssssBBBBSS     ",
+      "        SSSSSsMMMMsSSSSS     ",
+      "         SSSSSSMMSSSSSS      ",
+      "          SSSSSSSSSSSS       ",
+      "           SSSSSSSSSS        ",
+      "          TTTTTTTTTTTT       "
     ];
 
-    // 3. LAUGH PORTRAIT (Fight / Date: Crinkled eyes, wide laughing grin)
+    // 3. SURPRISED / FIGHT REACTION PORTRAIT (Clean circle 'o' shocked mouth!)
+    const surprisedPattern = [
+      "        HHHHHHHHHHHHH        ",
+      "      HHhhhhhHHhhhhhhHH      ",
+      "     HhhhhhhhhhhhhhhhhhH     ",
+      "    HHhhHHHHHHHHHHHHhhhhH    ",
+      "    HhhHSSSSSSSSSSSSShhhH    ",
+      "    HhhHSSGgEEgGSSGgEEgGSh   ",
+      "    HhhHSGGGEEGgSGGGEEGgSh   ",
+      "    HhhHSSGGGGgSSGGGGgShh    ",
+      "        SSSSSSSSSSSSSSSS     ",
+      "        SSSSSsMMMMsSSSSS     ",
+      "        SSSSSMMssMMSSSSS     ",
+      "         SSSSMMssMMSSSS      ",
+      "          SSSSMMMMSSSS       ",
+      "           SSSSSSSSSS        ",
+      "          TTTTTTTTTTTT       "
+    ];
+
+    // 4. LAUGH PORTRAIT (Crinkled eyes, happy warm smile)
     const laughPattern = [
       "        HHHHHHHHHHHHH        ",
       "      HHhhhhhHHhhhhhhHH      ",
       "     HhhhhhhhhhhhhhhhhhH     ",
       "    HHhhHHHHHHHHHHHHhhhhH    ",
       "    HhhHSSSSSSSSSSSSShhhH    ",
-      "    HhhHSSG^^GgSSG^^GgShH    ",
-      "    HhhHSGGGGGgSGGGGGgShH    ",
-      "    HhhHSSSSSSSSSSSSSSShH    ",
-      "    HhhSSSSSssSSssSSSSShH    ",
-      "    HhhSSSSWMMMMMWSSSSShH    ",
-      "    HHhSSSWMMMMMMMWSSSShH    ",
-      "     HhhSSWMMMMMMMWSSShhH    ",
-      "      HhhhSSSSSSSSSSShhH     ",
-      "        HHhhhhhhhhhhHH       ",
-      "         TTTTTTTTTTTT        "
+      "    HhhHSSG^^GgSSG^^GgShh    ",
+      "    HhhHSGGGGGgSGGGGGgShh    ",
+      "    HhhHSSGGGGSSGGGGSSSh     ",
+      "        SSSSSSSSSSSSSSSS     ",
+      "        SSSSSsMMMMsSSSSS     ",
+      "        SSSSSMMMMMMSSSSS     ",
+      "         SSSSSSMMSSSSSS      ",
+      "          SSSSSSSSSSSS       ",
+      "           SSSSSSSSSS        ",
+      "          TTTTTTTTTTTT       "
     ];
 
-    // 4. COUGH / SMOKE PORTRAIT (Smoke act: coughing, little puff of smoke)
+    // 5. COUGH / SMOKE PORTRAIT (Smoke act: coughing, little puff of smoke)
     const coughPattern = [
       "        HHHHHHHHHHHHH        ",
       "      HHhhhhhHHhhhhhhHH      ",
@@ -535,20 +562,20 @@ class SpriteManager {
       "    HHhhHHHHHHHHHHHHhhhhHCCC ",
       "    HhhHSSSSSSSSSSSSShhhCC   ",
       "    HhhHSSG><GgSSG><GgShHC   ",
-      "    HhhHSGGGGGgSGGGGGgShH    ",
-      "    HhhHSSSSSSSSSSSSSSShH    ",
-      "    HhhSSSSSssSSssSSSSShH    ",
-      "    HhhSSSSSOOOOOSSSSSShH    ",
-      "    HHhSSSSSOOOOOSSSSSShH    ",
-      "     HhhSSSSSSSSSSSSShhH     ",
-      "      HhhhSSSSSSSSSSShhH     ",
-      "        HHhhhhhhhhhhHH       ",
-      "         TTTTTTTTTTTT        "
+      "    HhhHSGGGGGgSGGGGGgShh    ",
+      "        SSSSSSSSSSSSSSSS     ",
+      "        SSSSSssSSssSSSSS     ",
+      "        SSSSsMMMMsSSSSSS     ",
+      "         SSSSMMMMSSSSSS      ",
+      "          SSSSSSSSSSSS       ",
+      "           SSSSSSSSSS        ",
+      "          TTTTTTTTTTTT       "
     ];
 
     const list = [
       { name: 'neutral', pat: neutralPattern },
       { name: 'blush', pat: blushPattern },
+      { name: 'surprised', pat: surprisedPattern },
       { name: 'laugh', pat: laughPattern },
       { name: 'cough', pat: coughPattern }
     ];

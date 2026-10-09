@@ -223,9 +223,9 @@ class Game {
         if (this.menuIndex === 0) {
           // ITEM
           window.dialogueManager.start([
-            "* ITEM:\n* Sticky Toffee Pudding\n* pretty dress",
+            "* ITEM:\n* Sticky Toffee Pudding\n* Pretty Dress",
             "* Sticky Toffee Pudding:\n* Warm & baked with love.",
-            "* pretty dress:\n* A lovely dress waiting to\n  be worn on a date!"
+            "* Pretty Dress:\n* A lovely Dress waiting to\n  be worn on a date!"
           ]);
         } else if (this.menuIndex === 1) {
           // STAT

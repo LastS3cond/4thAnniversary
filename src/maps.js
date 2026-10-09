@@ -825,8 +825,12 @@ class MapManager {
         ctx.fillText("▼ STAIRS", 295, 412);
 
         // If Jaydon stepped out into the hallway before battle
+        // Jaydon steps out of his bedroom door to the side of Mallika
         if (window.game && window.game.isJaydonInHallway) {
-          ctx.drawImage(window.spriteManager.jaydonOverworld, 305, 80);
+          const player = window.game.player;
+          const jx = (player && player.x) ? Math.min(342, Math.max(330, player.x + 18)) : 338;
+          const jy = (player && player.y) ? Math.max(65, player.y - 12) : 70;
+          ctx.drawImage(window.spriteManager.jaydonOverworld, jx, jy);
         }
       }
     };

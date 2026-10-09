@@ -54,7 +54,42 @@ This document tracks learned preferences, design rules, and behavioral guideline
 
 ---
 
+## 🧍 Character Sprites & Staging
+1. **Jaydon (Overworld & Battle)**:
+   - **Barefoot Indoors**: Wears cozy red plaid pajama pants and a heather grey crewneck, completely barefoot (no socks/shoes).
+   - **Hair Length**: Curly dark brown hair neatly frames temples/crown and terminates at ear level—never cascade curls down past the chin or shoulders.
+   - **Hallway Staging**: When Jaydon steps out of his bedroom into the narrow 2nd-floor hallway, he stands to the side of Mallika rather than directly behind her.
+   - **Battle Sprite Proportions**: Longer torso, bright clear blue eyes visible behind rectangular glasses, and a smaller subtle smile (never overly wide lips).
+   - **Fight Reaction Expression**: When struck in battle, Jaydon has an expressive surprised look with a clean circular 'o' mouth (not a goofy or silly grin).
+2. **Mallika (Protagonist)**:
+   - Denim overalls layered over an olive tube top, barefoot/white socks, natural gait without outward leg sprawling.
+
+---
+
+## ⚔️ Battle System & Dialogue Flow
+1. **ACT 2x2 Grid Navigation**:
+   - The ACT submenu is rendered as a 2×2 grid (`Check`, `Flirt`, `Smoke`, `Hug`).
+   - Must support intuitive 2D grid navigation: `A`/`D` and `Left`/`Right` switch columns, while `W`/`S` and `Up`/`Down` switch rows.
+2. **Strict Text Wrapping Limits**:
+   - Battle Box (560px wide): Monospace characters at 16px require dynamic wrap limits:
+     - Without portrait: wrap at $\le 26$ characters.
+     - With portrait (75px offset): wrap at $\le 22$ characters.
+   - Finale Monologue Box: Wrap at $\le 28$ characters at 14px font to prevent text bleeding off the screen.
+3. **MERCY & Spared Condition**:
+   - The MERCY menu contains strictly `* Spare` (no instant victory `Date` button).
+   - `* Spare` ONLY turns yellow after giving Jaydon a `Hug`. No other sequence unlocks mercy.
+4. **Dialogue & Flavour Text Nuances**:
+   - **Check**: Jaydon asks `"Do you like it so far?"`.
+   - **Flirt**: Narration notes Jaydon looks back into his bedroom before refocusing on Mallika (`"Whoa... hey there..."`).
+   - **Smoke**: Jaydon coughs and asks if she wants water (`"*cough cough* Do you want some water?"`).
+   - **Hug**: Adapts the warm and steady feeling of their embrace.
+   - **Sticky Toffee Pudding**: Jaydon asks `"Is it as good as the one you made?"`, prompting response `* You let him down easy.`, then cleanly returning to the menu.
+   - **Item Names**: Always capitalize "Dress" (never lowercase "dress").
+
+---
+
 ## 💻 Codebase Standards
 - **Zero External Dependencies**: Pure vanilla HTML5, Canvas 2D, and Web Audio API.
 - **Audio Autoplay**: Always support instant audio unlock across mouse clicks, touches, and key presses with helpful on-screen cues if suspended.
 - **Documentation**: Keep `README.md` completely up to date with full specifications, room catalogs, and floor plans.
+- **Preferences**: Maintain `preferences.md` continuously as new design feedback is received.

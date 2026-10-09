@@ -352,15 +352,25 @@ A cozy, narrow residential hallway (80px wide, matching the staircase) directly 
 
 ### Jaydon (Boss Encounter)
 
-- **Battle Sprite (120 × 160 pixels)**:
-  - Dark curly hair, glasses, friendly warm expression.
-  - Charcoal long-sleeve crewneck shirt.
-  - **Red Plaid Pajama Pants**: Red fabric patterned with black and white intersecting flannel grid lines.
-- **Four Expressive Dialogue Portraits (80 × 80 pixels)**:
-  1. `neutral`: Glasses, curly hair, gentle smile.
-  2. `blush`: Rose-red blushed cheeks and bashful expression (used for *Flirt* and *dress*).
-  3. `laugh`: Crinkled joyful eyes and open smiling mouth (used for *Fight*, *Pudding*, *Spare*, *Date*).
-  4. `cough`: Puffed cheeks, closed coughing eyes, with a tiny pixel puff of smoke (used for *Smoke*).
+- **Overworld Sprite (44 × 64 pixels)**:
+  - Curly dark brown hair terminating neatly at ear level.
+  - Black rectangular glasses with shine.
+  - Heather grey long-sleeve crewneck.
+  - Iconic red plaid pajama pants.
+  - Barefoot (no shoes indoors).
+  - Stands to the side of Mallika outside his bedroom doorway when stepping into the hallway.
+- **Battle Sprite (144 × 192 pixels)**:
+  - Longer torso with authentic proportions.
+  - Bright clear blue eyes behind rectangular glasses.
+  - Small gentle smile (refined, understated lips).
+  - Curly dark brown hair stopping at ear level.
+  - Red plaid pajama pants and barefoot.
+- **Five Expressive Dialogue Portraits (64 × 64 pixels)**:
+  1. `neutral`: Blue eyes, ear-length hair, gentle smile.
+  2. `blush`: Rose-red blushed cheeks and bashful expression (used for *Flirt* and *Dress*).
+  3. `surprised`: Expressive surprised look with a clean circular 'o' mouth (used for *Fight* reaction).
+  4. `laugh`: Crinkled joyful eyes and warm smile (used for *Spare*).
+  5. `cough`: Puffed cheeks, closed coughing eyes, with a tiny pixel puff of smoke (used for *Smoke*).
 
 ---
 
@@ -375,7 +385,7 @@ Strictly faithful to Toby Fox's Undertale battle framework.
 |                                                                   |
 |  +-------------------------------------------------------------+  |
 |  | DIALOGUE & ACTION DISPLAY BOX                               |  |
-|  | Typewriter blips, word wrap, target reticle meter           |  |
+|  | Typewriter blips, dynamic wrap (22-26 chars), target reticle|  |
 |  +-------------------------------------------------------------+  |
 |                                                                   |
 |  MALLIKA   LV 1    HP [████████████████████] 20 / 20              |
@@ -395,20 +405,26 @@ Strictly faithful to Toby Fox's Undertale battle framework.
 - Attack outcome:
   ```text
   * You try to attack, but you can't bring yourself to do it.
-  * Jaydon laughs and dramatically pretends to take 1 damage anyway.
+  * Jaydon gasps and dramatically pretends to take 1 damage anyway.
   ```
   *(If Mallika punched the punching bag earlier, Jaydon acknowledges her strong core muscles and bag training!)*
-- Jaydon's reaction: `"Haha! Ow, ow, critical hit!"`
+- Jaydon's reaction (using surprised circle 'o' face): `"Whoa! Ow, ow, critical hit!"`
 
-### ACT Submenus
+### ACT Submenus (Full 2×2 WASD / Arrow Key Grid Navigation)
+Navigation: `A`/`D` and `Left`/`Right` switch columns, `W`/`S` and `Up`/`Down` switch rows.
 1. **Check**:
    - Text: `* JAYDON - ATK 1 DEF 999. Currently trying his best to give you the sweetest anniversary possible.`
-   - Jaydon reaction: `"I mean, I really am trying my best here!"`
+   - Jaydon reaction: `"Do you like it so far?"`
 2. **Flirt**:
    - Portrait: `blush`
    - Effect: Jaydon's DEF drops to 0!
-   - Text: `* You give Jaydon that familiar look. Jaydon blushes bright red! His defense dropped to 0.`
-   - Jaydon reaction: `"Whoa... hey there... is it warm in here, or is it just you?"`
+   - Text:
+     ```text
+     * You give Jaydon that familiar look.
+     * Jaydon blushes bright red! His defense dropped to 0.
+     * Jaydon looks back into his bedroom before refocusing on you.
+     ```
+   - Jaydon reaction: `"Whoa... hey there..."`
 3. **Smoke**:
    - Portrait: `cough`
    - Effect: Both Mallika and Jaydon take 5 damage (dropping to 15/20 HP); Jaydon's DEF drops by 50.
@@ -418,48 +434,41 @@ Strictly faithful to Toby Fox's Undertale battle framework.
      * *Cough cough*
      * (Deals 5 damage to both of you! Defense lowered!)
      ```
-   - Jaydon reaction: `"*cough cough* Totally worth it though."`
-4. **Hold Hands**:
+   - Jaydon reaction: `"*cough cough* Do you want some water?"`
+4. **Hug**:
    - Portrait: `neutral`
    - Effect: Jaydon becomes eligible for SPARE! Name turns **YELLOW** on the Mercy menu!
    - Text:
      ```text
-     * You take Jaydon's hand.
-     * It feels warm and steady.
+     * You wrap your arms around Jaydon in a warm hug.
+     * His embrace feels warm and steady.
      * Jaydon's name turns YELLOW on the Mercy menu!
      ```
-   - Jaydon reaction: `"You have no idea how much I love holding your hand."`
+   - Jaydon reaction: `"You give the best hugs in the world."`
 
 ### ITEM Submenus
 1. **Sticky Toffee Pudding**:
-   - Portrait: `laugh`
    - Effect: Restores HP back to 20/20! Plays Undertale heal chime.
-   - Text: `* You shared the freshly baked Sticky Toffee Pudding! It was made with love. Fully restores HP!`
-   - Jaydon reaction: `"Mmm, dates and brown sugar... best pudding ever!"`
-2. **dress**:
+   - Sequence:
+     1. Text: `* You shared the freshly baked Sticky Toffee Pudding! (HP Maxed)`
+     2. Jaydon asks: `"Is it as good as the one you made?"`
+     3. Narrative response: `* You let him down easy.`
+     4. Cleanly returns to the battle action buttons.
+2. **Dress**:
    - Portrait: `blush`
    - Effect: Style increased by 100!
-   - Text: `* You inspect the package... It's a new pretty dress! Mallika's style increased by 100!`
+   - Text: `* You inspect the package... It's a new pretty Dress! Mallika's style increased by 100!`
    - Jaydon reaction: `"You're going to look absolutely stunning in it."`
 
 ### MERCY System
 1. **Spare**:
-   - Available once *Hold Hands* is selected or any 2 acts are performed (name turns yellow).
-   - If not yet eligible: `* Jaydon isn't ready to be spared yet. Try taking his hand or showing some love first!`
+   - Strictly unlocked only after performing **Hug** (turns yellow).
+   - If not yet eligible: `* Jaydon isn't ready to be spared yet. Try giving him a hug first!`
    - If eligible:
      ```text
      * You chose to SPARE Jaydon.
      * YOU WON! You earned 0 EXP and lots of LOVE.
      * But you gained something infinitely more precious.
-     ```
-     Triggers the **Finale Climax**!
-2. **Date**:
-   - Always available! Instant unconditional victory!
-   - Text:
-     ```text
-     * You chose to DATE Jaydon!
-     * An absolute critical hit of pure joy straight to his heart!
-     * Jaydon says: 'YES! A thousand times yes!'
      ```
      Triggers the **Finale Climax**!
 
@@ -498,17 +507,21 @@ graph LR
 
 ## 🌟 The Finale: Save Star & Determination
 
-When the battle concludes via **SPARE** or **DATE**:
+When the battle concludes via **SPARE**:
 
 1. The screen smoothly fades to black as the battle BGM transitions into the synthesized *Determination* music box theme.
 2. A pulsing golden **Save Star** materializes in the center of the dark screen, rotating gently and radiating sparkle particle motes.
-3. The classic Undertale dialogue box types letter-by-letter:
+3. The classic Undertale dialogue box types letter-by-letter with word wrapping ($\le 28$ characters per line):
    ```text
-   * (Knowing how much love, laughter, and adventures you share...)
-   * (...it fills you with DETERMINATION.)
-   * Happy Anniversary, Mallika. I love you.
+   * (Knowing how much love,
+     laughter, and adventures
+     you share...)
+   * (...it fills you with
+     DETERMINATION.)
+   * Happy Anniversary,
+     Mallika. I love you.
    ```
-4. The scene rests peacefully, glowing with the pulsing star.
+4. The scene rests peacefully, glowing with the pulsing star and resting heartbeat prompt.
 
 ---
 
