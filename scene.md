@@ -55,7 +55,7 @@
 
 ### Aesthetic & Environment:
 - **Season**: **Fall Emulation** (autumn theme). Autumn grass lawn (golden/olive tones `#5a6828`, `#6b7a32`) with scattered rust-colored fallen leaves (`#c05822`, `#d97724`, `#e29b38`).
-- **Falling Leaves**: Animated autumn leaf particles drifting in the sky and lawn (replacing winter snow).
+- **Falling Leaves**: A few tumbling autumn leaves drift on the breeze across the sky, facade and lawn, passing in front of Mallika (replacing winter snow).
 - **Playable Alleyway Bounds**: Thinner playable alleyway—the first 1/4 and last 1/4 of the 640px screen are cut out. Walkable area is strictly bounded between **$x = 160$** and **$x = 480$**. Outside this ($x < 160$ and $x > 480$) is pitch-black void.
 
 ### Facade Architecture:
@@ -147,7 +147,7 @@ Spans the whole north of the house ($x = 40..600, y = 60..200$). The couch and T
 1. **Emerald Ceiling LED Strip**:
    - A glowing emerald-green LED strip running along the entire north ceiling perimeter casting a subtle ambient green bloom (`rgba(0, 255, 68, 0.08)`).
 2. **Sliding Screen Door**:
-   - Sliding glass patio door on north wall ($x = 95..150, y = 45..75$). Inspect text: `* It's chilly outside.`
+   - Sliding glass patio door on north wall ($x = 95..150, y = 45..75$) with vertical blinds; a few fall leaves drift past outside the glass. Inspect text: `* It's chilly outside.`
 3. **Freestanding Heavy Punching Bag Station (Enlarged)**:
    - Tucked in the top-left corner against the brick wall ($x = 45..93, y = 65..135$, size $48 \times 70$).
    - **Structure**: Freestanding metal frame contraption with triangular cantilever support arm, circular steel base with **sandbags weighing down the support legs**. Heavy black vinyl punching bag.
@@ -215,7 +215,7 @@ Spans the whole north of the house ($x = 40..600, y = 60..200$). The couch and T
   - Smooth 180° turn from left flight to right flight.
   - **No Directional Text**: The `"TURN 180° ►"` instruction text has been removed for a clean, non-handholding Undertale aesthetic.
 - **Landing Window & Collider**:
-  - Double-hung window on the south landing wall framing the night sky ($x = 270..340, y = 350..390$). No falling particles; just a calm autumn night sky and a faint moonlight patch on the landing (inspect text mentions drifting fall leaves, not snow).
+  - Double-hung window on the south landing wall framing the night sky ($x = 270..340, y = 350..390$). A few autumn leaves drift past outside its panes (never snow), and a faint moonlight patch falls on the landing.
   - **Strict Collider**: A solid collider at `{ x: 235, y: 350, w: 140, h: 40 }` prevents the player from ever walking onto or through the window graphic.
 - **Flight 2 (Right, Ascending to Second Floor)**:
   - 7 beige carpet steps ascending north ($x = 315..375, y = 60..290$).

@@ -6,7 +6,7 @@
  *    offscreen canvas, then blitted at exactly 2x. One art pixel = one 2x2 screen block.
  *  - Colliders, interactables and spawn points stay in 640 x 480 screen coordinates.
  *  - Props the player can walk behind are depth-sorted with the characters by their base y.
- *  - Small animated layers (falling leaves, lantern, LED, oven glow) are drawn
+ *  - Small animated layers (drifting leaves, lantern, LED, oven glow) are drawn
  *    every frame on the same 2x pixel grid.
  */
 
@@ -347,16 +347,12 @@ class MapManager {
         ctx.globalAlpha = 1;
       },
       drawOver: (ctx, t) => {
-        // Falling autumn leaves (drift across sky, facade and yard)
-        const colors = ['#c05822', '#d97724', '#e29b38', '#a8441c'];
-        for (let i = 0; i < 18; i++) {
-          const speed = 14 + (i % 5) * 3;
-          const y = ((i * 37 + t * speed) % 230);
-          const sway = Math.sin(t * 1.6 + i * 2.3) * 6;
-          const x = 80 + (((i * 53 + t * 6) + sway) % 160 + 160) % 160;
-          const flip = Math.sin(t * 3 + i) > 0;
-          A(ctx, x, y, flip ? 2 : 1, flip ? 1 : 2, colors[i % colors.length]);
-        }
+        // A few autumn leaves tumbling down on the breeze around Mallika
+        M.drawLeaves(ctx, t, {
+          count: 14, x0: 80, x1: 240, y0: -6, y1: 238,
+          speed: [12, 22], drift: [2, 7], sway: 6, seed: 1716,
+          clip: [[80, 0, 160, 240]]
+        });
       }
     };
 
@@ -577,6 +573,12 @@ class MapManager {
         H.img(S.env.puzzleTable, 278, 31);    // against the east wall, above the fridge
       },
       drawUnder: (ctx, t) => {
+        // A few leaves drifting past outside the sliding glass door
+        M.drawLeaves(ctx, t, {
+          count: 3, small: true, x0: 45, x1: 67, y0: 5, y1: 34,
+          speed: [5, 9], drift: [1, 4], sway: 3, seed: 316,
+          clip: [[49, 9, 11, 21], [62, 9, 2, 21]]
+        });
         // Gentle breathing of the emerald LED bloom
         const a = 0.05 + (Math.sin(t * 1.4) + 1) * 0.025;
         A(ctx, 20, 3, 280, 3, `rgba(57,255,122,${a.toFixed(3)})`);
@@ -696,10 +698,16 @@ class MapManager {
         H.R(152, 180, 2, 12, '#f4f1ea');
         H.R(134, 193, 38, 2, '#ddd8cc');
       },
-      drawUnder: (ctx) => {
+      drawUnder: (ctx, t) => {
         // Faint cool moonlight from the landing window
         A(ctx, 136, 165, 34, 10, 'rgba(170,190,255,0.07)');
         A(ctx, 140, 158, 26, 7, 'rgba(170,190,255,0.05)');
+        // A few fall leaves drifting past outside the window panes
+        M.drawLeaves(ctx, t, {
+          count: 5, small: true, x0: 132, x1: 174, y0: 175, y1: 197,
+          speed: [5, 8], drift: [2, 5], sway: 3, seed: 2021,
+          clip: [[137, 180, 15, 5], [154, 180, 15, 5], [137, 187, 15, 5], [154, 187, 15, 5]]
+        });
       }
     };
 
@@ -799,6 +807,56 @@ class MapManager {
         }
       }
     };
+  }
+
+  // Tiny tumbling autumn-leaf sprites (4 colors x 4 tumble frames), cached
+  getLeafFrames(small) {
+    const key = small ? 'leaf_small' : 'leaf';
+    if (this.bgCache[key]) return this.bgCache[key];
+    const S = window.spriteManager;
+    const palettes = [
+      { h: '#efa04a', b: '#d97724', d: '#a8501c' },  // orange
+      { h: '#dc7a3c', b: '#c05822', d: '#8a3a16' },  // rust
+      { h: '#f4c565', b: '#e2a238', d: '#b07a20' },  // gold
+      { h: '#d4603a', b: '#b8401e', d: '#7e2a12' }   // red
+    ];
+    const shapes = small
+      ? [['hb.', '.bd'], ['.h', 'bd'], ['hbd'], ['.hb', 'bd.']]
+      : [['.hb.', 'hbbd', '.bd.'], ['..hb', '.hbd', 'bd..'], ['hbbd'], ['hb..', 'bbd.', '..bd']];
+    const frames = palettes.map((pal) => shapes.map((shape) => S.fromPattern(shape, pal)));
+    this.bgCache[key] = frames;
+    return frames;
+  }
+
+  // Draws a few leaves drifting down through a region (art px), optionally clipped
+  // to window panes. Deterministic per seed, so every frame lines up smoothly.
+  drawLeaves(ctx, t, o) {
+    const frames = this.getLeafFrames(o.small);
+    const rand = this.rng(o.seed);
+    const spanX = o.x1 - o.x0;
+    const spanY = o.y1 - o.y0;
+    ctx.save();
+    if (o.clip) {
+      ctx.beginPath();
+      o.clip.forEach(([x, y, w, h]) => ctx.rect(x * 2, y * 2, w * 2, h * 2));
+      ctx.clip();
+    }
+    for (let i = 0; i < o.count; i++) {
+      const p1 = rand();
+      const p2 = rand();
+      const p3 = rand();
+      const p4 = rand();
+      const p5 = rand();
+      const speed = o.speed[0] + p3 * (o.speed[1] - o.speed[0]);
+      const drift = o.drift[0] + p4 * (o.drift[1] - o.drift[0]);
+      const sway = Math.sin(t * (0.8 + p5 * 1.2) + p1 * 6.283) * o.sway;
+      const y = o.y0 + ((p1 * spanY + t * speed) % spanY);
+      const x = o.x0 + ((((p2 * spanX + t * drift + sway) % spanX) + spanX) % spanX);
+      const tumble = frames[i % frames.length];
+      const fr = tumble[Math.floor(t * (2 + p5 * 3) + p2 * 4) % 4];
+      ctx.drawImage(fr, Math.round(x) * 2, Math.round(y) * 2, fr.width * 2, fr.height * 2);
+    }
+    ctx.restore();
   }
 
   // Cached stepped radial glow (pixel-art friendly light pool)

@@ -34,7 +34,7 @@ This document tracks learned preferences, design rules, and behavioral guideline
    - Kitchen sink is rotated 180° (faucet south pointing into basin) with exterior window removed.
    - Kitchen stove is rotated 90° (backguard east, oven door west). Countertop microwave is removed to eliminate visual clutter.
    - Remove unnecessary text labels in the overworld (e.g., remove `[WALL]` label, remove `TURN 180° ►` prompt, no labels next to doors).
-   - No falling particles in the staircase landing window, and no winter/snow references anywhere: it is a fall night (leaves).
+   - The season is fall everywhere: a few drifting leaves outside (exterior, landing window, sliding door glass), never snow or winter references.
    - Remove suitcases prop graphic from the second-floor hallway.
 
 ---
