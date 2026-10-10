@@ -227,7 +227,7 @@ Dials Jaydon's phone:
 1. **Intermediate Landing Window** ($x: 270..340, y: 345..390$):
    ```text
    * You pause at the intermediate landing.
-   * Outside the window, snowflakes drift through the quiet winter night.
+   * Outside the window, leaves drift through the quiet fall night.
    ```
 2. **Flight 1 Doorway** ($x: 235..295, y: 40..65$):
    - Transitions back down to First Floor kitchen.

@@ -6,7 +6,7 @@
  *    offscreen canvas, then blitted at exactly 2x. One art pixel = one 2x2 screen block.
  *  - Colliders, interactables and spawn points stay in 640 x 480 screen coordinates.
  *  - Props the player can walk behind are depth-sorted with the characters by their base y.
- *  - Small animated layers (falling leaves, lantern, LED, oven glow, window snow) are drawn
+ *  - Small animated layers (falling leaves, lantern, LED, oven glow) are drawn
  *    every frame on the same 2x pixel grid.
  */
 
@@ -616,7 +616,7 @@ class MapManager {
           x: 270, y: 345, w: 70, h: 45,
           text: [
             "* You pause at the intermediate landing.",
-            "* Outside the window, snowflakes drift through the quiet winter night."
+            "* Outside the window, leaves drift through the quiet fall night."
           ]
         },
         {

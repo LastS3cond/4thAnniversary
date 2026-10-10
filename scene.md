@@ -201,7 +201,7 @@ Spans the whole north of the house ($x = 40..600, y = 60..200$). The couch and T
 | LANDING FLOOR  | I  | LANDING FLOOR  |
 | (Connecting)   | L  | (Turn 180°)    |
 |                +----+                |
-| COLLIDER: Intermediate Window (Snow) |
+| COLLIDER: Intermediate Window (Fall) |
 +--------------------------------------+
 ```
 
@@ -215,7 +215,7 @@ Spans the whole north of the house ($x = 40..600, y = 60..200$). The couch and T
   - Smooth 180° turn from left flight to right flight.
   - **No Directional Text**: The `"TURN 180° ►"` instruction text has been removed for a clean, non-handholding Undertale aesthetic.
 - **Landing Window & Collider**:
-  - Double-hung window on the south landing wall framing the night sky ($x = 270..340, y = 350..390$). No falling snow particles; just a calm night sky and a faint moonlight patch on the landing.
+  - Double-hung window on the south landing wall framing the night sky ($x = 270..340, y = 350..390$). No falling particles; just a calm autumn night sky and a faint moonlight patch on the landing (inspect text mentions drifting fall leaves, not snow).
   - **Strict Collider**: A solid collider at `{ x: 235, y: 350, w: 140, h: 40 }` prevents the player from ever walking onto or through the window graphic.
 - **Flight 2 (Right, Ascending to Second Floor)**:
   - 7 beige carpet steps ascending north ($x = 315..375, y = 60..290$).
