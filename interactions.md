@@ -126,7 +126,7 @@ Dials Jaydon's phone:
 ### Kitchen South & East Walls
 7. **Pantry** ($x: 270..305, y: 390..440$):
    ```text
-   * The pantry is closed.
+   * You don't really want anything from the pantry right now.
    ```
 8. **Lower Cabinets Left of Sink** ($x: 305..374, y: 395..440$):
    ```text
@@ -149,7 +149,7 @@ Dials Jaydon's phone:
      ```
 10. **Dishwasher** ($x: 414..446, y: 395..440$):
     ```text
-    * Never figured out how it worked.
+    * Never figured out how this dishwasher worked.
     ```
 11. **Lower Cabinets Right of Dishwasher** ($x: 446..544, y: 395..440$):
     ```text
@@ -157,7 +157,7 @@ Dials Jaydon's phone:
     ```
 12. **Refrigerator** ($x: 544..600, y: 220..274$):
     ```text
-    * I'm not particularly hungry.
+    * You don't really want anything from the fridge right now.
     ```
 13. **Prep Counter** ($x: 544..600, y: 274..315$):
     ```text
@@ -170,9 +170,19 @@ Dials Jaydon's phone:
 
 ### Living Room (Full Width, North)
 15. **Sliding Screen Door** ($x: 438..502$, north wall east of the couch):
-    ```text
-    * It's chilly outside.
-    ```
+    - Interactive prompt:
+      ```text
+      * It's chilly outside. A broken blind hangs at your feet. Do you want to put it back up?
+      [ YES / NO ]
+      ```
+    - **If YES**:
+      ```text
+      * You try, but you are too short.
+      ```
+    - **If NO**:
+      ```text
+      * You leave it there.
+      ```
 16. **Freestanding Heavy Punching Bag Station** ($x: 77..125, y: 65..135$):
     - Interactive prompt:
       ```text

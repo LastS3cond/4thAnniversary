@@ -47,6 +47,7 @@ This document tracks learned preferences, design rules, and behavioral guideline
      - Punching bag: Prompt `Give it a punch?` -> Only punch/play hit SFX if YES. Grants +1 ATK bonus.
      - Dirty dishes in the sink: Prompt `Clean them?` -> `* There are too many.`
      - Jaydon's door: Prompt `Knock on Jaydon's door?` -> Initiates encounter on YES.
+     - Sliding door's broken blind: Prompt `Do you want to put it back up?` -> YES: `* You try, but you are too short.` / NO: `* You leave it there.`
 2. **Ergonomic Traversal & Colliders**:
    - Maintain active `doorCooldown` buffer (800ms) upon room transitions to prevent instant bounce-backs.
    - Staircase intermediate landing window must have a solid collider preventing walking onto the glass.

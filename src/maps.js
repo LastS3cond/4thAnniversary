@@ -431,16 +431,24 @@ class MapManager {
             });
           }
         },
-        { x: 270, y: 390, w: 35, h: 50, text: ["* The pantry is closed."] },
+        { x: 270, y: 390, w: 35, h: 50, text: ["* You don't really want anything from the pantry right now."] },
         { x: 305, y: 395, w: 69, h: 45, text: ["* Dark wood cabinetry filled with plates and mugs."] },
         { x: 374, y: 400, w: 40, h: 35, triggerSink: true },
-        { x: 414, y: 395, w: 32, h: 45, text: ["* Never figured out how it worked."] },
+        { x: 414, y: 395, w: 32, h: 45, text: ["* Never figured out how this dishwasher worked."] },
         { x: 446, y: 395, w: 98, h: 45, text: ["* More dark wood cabinets with bowls and spices."] },
-        { x: 544, y: 220, w: 56, h: 54, text: ["* I'm not particularly hungry."] },
+        { x: 544, y: 220, w: 56, h: 54, text: ["* You don't really want anything from the fridge right now."] },
         { x: 544, y: 274, w: 56, h: 41, text: ["* A kitchen counter with spices and cutting boards."] },
         { x: 544, y: 315, w: 56, h: 70, text: ["* The oven is warm. A rich aroma of brown sugar and dates fills the kitchen."] },
         { x: 77, y: 65, w: 48, h: 70, triggerPunchingBag: true },
-        { x: 438, y: 40, w: 64, h: 30, text: ["* It's chilly outside."] },
+        {
+          // Sliding screen door: the broken blind (YES / NO choice)
+          x: 438, y: 40, w: 64, h: 30,
+          choice: {
+            prompt: "* It's chilly outside. A broken blind hangs at your feet. Do you want to put it back up?",
+            yes: ["* You try, but you are too short."],
+            no: ["* You leave it there."]
+          }
+        },
         // Coffee table is listed before the couch so it wins when both are in reach
         { x: 312, y: 96, w: 76, h: 30, text: ["* Papers just strewn about."] },
         { x: 232, y: 62, w: 176, h: 68, text: ["* The red sectional couch in the center of the room. Warm and inviting."] },

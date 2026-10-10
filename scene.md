@@ -118,7 +118,7 @@ Running from left to right along the south wall ($y = 395..440$):
 1. **Stairs Entrance**:
    - Starts immediately right of the foyer hallway ($x = 215..265$). Beige carpet steps leading up into the switchback stairwell.
 2. **Pantry**:
-   - Tall wooden pantry door ($x = 270..305, y = 390..440$) with brass knob. Inspect text: `* The pantry is closed.`
+   - Tall wooden pantry door ($x = 270..305, y = 390..440$) with brass knob. Inspect text: `* You don't really want anything from the pantry right now.`
 3. **Lower Cabinets (Left)**:
    - Dark wood shaker cabinets ($x = 305..374$, three doors).
 4. **Kitchen Sink (Rotated 180°, Window Removed)**:
@@ -126,14 +126,14 @@ Running from left to right along the south wall ($y = 395..440$):
    - **Window**: **Completely removed** (there is no exterior window above this sink).
    - **Dishes & Inspection**: Pile of dirty dishes. Selecting `Clean them?` prompts: `* There are too many.`
 5. **Dishwasher**:
-   - Stainless steel/black dishwasher ($x = 414..446, y = 395..440$). Inspect text: `* Never figured out how it worked.`
+   - Stainless steel/black dishwasher ($x = 414..446, y = 395..440$). Inspect text: `* Never figured out how this dishwasher worked.`
 6. **Lower Cabinets (Right)**:
    - Continuous row of dark wood cabinets ($x = 446..544$) running to the corner counter.
 
 ### Kitchen East Wall
 Running from top to bottom along the right wall ($x = 544..600$), below the kitchen's north wall ($y = 200..220$):
 1. **Refrigerator (Top)**:
-   - Clean stainless steel double-door fridge ($y = 220..274$). Inspect text: `* I'm not particularly hungry.`
+   - Clean stainless steel double-door fridge ($y = 220..274$). Inspect text: `* You don't really want anything from the fridge right now.`
 2. **Kitchen Counter (Middle)**:
    - Prep counter with butcher block and spices ($y = 274..315$).
 3. **Stove & Oven (Rotated 90°)**:
@@ -148,7 +148,7 @@ Spans the whole north of the house ($x = 40..600, y = 60..200$). The couch and T
 1. **Emerald Ceiling LED Strip**:
    - A glowing emerald-green LED strip running along the entire north ceiling perimeter casting a subtle ambient green bloom (`rgba(0, 255, 68, 0.08)`).
 2. **Sliding Screen Door**:
-   - Sliding glass patio door on the north wall east of the couch, right beside the puzzle table ($x = 438..502$, $64 \times 52$, 1.14x the old size) with vertical blinds; a few fall leaves drift past outside the glass. Inspect text: `* It's chilly outside.`
+   - Sliding glass patio door on the north wall east of the couch, right beside the puzzle table ($x = 438..502$, $64 \times 52$, 1.14x the old size) with vertical blinds; a few fall leaves drift past outside the glass. Inspect prompt: `* It's chilly outside. A broken blind hangs at your feet. Do you want to put it back up?` → YES: `* You try, but you are too short.` / NO: `* You leave it there.`
 2b. **"Happy Anniversary" Banner**:
    - A pink ribbon banner reading **HAPPY ANNIVERSARY** (with little hearts) hangs on the north wall directly above the couch. Decorative, no interaction.
 3. **Freestanding Heavy Punching Bag Station (Enlarged)**:

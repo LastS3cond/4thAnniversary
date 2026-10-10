@@ -441,6 +441,14 @@ class Game {
           return;
         }
 
+        // Generic [ YES / NO ] prompt defined on the interactable
+        if (item.choice) {
+          window.dialogueManager.startChoice(item.choice.prompt, (choice) => {
+            window.dialogueManager.start(choice === 'YES' ? item.choice.yes : item.choice.no);
+          });
+          return;
+        }
+
         // Doors / stairs can also be used by facing them and pressing Z
         if (item.isDoor && item.onEnter && !item.text) {
           if (this.doorCooldown <= 0 && !this.isTransitioning) item.onEnter();
