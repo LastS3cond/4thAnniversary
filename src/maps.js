@@ -361,8 +361,10 @@ class MapManager {
     };
 
     // ----------------------------------------------------
-    // ROOM 2: FIRST FLOOR (HALF-SPLIT TOWNHOUSE)
-    // Living room = left half (x: 40..325), kitchen = right half (x: 325..600).
+    // ROOM 2: FIRST FLOOR
+    // Living room spans the full width of the house along the north (x: 40..600,
+    // y: 60..200) with the couch + TV centered; kitchen sits below it on the right
+    // (x: 320..600, y: 195..440); bathroom / hallway / center box on the left.
     // ----------------------------------------------------
     this.rooms['first_floor'] = {
       name: 'first_floor',
@@ -378,8 +380,6 @@ class MapManager {
         { x: 600, y: 0, w: 40, h: 480 },
         // Exposed brick strip on the west living room wall
         { x: 40, y: 60, w: 20, h: 140 },
-        // Living room / kitchen dividing wall
-        { x: 325, y: 60, w: 8, h: 120 },
         // Center interior dividing wall box (at par with the bathroom box)
         { x: 215, y: 200, w: 105, h: 165 },
         // Bathroom block
@@ -395,14 +395,14 @@ class MapManager {
         { x: 545, y: 195, w: 55, h: 245 },
         // Living room furniture
         { x: 45, y: 65, w: 48, h: 70 },    // punching bag station
-        { x: 135, y: 68, w: 76, h: 56 },   // L-couch
-        { x: 165, y: 92, w: 40, h: 26 },   // coffee table inside the L
-        { x: 130, y: 148, w: 86, h: 24 },  // TV stand
-        { x: 280, y: 65, w: 36, h: 96 }    // folding puzzle table
+        { x: 232, y: 66, w: 176, h: 68 },  // L-couch (coffee table sits inside the L)
+        { x: 244, y: 160, w: 152, h: 28 }, // TV stand (walking corridor y: 134..160)
+        { x: 558, y: 65, w: 36, h: 96 }    // folding puzzle table on the east wall
       ],
+      // Depth-sorted props (sprites carry a 1px outline margin, hence the -1 offsets)
       props: [
-        { sprite: 'tvStand', x: 65, y: 68, baseY: 172 },
-        { sprite: 'shoeRack', x: 57, y: 193, baseY: 430 }
+        { sprite: 'tvStand', x: 121, y: 71, baseY: 188 },
+        { sprite: 'shoeRack', x: 56, y: 192, baseY: 430 }
       ],
       interactables: [
         { x: 40, y: 365, w: 55, h: 75, text: ["* Just some warm coats hanging."] },
@@ -438,10 +438,11 @@ class MapManager {
         { x: 545, y: 315, w: 55, h: 70, text: ["* The oven is warm. A rich aroma of brown sugar and dates fills the kitchen."] },
         { x: 45, y: 65, w: 48, h: 70, triggerPunchingBag: true },
         { x: 95, y: 45, w: 55, h: 30, text: ["* It's chilly outside."] },
-        { x: 135, y: 68, w: 76, h: 56, text: ["* The red sectional couch in the center of the room. Warm and inviting."] },
-        { x: 165, y: 92, w: 40, h: 26, text: ["* Papers just strewn about."] },
-        { x: 130, y: 148, w: 86, h: 24, text: ["* The TV is quiet. A cozy reflection fills the screen."] },
-        { x: 280, y: 65, w: 36, h: 96, text: ["* A cute puzzle of ducklings and flowers."] }
+        // Coffee table is listed before the couch so it wins when both are in reach
+        { x: 312, y: 100, w: 76, h: 30, text: ["* Papers just strewn about."] },
+        { x: 232, y: 66, w: 176, h: 68, text: ["* The red sectional couch in the center of the room. Warm and inviting."] },
+        { x: 244, y: 160, w: 152, h: 28, text: ["* The TV is quiet. A cozy reflection fills the screen."] },
+        { x: 558, y: 65, w: 36, h: 96, text: ["* A cute puzzle of ducklings and flowers."] }
       ],
       buildBackground: (ctx, S, H) => {
         const rand = M.rng(325);
@@ -457,24 +458,24 @@ class MapManager {
             for (let px = x + ((row * 17) % 29); px < x + w; px += 29) H.R(px, py, 1, Math.min(5, y + h - py), PAL.oakSeam);
           }
         };
-        oak(20, 30, 146, 70);
+        oak(20, 30, 280, 70);
         oak(67, 100, 40, 82);
-        // Kitchen floor (warm vinyl with a faint diamond lattice, no tile grid)
-        H.R(162, 30, 138, 190, PAL.kitchen);
-        H.R(107, 182, 55, 38, PAL.kitchen);
-        for (let y = 33; y < 220; y += 8) {
+        // Kitchen floor below the living room (warm vinyl, faint lattice, no tile grid)
+        H.R(160, 97, 140, 123, PAL.kitchen);
+        H.R(107, 182, 53, 38, PAL.kitchen);
+        for (let y = 99; y < 220; y += 8) {
           for (let x = 108 + ((y >> 3) % 2) * 6; x < 300; x += 12) {
-            if (x < 162 && y < 182) continue;
+            if (x < 160 && y < 182) continue;
             H.P(x, y, PAL.kitchenDot);
           }
         }
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 30; i++) {
           const x = 108 + Math.floor(rand() * 190);
-          const y = 31 + Math.floor(rand() * 188);
-          if (x < 162 && y < 182) continue;
+          const y = 98 + Math.floor(rand() * 121);
+          if (x < 160 && y < 182) continue;
           H.P(x, y, PAL.kitchenSpeck);
         }
-        H.R(162, 30, 1, 70, '#b8a684');
+        H.R(160, 97, 140, 1, '#a8865e');
         // Foyer landing
         H.R(20, 182, 87, 38, PAL.foyer);
         H.R(20, 182, 87, 1, PAL.foyerEdge);
@@ -491,10 +492,10 @@ class MapManager {
         H.R(20, 2, 280, 1, PAL.wallShade);
         H.R(20, 27, 280, 3, PAL.base);
         H.R(20, 27, 280, 1, PAL.baseHi);
-        // Emerald LED strip along the living room ceiling + soft bloom
-        H.R(20, 2, 142, 1, PAL.led);
-        H.R(20, 3, 142, 2, 'rgba(57,255,122,0.20)');
-        H.R(20, 5, 142, 4, 'rgba(57,255,122,0.08)');
+        // Emerald LED strip along the living room ceiling (full width) + soft bloom
+        H.R(20, 2, 280, 1, PAL.led);
+        H.R(20, 3, 280, 2, 'rgba(57,255,122,0.20)');
+        H.R(20, 5, 280, 4, 'rgba(57,255,122,0.08)');
         // Sliding glass door
         H.img(S.env.slidingDoor, 47, 7);
 
@@ -507,12 +508,6 @@ class MapManager {
         // ---------- EAST + SOUTH PERIMETER CAPS ----------
         H.R(300, 0, 2, 222, PAL.cap);
         H.R(18, 220, 284, 2, PAL.cap);
-
-        // ---------- DIVIDING WALL (living room | kitchen) ----------
-        H.R(162, 0, 4, 74, PAL.wallTop);
-        H.R(162, 0, 1, 74, PAL.wallTopHi);
-        H.R(162, 74, 4, 16, PAL.wall);
-        H.R(162, 87, 4, 3, PAL.base);
 
         // ---------- BATHROOM BLOCK + COAT CLOSET ----------
         M.wallBlock(H, 20, 100, 47, 82, { east: true });
@@ -575,16 +570,16 @@ class MapManager {
         H.R(272, 192, 28, 1, PAL.cap);
         H.R(271, 192, 1, 28, PAL.cap);
 
-        // ---------- LIVING ROOM FURNITURE ----------
-        H.img(S.env.punchBag, 22, 32);
-        H.img(S.env.couch, 67, 34);
-        H.img(S.env.coffeeTable, 82, 46);
-        H.img(S.env.puzzleTable, 140, 32);
+        // ---------- LIVING ROOM FURNITURE (sprites carry a 1px outline margin) ----------
+        H.img(S.env.punchBag, 21, 31);
+        H.img(S.env.couch, 115, 32);          // centered L-couch
+        H.img(S.env.coffeeTable, 155, 49);    // inside the L
+        H.img(S.env.puzzleTable, 278, 31);    // against the east wall, above the fridge
       },
       drawUnder: (ctx, t) => {
         // Gentle breathing of the emerald LED bloom
         const a = 0.05 + (Math.sin(t * 1.4) + 1) * 0.025;
-        A(ctx, 20, 3, 142, 3, `rgba(57,255,122,${a.toFixed(3)})`);
+        A(ctx, 20, 3, 280, 3, `rgba(57,255,122,${a.toFixed(3)})`);
         // Warm oven glow spilling out of the oven door onto the kitchen floor
         const f = 0.85 + Math.sin(t * 5.1) * 0.08 + Math.sin(t * 1.7) * 0.06;
         const glow = M.getGlow(16, 255, 150, 60);
@@ -701,19 +696,10 @@ class MapManager {
         H.R(152, 180, 2, 12, '#f4f1ea');
         H.R(134, 193, 38, 2, '#ddd8cc');
       },
-      drawUnder: (ctx, t) => {
+      drawUnder: (ctx) => {
         // Faint cool moonlight from the landing window
         A(ctx, 136, 165, 34, 10, 'rgba(170,190,255,0.07)');
         A(ctx, 140, 158, 26, 7, 'rgba(170,190,255,0.05)');
-        // Snow drifting outside the landing window
-        for (let i = 0; i < 14; i++) {
-          const x = 137 + ((i * 11 + t * 3 + Math.sin(t + i) * 2) % 32 + 32) % 32;
-          const y = 180 + ((i * 7 + t * 5) % 12);
-          const yy = y >= 185 ? y + 2 : y;
-          if (yy > 191) continue;
-          if (x >= 152 && x < 154) continue;
-          A(ctx, x, yy, 1, 1, '#f4f8ff');
-        }
       }
     };
 
@@ -773,7 +759,7 @@ class MapManager {
         H.R(146, 32, 1, 180, '#6b4630'); H.R(173, 32, 1, 180, '#6b4630');
         H.R(148, 32, 1, 180, '#c4a888'); H.R(171, 32, 1, 180, '#c4a888');
 
-        // doors + nameplates
+        // doors (no labels; Jaydon's has the gold trim)
         doorSlots.forEach((d) => {
           const dx = d.side === 'L' ? 122 : 183;
           const dy = d.y - 5;
@@ -789,14 +775,6 @@ class MapManager {
           H.R(dx + 3, dy + 17, 9, 1, '#9a6a43');
           const kx = d.side === 'L' ? dx + 12 : dx + 2;
           H.R(kx, dy + 15, 1, 2, PAL.brass); H.P(kx, dy + 15, PAL.brassHi);
-          // nameplate on the wall just above the door
-          const tw = S.textWidth(d.label);
-          const pw = tw + 4;
-          const px = d.side === 'L' ? Math.min(dx + 7 - Math.floor(pw / 2), 136 - pw) : Math.max(dx + 7 - Math.floor(pw / 2), 184);
-          const py = dy - 9;
-          H.R(px, py, pw, 7, d.gold ? '#7a5a12' : '#3b2a20');
-          H.R(px, py, pw, 1, d.gold ? '#ffe27a' : '#5a4232');
-          S.drawText(ctx, d.label, px + 2, py + 1, d.gold ? '#ffe27a' : '#efe6d2');
         });
 
         // stairs opening at the south end of the hallway

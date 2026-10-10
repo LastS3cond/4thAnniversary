@@ -13,7 +13,7 @@
 5. [Room 4: Second Floor Hallway & Door Encounter](#5-room-4-second-floor-hallway--door-encounter)
 6. [Combat Engine: The Jaydon Boss Encounter](#6-combat-engine-the-jaydon-boss-encounter)
    - [Opening Flavour & Stats](#opening-flavour--stats)
-   - [FIGHT System & 11 HP Cap](#fight-system--11-hp-cap)
+   - [FIGHT System & 1 HP Floor](#fight-system--1-hp-floor)
    - [ACT Submenu (Check, Flirt, Smoke, Hug)](#act-submenu-check-flirt-smoke-hug)
    - [ITEM Submenu (Sticky Toffee Pudding & Dress)](#item-submenu-sticky-toffee-pudding--dress)
    - [MERCY Submenu & Spared Unlock](#mercy-submenu--spared-unlock)
@@ -168,7 +168,7 @@ Dials Jaydon's phone:
     * The oven is warm. A rich aroma of brown sugar and dates fills the kitchen.
     ```
 
-### Living Room (Left Half, North)
+### Living Room (Full Width, North)
 15. **Sliding Screen Door** ($x: 95..150, y: 45..75$):
     ```text
     * It's chilly outside.
@@ -203,19 +203,19 @@ Dials Jaydon's phone:
       ```text
       * You leave the punching bag hanging peacefully.
       ```
-17. **Red L-Sectional Couch** ($x: 135..211, y: 68..124$):
+17. **Red L-Sectional Couch** ($x: 232..408, y: 66..134$):
     ```text
     * The red sectional couch in the center of the room. Warm and inviting.
     ```
-18. **Coffee Table Inside L** ($x: 165..205, y: 92..118$):
+18. **Coffee Table Inside L** ($x: 312..388, y: 100..130$, inspect from the corridor below it):
     ```text
     * Papers just strewn about.
     ```
-19. **TV Stand Opposite Couch** ($x: 130..216, y: 148..172$):
+19. **TV Stand Opposite Couch** ($x: 244..396, y: 160..188$):
     ```text
     * The TV is quiet. A cozy reflection fills the screen.
     ```
-20. **White Folding Table with Duckling Puzzle** ($x: 280..316, y: 65..161$):
+20. **White Folding Table with Duckling Puzzle** ($x: 558..594, y: 65..161$, east wall):
     ```text
     * A cute puzzle of ducklings and flowers.
     ```
@@ -282,15 +282,16 @@ Dials Jaydon's phone:
 ### Opening Flavour & Stats
 - **Opening Text**: `* (Why is he in pajama pants?)`
 - **Mallika Stats**: HP: 20 / 20 | DEF: 10
-- **Jaydon Stats**: HP: 12 / 12 | ATK: 1 | DEF: 999
+- **Jaydon Stats**: HP: 20 / 20 | ATK: 1 | DEF: 999
 - **Status Bar**: Clean two-row display with HP bars and numbers (LV 1 removed).
 
-### FIGHT System & 11 HP Cap
+### FIGHT System & 1 HP Floor
 - Moving target reticle across oval meter. Press **Z/Enter** to strike.
 - Plays slash SFX followed by hit SFX.
-- **When Jaydon's HP > 11**:
-  - Jaydon's HP drops from 12 to **11** (takes 1 damage).
-  - Portrait changes to `surprised` (clean circular 'o' mouth).
+- **Damage**: 2–6 per hit depending on timing (closer to the center line hits harder), **+1** if the punching bag was punched. A red damage number pops up over Jaydon.
+- **While Jaydon's HP > 1**:
+  - Jaydon takes the hit, but damage is capped so he never drops below **1 / 20**.
+  - Portrait changes to `surprised`; the battle sprite shows the clean circular 'o' mouth.
   - Narration:
     ```text
     * You try to attack, but you can't bring yourself to do it.
@@ -300,13 +301,13 @@ Dials Jaydon's phone:
       * Jaydon gasps and dramatically pretends to take 1 extra damage from that punching bag workout!
       * Jaydon: "Whoa! Ow, ow! Those strong core muscles are really paying off!"
       ```
-    - *If bag was not punched*:
+    - *If bag was not punched* (N = damage dealt):
       ```text
-      * Jaydon gasps and dramatically pretends to take 1 damage anyway.
+      * Jaydon gasps and dramatically pretends to take N damage anyway.
       * Jaydon: "Whoa! Ow, ow, critical hit!"
       ```
-- **When Jaydon's HP is at 11 (Damage Cap Reached)**:
-  - Jaydon takes **0 damage** (HP remains at 11).
+- **When Jaydon's HP is at 1 (Floor Reached)**:
+  - Jaydon takes **0 damage** (shows `MISS`; HP remains at 1).
   - Portrait: `neutral`.
   - Narration:
     ```text
@@ -314,7 +315,7 @@ Dials Jaydon's phone:
     * Jaydon has pretended enough.
     * Jaydon: "Hey, take it easy!"
     ```
-  - *(Guarantees that the maximum damage Jaydon can ever take throughout the game is exactly 1)*.
+  - *(Mallika can wear Jaydon all the way down to 1 / 20, but never defeat him.)*
 
 ### ACT Submenu (Check, Flirt, Smoke, Hug)
 2×2 grid navigation using WASD / Arrow Keys:

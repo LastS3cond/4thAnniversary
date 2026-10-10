@@ -74,7 +74,7 @@ flowchart LR
 
 1. **Title Screen**: Classic Undertale title with pulsing red soul cursor and browser audio unlock.
 2. **Exterior (Townhouse 316)**: Fall leaves drifting across an autumn lawn, red brick framing, and the iconic "316" plaque.
-3. **First Floor (The Open Loop)**: An authentic half-split townhouse with a living room on the left and kitchen on the right. Includes an L-couch, TV stand, punching bag, puzzle table, and warm oven.
+3. **First Floor (The Open Loop)**: A full-width living room across the top (L-couch and TV stand front and center, punching bag, puzzle table) with the kitchen and its warm oven below on the right.
 4. **The Staircase**: A compact switchback U-shaped staircase descending to an intermediate landing window before ascending to the top floor.
 5. **Second Floor**: A narrow corridor with roommates' doors (Alex, Kevin) leading to Jaydon's bedroom.
 6. **Boss Encounter (Jaydon)**: Full Undertale battle engine with Fight meter, rotating Flirt responses, smoke breaks, and a warm hug that unlocks Mercy.

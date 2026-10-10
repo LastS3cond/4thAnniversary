@@ -118,8 +118,18 @@ class SpriteManager {
     }
   }
 
+  // Draws a prop into a canvas with a 1px transparent margin so the black
+  // outline wraps all four sides. Place the result at (x - 1, y - 1).
+  makeProp(w, h, draw, opts = {}) {
+    const { canvas, ctx } = this.createCanvas(w + 2, h + 2);
+    ctx.translate(1, 1);
+    draw(ctx, (x, y, ww, hh, c) => this.rect(ctx, x, y, ww, hh, c), (x, y, c) => this.px(ctx, x, y, c));
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    return opts.shadow ? this.outlineKeepShadow(canvas) : this.outline(canvas);
+  }
+
   // ==========================================
-  // TINY 3x5 PIXEL FONT (door nameplates, house number)
+  // TINY 3x5 PIXEL FONT (house number)
   // ==========================================
   getGlyphs() {
     if (this.glyphs) return this.glyphs;
@@ -713,18 +723,16 @@ class SpriteManager {
     this.env = {};
 
     // ---------- Punching bag station (24 x 36) ----------
-    {
-      const { canvas, ctx } = this.createCanvas(24, 36);
-      const R = (x, y, w, h, c) => this.rect(ctx, x, y, w, h, c);
+    this.env.punchBag = this.makeProp(24, 36, (ctx, R, P) => {
       // floor shadow
       this.ellipse(ctx, 12, 32, 10, 2, 'rgba(0,0,0,0.28)');
       // steel post + cantilever arm + brace
       R(4, 3, 2, 29, '#3b3f46'); R(4, 3, 1, 29, '#5f6670');
       R(4, 2, 14, 2, '#3b3f46'); R(4, 2, 14, 1, '#5f6670');
-      for (let i = 0; i < 6; i++) this.px(ctx, 6 + i, 9 - i, '#3b3f46');
+      for (let i = 0; i < 6; i++) P(6 + i, 9 - i, '#3b3f46');
       // chain
-      this.px(ctx, 15, 4, '#a9b0ba'); this.px(ctx, 15, 5, '#7c838d'); this.px(ctx, 15, 6, '#a9b0ba');
-      this.px(ctx, 14, 7, '#7c838d'); this.px(ctx, 16, 7, '#7c838d');
+      P(15, 4, '#a9b0ba'); P(15, 5, '#7c838d'); P(15, 6, '#a9b0ba');
+      P(14, 7, '#7c838d'); P(16, 7, '#7c838d');
       // heavy black vinyl bag
       R(11, 8, 9, 20, '#202226');
       R(12, 7, 7, 1, '#202226');
@@ -739,90 +747,78 @@ class SpriteManager {
       R(0, 29, 6, 4, '#b89c72'); R(18, 29, 6, 4, '#b89c72');
       R(0, 29, 6, 1, '#d3b98e'); R(18, 29, 6, 1, '#d3b98e');
       R(2, 30, 1, 3, '#8f7552'); R(21, 30, 1, 3, '#8f7552');
-      this.env.punchBag = this.outlineKeepShadow(canvas);
-    }
+    }, { shadow: true });
 
-    // ---------- Red L-sectional couch (38 x 28) ----------
-    {
-      const { canvas, ctx } = this.createCanvas(38, 28);
-      const R = (x, y, w, h, c) => this.rect(ctx, x, y, w, h, c);
+    // ---------- Red L-sectional couch: the living room centerpiece (88 x 34) ----------
+    this.env.couch = this.makeProp(88, 34, (ctx, R) => {
       const base = '#9e2a2b';
       const shade = '#7a1d22';
       const dark = '#57131a';
       const hi = '#bf4744';
-      // backrest (long, along the north)
-      R(0, 0, 38, 7, shade);
-      R(1, 0, 36, 1, hi);
-      R(0, 6, 38, 1, dark);
-      // back cushion seams
-      R(13, 1, 1, 5, dark); R(25, 1, 1, 5, dark);
-      // main seat
-      R(0, 7, 38, 8, base);
-      R(0, 7, 38, 1, hi);
-      R(13, 7, 1, 8, dark); R(25, 7, 1, 8, dark);
-      // seat front face (right part)
-      R(13, 15, 25, 3, dark);
-      // chaise lounge projecting forward on the left
-      R(0, 15, 13, 9, base);
-      R(0, 15, 13, 1, shade);
-      R(0, 24, 13, 4, dark);
+      const seams = [26, 47, 67];
+      // long backrest along the north
+      R(0, 0, 88, 9, shade);
+      R(1, 0, 86, 1, hi);
+      R(0, 8, 88, 1, dark);
+      seams.forEach((x) => R(x, 1, 1, 7, dark));
+      // main seat cushions
+      R(0, 9, 88, 12, base);
+      R(0, 9, 88, 1, hi);
+      seams.forEach((x) => R(x, 9, 1, 12, dark));
+      // seat front face (right of the chaise)
+      R(26, 21, 62, 4, dark);
+      // chaise lounge projecting forward on the left (the L)
+      R(0, 21, 26, 9, base);
+      R(4, 21, 22, 1, shade);
+      R(0, 30, 26, 4, dark);
       // arms
-      R(0, 1, 3, 23, shade); R(0, 1, 1, 23, hi);
-      R(35, 1, 3, 14, shade); R(37, 1, 1, 14, dark);
-      R(0, 24, 3, 4, '#46101a'); R(35, 15, 3, 3, '#46101a');
-      // throw pillow
-      R(4, 2, 6, 5, '#e6d8b8'); R(4, 2, 6, 1, '#f6ecd4'); R(4, 6, 6, 1, '#bfae88');
-      this.env.couch = this.outline(canvas);
-    }
+      R(0, 1, 4, 29, shade); R(0, 1, 1, 29, hi);
+      R(83, 1, 5, 20, shade); R(87, 1, 1, 20, dark);
+      R(0, 30, 4, 4, '#46101a'); R(83, 21, 5, 4, '#46101a');
+      // throw pillows
+      R(6, 2, 11, 6, '#e6d8b8'); R(6, 2, 11, 1, '#f6ecd4'); R(6, 7, 11, 1, '#bfae88');
+      R(70, 2, 10, 6, '#e6d8b8'); R(70, 2, 10, 1, '#f6ecd4'); R(70, 7, 10, 1, '#bfae88');
+    });
 
-    // ---------- Coffee table with strewn papers + notebook (22 x 14) ----------
-    {
-      const { canvas, ctx } = this.createCanvas(22, 14);
-      const R = (x, y, w, h, c) => this.rect(ctx, x, y, w, h, c);
-      R(0, 0, 22, 10, '#5e3a22');
-      R(0, 0, 22, 1, '#7a4f31');
-      R(0, 10, 22, 2, '#3f2615');
-      R(1, 12, 2, 2, '#3f2615'); R(19, 12, 2, 2, '#3f2615');
-      // notebook (open, blue cover)
-      R(2, 2, 8, 6, '#2c4a78');
-      R(3, 2, 6, 5, '#f4f1e8');
-      R(6, 2, 1, 5, '#c9c2b0');
-      R(4, 3, 2, 1, '#9fb0c9'); R(4, 5, 2, 1, '#9fb0c9'); R(7, 4, 1, 1, '#9fb0c9');
-      // strewn papers
-      R(11, 1, 6, 5, '#ece6d6');
-      R(12, 2, 4, 1, '#b5ad99'); R(12, 4, 3, 1, '#b5ad99');
-      R(13, 4, 6, 5, '#fbfaf5');
-      R(14, 5, 4, 1, '#a9a395'); R(14, 7, 3, 1, '#a9a395');
-      R(9, 7, 4, 2, '#f1ecdf');
+    // ---------- Coffee table inside the L: papers + notebook strewn about (38 x 15) ----------
+    this.env.coffeeTable = this.makeProp(38, 15, (ctx, R, P) => {
+      R(0, 0, 38, 11, '#5e3a22');
+      R(0, 0, 38, 1, '#7a4f31');
+      R(0, 11, 38, 2, '#3f2615');
+      R(1, 13, 2, 2, '#3f2615'); R(35, 13, 2, 2, '#3f2615');
+      // open spiral notebook
+      R(3, 2, 13, 7, '#2c4a78');
+      R(4, 2, 11, 6, '#f4f1e8');
+      R(9, 2, 1, 6, '#c9c2b0');
+      R(5, 3, 3, 1, '#9fb0c9'); R(5, 5, 3, 1, '#9fb0c9'); R(11, 3, 3, 1, '#9fb0c9'); R(11, 5, 3, 1, '#9fb0c9');
+      // papers strewn about
+      R(19, 1, 8, 6, '#ece6d6');
+      R(20, 2, 6, 1, '#b5ad99'); R(20, 4, 4, 1, '#b5ad99');
+      R(22, 4, 9, 6, '#fbfaf5');
+      R(23, 5, 7, 1, '#a9a395'); R(23, 7, 5, 1, '#a9a395');
+      R(15, 8, 6, 2, '#f1ecdf');
       // pen
-      R(11, 8, 4, 1, '#c8323a'); this.px(ctx, 15, 8, '#e8e8e8');
+      R(17, 10, 5, 1, '#c8323a'); P(22, 10, '#e8e8e8');
       // little bowl
-      R(18, 1, 3, 3, '#f2efe6'); this.px(ctx, 18, 1, '#ffffff'); R(18, 4, 3, 1, '#c9c4b6');
-      this.env.coffeeTable = this.outline(canvas);
-    }
+      R(32, 2, 4, 4, '#f2efe6'); P(32, 2, '#ffffff'); R(32, 6, 4, 1, '#c9c4b6');
+    });
 
-    // ---------- TV stand + TV seen from behind (TV faces north toward couch) (44 x 18) ----------
-    {
-      const { canvas, ctx } = this.createCanvas(44, 18);
-      const R = (x, y, w, h, c) => this.rect(ctx, x, y, w, h, c);
+    // ---------- TV stand + TV seen from behind (TV faces north toward the couch) (76 x 22) ----------
+    this.env.tvStand = this.makeProp(76, 22, (ctx, R) => {
       // TV back panel
-      R(7, 0, 30, 6, '#18191c');
-      R(7, 0, 30, 1, '#34363b');
-      R(19, 6, 6, 1, '#26282c');
+      R(12, 0, 52, 7, '#18191c');
+      R(12, 0, 52, 1, '#34363b');
+      R(35, 7, 6, 1, '#26282c');
       // stand top + body (wood)
-      R(0, 7, 44, 3, '#8a5a36');
-      R(0, 7, 44, 1, '#a8744a');
-      R(0, 10, 44, 5, '#5e3a22');
-      R(1, 11, 42, 1, '#4c2e1a');
-      R(2, 15, 2, 3, '#3f2615'); R(40, 15, 2, 3, '#3f2615');
-      this.env.tvStand = this.outline(canvas);
-    }
+      R(0, 8, 76, 3, '#8a5a36');
+      R(0, 8, 76, 1, '#a8744a');
+      R(0, 11, 76, 7, '#5e3a22');
+      R(1, 12, 74, 1, '#4c2e1a');
+      R(2, 18, 3, 4, '#3f2615'); R(71, 18, 3, 4, '#3f2615');
+    });
 
     // ---------- White folding table + folding bench + duckling puzzle (19 x 49) ----------
-    {
-      const { canvas, ctx } = this.createCanvas(19, 49);
-      const R = (x, y, w, h, c) => this.rect(ctx, x, y, w, h, c);
-      const P = (x, y, c) => this.px(ctx, x, y, c);
+    this.env.puzzleTable = this.makeProp(19, 49, (ctx, R, P) => {
       // folding bench (tucked along the west side)
       R(0, 4, 4, 40, '#dcdad3'); R(0, 4, 1, 40, '#f1efe9'); R(0, 44, 4, 2, '#a9a79f');
       // table top
@@ -855,14 +851,10 @@ class SpriteManager {
       R(7, 27, 3, 4, '#1f5fb0'); R(7, 27, 3, 1, '#4f8ad8');
       R(12, 33, 3, 4, '#1f5fb0'); R(12, 33, 3, 1, '#4f8ad8');
       R(6, 38, 5, 1, '#1a1a1a'); R(13, 28, 1, 4, '#c8323a');
-      this.env.puzzleTable = this.outline(canvas);
-    }
+    });
 
     // ---------- White shoe rack with New Balances (14 x 22) ----------
-    {
-      const { canvas, ctx } = this.createCanvas(14, 22);
-      const R = (x, y, w, h, c) => this.rect(ctx, x, y, w, h, c);
-      const P = (x, y, c) => this.px(ctx, x, y, c);
+    this.env.shoeRack = this.makeProp(14, 22, (ctx, R, P) => {
       // posts
       R(0, 0, 1, 22, '#f2f2ef'); R(13, 0, 1, 22, '#d6d6d2');
       // shelves
@@ -878,8 +870,7 @@ class SpriteManager {
       sneaker(1, 6, '#8a929c', '#1f2d52'); sneaker(7, 6, '#8a929c', '#1f2d52');
       sneaker(1, 13, '#2a3f6e', '#e9edf5'); sneaker(7, 13, '#2a3f6e', '#e9edf5');
       sneaker(1, 20, '#b5bbc4', '#c8323a'); sneaker(7, 20, '#b5bbc4', '#c8323a');
-      this.env.shoeRack = this.outline(canvas);
-    }
+    });
 
     // ---------- Sliding glass door with vertical blinds (28 x 23) ----------
     {

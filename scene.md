@@ -9,7 +9,7 @@
 1. [Engine Architecture & Visual Constraints](#1-engine-architecture--visual-constraints)
 2. [Exterior Scene & Facade (Townhouse 316)](#2-exterior-scene--facade-townhouse-316)
 3. [First Floor Townhouse Layout & Architecture](#3-first-floor-townhouse-layout--architecture)
-   - [Zoning & Proportions (Exact Half-Split)](#zoning--proportions-exact-half-split)
+   - [Zoning & Proportions](#zoning--proportions)
    - [Foyer & Entry Pocket (Bottom-Left)](#foyer--entry-pocket-bottom-left)
    - [Kitchen South Wall & Fixtures](#kitchen-south-wall--fixtures)
    - [Kitchen East Wall & Removal of Clutter](#kitchen-east-wall--removal-of-clutter)
@@ -35,7 +35,7 @@
 - **Boundary Colliders**: All rooms must have strict enclosing colliders so the player cannot step onto walls or walk off the canvas.
 - **Native Art Pixel Grid**: All art is authored at Undertale's native **320 × 240 "art pixel"** resolution and displayed at exactly **2x** (one art pixel = one crisp 2 × 2 block). Room backgrounds are painted once into cached offscreen canvases; colliders, interactables and spawns stay in 640 × 480 screen coordinates (art coordinate × 2).
 - **Depth Sorting**: Props the player can walk behind (TV stand, shoe rack) and characters are drawn in order of where their feet touch the floor, so Mallika correctly disappears behind the TV when standing in the couch/TV corridor.
-- **Overworld Text**: No floating text labels in the overworld (doors and fixtures speak for themselves). The only in-world lettering is the brass `316` plaque and the second-floor door nameplates, drawn with a tiny 3 × 5 pixel font.
+- **Overworld Text**: No floating text labels in the overworld (doors and fixtures speak for themselves, including every door). The only in-world lettering is the brass `316` plaque, drawn with a tiny 3 × 5 pixel font.
 
 ---
 
@@ -78,31 +78,26 @@
 ## 3. First Floor Townhouse Layout & Architecture
 
 ```
-0                       325                     600      640
-+-----------------------+-----------------------+---------+
-| LIVING ROOM (Half)    | KITCHEN (Half)        | BLACK   |
-| Emerald LED Strip     | Dividing Wall (Top)   | VOID    |
-| Sliding Screen Door   | Void (Washer/Dryer)   | (x>600) |
-| Punching Bag Station  | Fridge (Top East)     |         |
-| Red L-Couch (Middle)  | Counter (Mid East)    |         |
-| Coffee Table (in L)   | Rotated Stove (Bot)   |         |
-| TV Stand (Opposite)   |                       |         |
-| Puzzle Table (Right)  |                       |         |
-+-----------------------+-----------------------+         |
-| BATHROOM | HALLWAY    | CENTER DIVIDER WALL   |         |
-| (x:40..  | (x:135..   | (x:215..320,y:200..365)         |
-|   135)   |   215)     | (At par with bathroom)|         |
-+----------+------------+-----------------------+         |
-| COAT     | SHOE RACK  | STAIRS | PANTRY | SINK| D/W |   |
-| CLOSET   | in pocket  | (Landing south wall)  | NO  |   |
-| (Bottom- | leaning on |                       | WIN |   |
-|   Left)  | bath wall  |                       | DOW |   |
-+----------+------------+-----------------------+---------+
+0    40                        320                     600   640
++----+------------------------------------------------------+----+
+|    | LIVING ROOM (full width, y: 60..200)                 |    |
+|    | Emerald LED strip along the whole north wall         |    |
+| B  | Bag | Sliding Door | RED L-COUCH + COFFEE TABLE |Puz-|  B |
+| L  |     |              | ~ walking corridor ~       |zle |  L |
+| A  |     |              | TV STAND (faces the couch) |Tbl |  A |
+| C  +-----------+----------+------------+-------------+----+  C |
+| K  | BATHROOM  | HALLWAY  | CENTER BOX | KITCHEN     |Frdg|  K |
+|    | (40..135) |(135..215)| (215..320) | (open to    |Cntr|    |
+| V  |           |          |            |  living rm) |Stov|  V |
+| O  +-----------+          +------------+             +----+  O |
+| I  | COAT      | SHOE     | STAIRS | PANTRY | SINK |D/W|VOID|  I |
+| D  | CLOSET    | RACK     |        |        |      |   |W/D |  D |
++----+-----------+----------+--------+--------+------+---+----+----+
 ```
 
-### Zoning & Proportions (Exact Half-Split)
-- **Living Room**: Occupies the **exact left half** of the townhouse ($x = 40..325$).
-- **Kitchen**: Occupies the **exact right half** of the townhouse ($x = 325..600$).
+### Zoning & Proportions
+- **Living Room**: Spans the **full width** of the townhouse along the north ($x = 40..600, y = 60..200$). There is no dividing wall; the old empty pocket above the kitchen is now living room.
+- **Kitchen**: Sits on the right below the living room ($x = 320..600, y = 195..440$), open to it; the floor changes from hardwood to warm vinyl at $y \approx 194$.
 - **Pitch-Black Void**: The exterior perimeter ($x < 40$, $x > 600$, $y < 60$, $y > 440$) and removed utility areas are deep black void.
 
 ### Foyer & Entry Pocket (Bottom-Left)
@@ -148,9 +143,9 @@ Running from top to bottom along the right wall ($x = 545..600$):
    - **Completely removed**. That corner (below the stove, $x = 545..600, y = 384..440$) is left as clean pitch-black void.
 
 ### Living Room & Furniture Layout
-Located in the northern left quadrant ($x = 40..325, y = 60..200$):
+Spans the whole north of the house ($x = 40..600, y = 60..200$). The couch and TV stand sit in the middle and take up a good share of the room; open space around them is intentional:
 1. **Emerald Ceiling LED Strip**:
-   - A glowing emerald-green LED strip running along the north ceiling perimeter casting a subtle ambient green bloom (`rgba(0, 255, 68, 0.08)`).
+   - A glowing emerald-green LED strip running along the entire north ceiling perimeter casting a subtle ambient green bloom (`rgba(0, 255, 68, 0.08)`).
 2. **Sliding Screen Door**:
    - Sliding glass patio door on north wall ($x = 95..150, y = 45..75$). Inspect text: `* It's chilly outside.`
 3. **Freestanding Heavy Punching Bag Station (Enlarged)**:
@@ -158,23 +153,23 @@ Located in the northern left quadrant ($x = 40..325, y = 60..200$):
    - **Structure**: Freestanding metal frame contraption with triangular cantilever support arm, circular steel base with **sandbags weighing down the support legs**. Heavy black vinyl punching bag.
    - **Interaction**: Interactive prompt `Give it a punch?` Selecting YES plays hit SFX, gives `* WHAM! Attack power +1` on first hit, and increases ATK to 11 in STAT menu.
 4. **Red L-Sectional Couch (Centered)**:
-   - Placed in the **middle of the living room** ($x = 135..211, y = 68..124$).
+   - Placed in the **middle of the living room** ($x = 232..408, y = 66..134$, $176 \times 68$).
    - Distinct, unmistakable **L-shape**: Long back cushion along the north, chaise lounge extension projecting forward on the left side. Warm crimson upholstery (`#9e2a2b`).
    - **Nintendo Switch**: Removed from cushion (no clutter).
 5. **Coffee Table (Inside the L)**:
-   - Tucked neatly inside the nook of the L-couch ($x = 165..205, y = 92..118$).
+   - Tucked neatly inside the nook of the L-couch ($x = 312..388, y = 100..130$).
    - **Surface**: No laptop. Just **papers and a notebook strewn about**. Inspect text: `* Papers just strewn about.`
 6. **TV Stand (Directly Opposite Couch)**:
-   - Placed opposite the couch facing north ($x = 130..216, y = 148..172$).
-   - **Corridor**: There is a clear, open **walking corridor between the couch and the TV stand** ($y = 124..148$) so the player can freely walk between them.
+   - Placed opposite the couch, centered, facing north ($x = 244..396, y = 160..188$, $152 \times 28$). Seen from behind; no clutter on the TV.
+   - **Corridor**: There is a clear, open **walking corridor between the couch and the TV stand** ($y = 134..160$) so the player can freely walk between them (Mallika correctly passes behind the TV).
 7. **White Plastic Folding Table & Duckling Puzzle (Enlarged)**:
-   - Long rectangular folding table ($36 \times 96$, $x = 280..316, y = 65..161$) with folding bench.
-   - Positioned against the right living room dividing wall, **where the fridge begins to leave off**.
+   - Long rectangular folding table ($36 \times 96$, $x = 558..594, y = 65..161$) with folding bench on its room side.
+   - Positioned against the right (east) living room wall, **directly above where the fridge begins**.
    - **Puzzle**: A colorful jigsaw puzzle covering half the table depicting ducklings among flowers. Inspect text: `* A cute puzzle of ducklings and flowers.`
 
 ### Interior Walls & The "Void"
 1. **Living Room / Kitchen Dividing Wall**:
-   - Vertical dividing wall at **$x = 325, y = 60..180$** (width 8px) with wood baseboards separating the living room from the kitchen.
+   - **Removed.** The living room spans the full width and the kitchen opens directly off its south-east side.
 2. **Center Interior Dividing Wall Box**:
    - Moved **DOWN so it is at par with the bathroom box** ($x = 215..320, y = 200..365$).
    - Leaves a central void where the back of the hallway closet sits.
@@ -220,7 +215,7 @@ Located in the northern left quadrant ($x = 40..325, y = 60..200$):
   - Smooth 180° turn from left flight to right flight.
   - **No Directional Text**: The `"TURN 180° ►"` instruction text has been removed for a clean, non-handholding Undertale aesthetic.
 - **Landing Window & Collider**:
-  - Double-hung window on the south landing wall framing the night sky ($x = 270..340, y = 350..390$).
+  - Double-hung window on the south landing wall framing the night sky ($x = 270..340, y = 350..390$). No falling snow particles; just a calm night sky and a faint moonlight patch on the landing.
   - **Strict Collider**: A solid collider at `{ x: 235, y: 350, w: 140, h: 40 }` prevents the player from ever walking onto or through the window graphic.
 - **Flight 2 (Right, Ascending to Second Floor)**:
   - 7 beige carpet steps ascending north ($x = 315..375, y = 60..290$).
@@ -259,7 +254,7 @@ Located in the northern left quadrant ($x = 40..325, y = 60..200$):
 - **Pair 3 (End of Hallway, $y = 80$)**:
   - **Left**: Kevin's Door (`KEVIN`). Inspect: `* You hear him speaking very formally, must be interviewing.`
   - **Right (Opposite)**: Jaydon's Door (`JAYDON`, Gold Trim). Inspect / Knock prompts boss encounter.
-- **Nameplates**: Each door has a small dark nameplate on the wall just above it (Jaydon's is gold), drawn in the 3 × 5 pixel font. The side walls are drawn as cream bands flanking the 80px corridor.
+- **No Door Labels**: Doors carry no text labels or nameplates; Jaydon's door is told apart by its gold trim. The side walls are drawn as cream bands flanking the 80px corridor.
 - **Jaydon Hallway Staging**:
   - When Jaydon steps out into the hallway upon knocking, **he stands to the side of Mallika**, never behind her: his door swings open, Mallika steps over to the left half of the corridor ($x \le 276$) while Jaydon slides out into the right half ($x \approx 316..322$), feet aligned, facing her.
 
@@ -327,10 +322,10 @@ $80 \times 80$ pixel dialogue portraits displayed in the combat text box:
 |---|---|---|---|
 | Coat Closet | $55 \times 70$ | Bottom-Left Foyer | Tile landing, brass knob |
 | Shoe Rack | $24 \times 36$ | Pocket left of door | Leaning against bathroom wall |
-| Red L-Couch | $76 \times 56$ | Middle of Living Room | Clear L-shape, no Switch on cushion |
-| TV Stand | $86 \times 24$ | Opposite Couch | Walking corridor between TV and Couch |
-| Coffee Table | $40 \times 26$ | Inside the L-Couch | Strewn papers and notebook |
-| Puzzle Table | $36 \times 96$ | Right Living Room Wall | Duckling and flowers jigsaw puzzle |
+| Red L-Couch | $176 \times 68$ | Middle of Living Room | Clear L-shape, no Switch on cushion |
+| TV Stand | $152 \times 28$ | Opposite Couch | Walking corridor between TV and Couch |
+| Coffee Table | $76 \times 30$ | Inside the L-Couch | Strewn papers and notebook |
+| Puzzle Table | $36 \times 96$ | East Living Room Wall (above the fridge) | Duckling and flowers jigsaw puzzle |
 | Heavy Punching Bag | $48 \times 70$ | West Brick Corner | Metal stand, cantilever, sandbag legs |
 | Kitchen Sink | $36 \times 28$ | South Kitchen Wall | Rotated 180°, NO window, dirty dishes |
 | Stove / Oven | $55 \times 70$ | East Kitchen Wall | Rotated 90°, white coil range, warm glow, NO microwave |

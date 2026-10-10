@@ -10,8 +10,8 @@ class BattleManager {
     // Combatant Stats
     this.mallikaHp = 20;
     this.mallikaMaxHp = 20;
-    this.jaydonHp = 12;
-    this.jaydonMaxHp = 12;
+    this.jaydonHp = 20;
+    this.jaydonMaxHp = 20;
     this.jaydonAtk = 1;
     this.jaydonDef = 999;
     this.jaydonSparedEligible = false;
@@ -61,6 +61,7 @@ class BattleManager {
 
     // FIGHT impact feedback (shake, surprised 'o' mouth, damage number)
     this.hitFx = null;
+    this.pendingDamage = 0;
     this.buttonIcons = null;
   }
 
@@ -68,8 +69,8 @@ class BattleManager {
     this.isActive = true;
     this.mallikaHp = 20;
     this.mallikaMaxHp = 20;
-    this.jaydonHp = 12;
-    this.jaydonMaxHp = 12;
+    this.jaydonHp = 20;
+    this.jaydonMaxHp = 20;
     this.jaydonAtk = 1;
     this.jaydonDef = 999;
     this.jaydonSparedEligible = false;
@@ -205,7 +206,8 @@ class BattleManager {
         this.slashTimer += dt;
         if (this.slashTimer >= 500) {
           this.slashTimer = 0;
-          if (this.jaydonHp <= 11) {
+          const dmg = this.pendingDamage;
+          if (dmg <= 0) {
             this.jaydonPortrait = 'neutral';
             this.setMultipleMessages([
               "* You try to attack, but you can't bring yourself to do it.",
@@ -214,11 +216,11 @@ class BattleManager {
               this.jaydonTurnReaction("Hey, take it easy!");
             });
           } else {
-            this.jaydonHp = 11;
+            this.jaydonHp = Math.max(1, this.jaydonHp - dmg);
             this.jaydonPortrait = 'surprised';
             const punchMsg = (window.game && window.game.hasPunchedBag)
               ? "* Jaydon gasps and dramatically pretends to take 1 extra damage from that punching bag workout!"
-              : "* Jaydon gasps and dramatically pretends to take 1 damage anyway.";
+              : `* Jaydon gasps and dramatically pretends to take ${dmg} damage anyway.`;
             const reactionMsg = (window.game && window.game.hasPunchedBag)
               ? "Whoa! Ow, ow! Those strong core muscles are really paying off!"
               : "Whoa! Ow, ow, critical hit!";
@@ -312,8 +314,14 @@ class BattleManager {
         window.audioManager.playSlash();
         setTimeout(() => window.audioManager.playHit(), 200);
       }
-      // 1 damage until he is at 11 HP, then he has "pretended enough" (0 damage)
-      this.hitFx = { t: 0, dmg: this.jaydonHp > 11 ? 1 : 0 };
+      // Timing-based damage (2-6, +1 from the punching bag workout).
+      // Jaydon can be worn down to 1 HP but never lower: at 1 HP he has "pretended enough".
+      const center = 320;
+      const accuracy = Math.max(0, 1 - Math.abs(this.fightMeterX + 6 - center) / 270);
+      let dmg = 2 + Math.round(accuracy * 4);
+      if (window.game && window.game.hasPunchedBag) dmg += 1;
+      this.pendingDamage = Math.max(0, Math.min(dmg, this.jaydonHp - 1));
+      this.hitFx = { t: 0, dmg: this.pendingDamage };
       this.battleState = 'FIGHT_SLASH';
       this.slashTimer = 0;
     }
@@ -642,7 +650,7 @@ class BattleManager {
       });
     }
 
-    // 3. Status rows: MALLIKA HP 20/20 | JAYDON HP 12/12 (clean, aligned, no LV)
+    // 3. Status rows: MALLIKA HP 20/20 | JAYDON HP 20/20 (clean, aligned, no LV)
     ctx.font = '13px "Press Start 2P", monospace';
     ctx.textBaseline = 'middle';
     const hpBarW = 90;

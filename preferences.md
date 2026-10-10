@@ -17,7 +17,8 @@ This document tracks learned preferences, design rules, and behavioral guideline
    - Prefer a pitch-black void (`#000000`) for exterior bounds and removed utility areas (e.g. washer/dryer corner).
    - Strict colliders must prevent the player from walking onto walls, windows, or off-screen.
 4. **Townhouse Architecture & True Scale**:
-   - **Proportions**: Half-and-half split—the Living Room occupies the left half ($x = 40..325$) and the Kitchen occupies the right half ($x = 325..600$).
+   - **Proportions**: The Living Room spans the full width of the house along the north ($x = 40..600$); the Kitchen sits below it on the right ($x = 320..600$). No dividing wall between them.
+   - **Centerpiece**: The couch and TV stand sit in the middle of the living room and take up a good share of it; open space around them is fine.
    - **Center Divider Box**: Moved DOWN to be at par with the bathroom box ($y = 200..365$).
    - **Corridors**: Hallways and staircases should be narrow corridors (~80px wide), not cavernous rooms.
    - **Walking Clearances**: Maintain clear walking corridors between furniture (e.g., between the couch and TV stand).
@@ -32,7 +33,8 @@ This document tracks learned preferences, design rules, and behavioral guideline
 7. **Decluttering & Perspective**:
    - Kitchen sink is rotated 180° (faucet south pointing into basin) with exterior window removed.
    - Kitchen stove is rotated 90° (backguard east, oven door west). Countertop microwave is removed to eliminate visual clutter.
-   - Remove unnecessary text labels in the overworld (e.g., remove `[WALL]` label, remove `TURN 180° ►` prompt).
+   - Remove unnecessary text labels in the overworld (e.g., remove `[WALL]` label, remove `TURN 180° ►` prompt, no labels next to doors).
+   - No falling snow particles in the staircase landing window.
    - Remove suitcases prop graphic from the second-floor hallway.
 
 ---
@@ -76,12 +78,11 @@ This document tracks learned preferences, design rules, and behavioral guideline
 
 1. **Status Bar Layout**:
    - Remove `LV 1` from the combat status bar for a clean Undertale aesthetic.
-   - Cleanly align player and opponent rows (MALLIKA HP 20/20, JAYDON HP 12/12).
-2. **FIGHT Damage Capping (Max 1 Damage)**:
-   - Jaydon starts at 12 HP.
-   - An attack lowers him to 11 HP (dealing 1 damage).
-   - At 11 HP, attacks deal 0 damage and display: `* Jaydon has pretended enough.`
-   - Ensures the maximum damage Jaydon can ever take throughout the game is exactly 1.
+   - Cleanly align player and opponent rows (MALLIKA HP 20/20, JAYDON HP 20/20).
+2. **FIGHT Damage (Down to 1 HP)**:
+   - Mallika and Jaydon both start at 20 HP.
+   - Attacks deal timing-based damage (2–6, +1 after punching the bag), so Jaydon can take several hits.
+   - Damage is capped so Jaydon bottoms out at 1 / 20; at 1 HP attacks deal 0 damage (`MISS`) and display: `* Jaydon has pretended enough.`
 3. **ACT Submenu Nuances**:
    - **Check**: Jaydon asks `"Do you like it so far?"`.
    - **Flirt**: Narration notes Jaydon looks back into his bedroom before refocusing on Mallika. Subsequent flirts rotate across 4 distinct responses:
