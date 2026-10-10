@@ -103,13 +103,11 @@ class MapManager {
 
   // Wooden door drawn on a side band (fits a w x h slot)
   sideDoor(H, x, y, w, h, knobSide) {
-    H.R(x, y, w, h, '#f4efe4');                 // light casing
-    H.R(x, y, w, 1, '#000000');
-    H.R(x + 1, y + 1, w - 2, h - 1, PAL.woodDark);
-    H.R(x + 1, y + 2, w - 2, h - 2, PAL.wood);
-    H.R(x + 1, y + 2, w - 2, 1, '#9a6a43');
-    H.R(x + 2, y + 4, w - 4, Math.floor(h / 2) - 5, PAL.woodMid);
-    H.R(x + 2, y + Math.floor(h / 2) + 2, w - 4, Math.floor(h / 2) - 5, PAL.woodMid);
+    H.R(x, y, w, h, PAL.woodDark);              // thin dark frame, no light casing
+    H.R(x + 1, y + 1, w - 2, h - 2, PAL.wood);
+    H.R(x + 1, y + 1, w - 2, 1, '#9a6a43');
+    H.R(x + 2, y + 3, w - 4, Math.floor(h / 2) - 4, PAL.woodMid);
+    H.R(x + 2, y + Math.floor(h / 2) + 1, w - 4, Math.floor(h / 2) - 4, PAL.woodMid);
     const kx = knobSide === 'right' ? x + w - 2 : x + 1;
     H.R(kx, y + Math.floor(h / 2), 1, 2, PAL.brass);
     H.P(kx, y + Math.floor(h / 2), PAL.brassHi);
@@ -325,14 +323,20 @@ class MapManager {
         [[155, 126, '#d97724'], [166, 140, '#c05822'], [158, 152, '#e29b38'], [153, 163, '#d97724']]
           .forEach(([x, y, c]) => H.R(x, y, 2, 1, c));
 
-        // --- Sidewalk, curb, street ---
+        // --- Sidewalk, curb, and a row of empty parking spaces ---
         H.R(80, 172, 160, 12, '#a9a49a');
         H.R(80, 172, 160, 1, '#bdb8ad');
         for (let x = 98; x < 240; x += 22) H.R(x, 173, 1, 11, '#928d83');
         H.R(80, 184, 160, 2, '#77736b');
-        H.R(80, 186, 160, 54, '#38383c');
+        H.R(80, 186, 160, 54, '#3a3a3e');
         H.R(80, 186, 160, 1, '#2a2a2e');
-        for (let x = 86; x < 236; x += 18) H.R(x, 213, 9, 1, '#8f7e3c');
+        for (let x = 82; x <= 240; x += 26) H.R(x, 188, 1, 34, '#d6d3c8');      // stall lines
+        for (let x = 82; x + 26 <= 242; x += 26) {                              // wheel stops
+          H.R(x + 7, 190, 12, 2, '#9c978d');
+          H.R(x + 7, 190, 12, 1, '#b8b3a8');
+        }
+        [[92, 205, '#d97724'], [141, 214, '#c05822'], [170, 199, '#e29b38'], [219, 210, '#d97724'], [118, 230, '#c05822']]
+          .forEach(([x, y, c]) => H.R(x, y, 2, 1, c));
       },
       drawUnder: (ctx, t) => {
         // Twinkling stars
@@ -376,8 +380,11 @@ class MapManager {
         { x: 600, y: 0, w: 40, h: 480 },
         // Exposed brick strip on the west living room wall
         { x: 40, y: 60, w: 20, h: 140 },
-        // Center interior dividing wall box (at par with the bathroom box)
-        { x: 215, y: 200, w: 105, h: 165 },
+        // Center box, extended east toward the kitchen (TV wall)
+        { x: 215, y: 200, w: 227, h: 165 },
+        // Kitchen north wall: west of the doorway, and above the fridge
+        { x: 442, y: 200, w: 38, h: 20 },
+        { x: 544, y: 200, w: 56, h: 20 },
         // Bathroom block
         { x: 40, y: 200, w: 95, h: 165 },
         // Coat closet (bottom-left corner)
@@ -387,21 +394,21 @@ class MapManager {
         // Kitchen south wall: pantry, cabinets, sink, dishwasher, cabinets
         { x: 270, y: 390, w: 35, h: 50 },
         { x: 305, y: 395, w: 240, h: 45 },
-        // Kitchen east wall: fridge, prep counter, stove (+ corner counter)
-        { x: 545, y: 195, w: 55, h: 245 },
+        // Kitchen east wall: fridge, prep counter, stove, corner counter + microwave
+        { x: 544, y: 220, w: 56, h: 220 },
         // Living room furniture
-        { x: 45, y: 65, w: 48, h: 70 },    // punching bag station
-        { x: 232, y: 66, w: 176, h: 68 },  // L-couch (coffee table sits inside the L)
-        { x: 244, y: 160, w: 152, h: 28 }, // TV stand (walking corridor y: 134..160)
-        { x: 558, y: 65, w: 36, h: 96 }    // folding puzzle table on the east wall
+        { x: 77, y: 65, w: 48, h: 70 },    // punching bag station
+        { x: 232, y: 62, w: 176, h: 68 },  // L-couch against the north wall (coffee table inside the L)
+        { x: 244, y: 170, w: 152, h: 28 }, // TV stand against the TV wall (corridor y: 130..170)
+        { x: 536, y: 62, w: 48, h: 136 }   // folding puzzle table, spans the room's height
       ],
       // Depth-sorted props (sprites carry a 1px outline margin, hence the -1 offsets)
       props: [
-        { sprite: 'tvStand', x: 121, y: 71, baseY: 188 },
+        { sprite: 'tvStand', x: 121, y: 76, baseY: 198 },
         { sprite: 'shoeRack', x: 56, y: 192, baseY: 430 }
       ],
       interactables: [
-        { x: 40, y: 365, w: 55, h: 75, text: ["* Just some warm coats hanging."] },
+        { x: 40, y: 365, w: 55, h: 75, text: ["* What is this closet even for?"] },
         { x: 115, y: 390, w: 26, h: 40, text: ["* A familiar row of New Balances resting in the foyer pocket."] },
         {
           // Front door: back outside
@@ -413,7 +420,7 @@ class MapManager {
           }
         },
         { x: 130, y: 250, w: 15, h: 45, text: ["* You don't have to use the bathroom right now."] },
-        { x: 215, y: 235, w: 15, h: 45, text: ["* A hallway storage closet. It's packed full."] },
+        { x: 215, y: 235, w: 15, h: 45, text: ["* You hear grumbling from the water heater inside."] },
         {
           // Stairs entrance: narrate, then head into the switchback staircase
           x: 215, y: 405, w: 50, h: 35,
@@ -425,20 +432,20 @@ class MapManager {
           }
         },
         { x: 270, y: 390, w: 35, h: 50, text: ["* The pantry is closed."] },
-        { x: 305, y: 395, w: 45, h: 45, text: ["* Dark wood cabinetry filled with plates and mugs."] },
-        { x: 350, y: 400, w: 36, h: 35, triggerSink: true },
-        { x: 390, y: 395, w: 30, h: 45, text: ["* Never figured out how it worked."] },
-        { x: 422, y: 395, w: 123, h: 45, text: ["* More dark wood cabinets with bowls and spices."] },
-        { x: 545, y: 195, w: 55, h: 60, text: ["* I'm not particularly hungry."] },
-        { x: 545, y: 255, w: 55, h: 60, text: ["* A kitchen counter with spices and cutting boards."] },
-        { x: 545, y: 315, w: 55, h: 70, text: ["* The oven is warm. A rich aroma of brown sugar and dates fills the kitchen."] },
-        { x: 45, y: 65, w: 48, h: 70, triggerPunchingBag: true },
-        { x: 95, y: 45, w: 55, h: 30, text: ["* It's chilly outside."] },
+        { x: 305, y: 395, w: 69, h: 45, text: ["* Dark wood cabinetry filled with plates and mugs."] },
+        { x: 374, y: 400, w: 40, h: 35, triggerSink: true },
+        { x: 414, y: 395, w: 32, h: 45, text: ["* Never figured out how it worked."] },
+        { x: 446, y: 395, w: 98, h: 45, text: ["* More dark wood cabinets with bowls and spices."] },
+        { x: 544, y: 220, w: 56, h: 54, text: ["* I'm not particularly hungry."] },
+        { x: 544, y: 274, w: 56, h: 41, text: ["* A kitchen counter with spices and cutting boards."] },
+        { x: 544, y: 315, w: 56, h: 70, text: ["* The oven is warm. A rich aroma of brown sugar and dates fills the kitchen."] },
+        { x: 77, y: 65, w: 48, h: 70, triggerPunchingBag: true },
+        { x: 438, y: 40, w: 64, h: 30, text: ["* It's chilly outside."] },
         // Coffee table is listed before the couch so it wins when both are in reach
-        { x: 312, y: 100, w: 76, h: 30, text: ["* Papers just strewn about."] },
-        { x: 232, y: 66, w: 176, h: 68, text: ["* The red sectional couch in the center of the room. Warm and inviting."] },
-        { x: 244, y: 160, w: 152, h: 28, text: ["* The TV is quiet. A cozy reflection fills the screen."] },
-        { x: 558, y: 65, w: 36, h: 96, text: ["* A cute puzzle of ducklings and flowers."] }
+        { x: 312, y: 96, w: 76, h: 30, text: ["* Papers just strewn about."] },
+        { x: 232, y: 62, w: 176, h: 68, text: ["* The red sectional couch in the center of the room. Warm and inviting."] },
+        { x: 244, y: 170, w: 152, h: 28, text: ["* The TV is quiet. A cozy reflection fills the screen."] },
+        { x: 536, y: 62, w: 48, h: 136, text: ["* A cute puzzle of ducklings and flowers."] }
       ],
       buildBackground: (ctx, S, H) => {
         const rand = M.rng(325);
@@ -456,22 +463,23 @@ class MapManager {
         };
         oak(20, 30, 280, 70);
         oak(67, 100, 40, 82);
-        // Kitchen floor below the living room (warm vinyl, faint lattice, no tile grid)
-        H.R(160, 97, 140, 123, PAL.kitchen);
-        H.R(107, 182, 53, 38, PAL.kitchen);
-        for (let y = 99; y < 220; y += 8) {
+        // Kitchen floor (warm vinyl, faint lattice, no tile grid): the galley east of
+        // the TV wall, the doorway from the living room, and the strip by the stairs
+        const inKitchen = (x, y) => (x >= 221 && y >= 110) || (y >= 182 && x >= 107) || (x >= 240 && x < 272 && y >= 100);
+        H.R(221, 110, 79, 110, PAL.kitchen);
+        H.R(107, 182, 114, 38, PAL.kitchen);
+        H.R(240, 100, 32, 10, PAL.kitchen);
+        for (let y = 101; y < 220; y += 8) {
           for (let x = 108 + ((y >> 3) % 2) * 6; x < 300; x += 12) {
-            if (x < 160 && y < 182) continue;
-            H.P(x, y, PAL.kitchenDot);
+            if (inKitchen(x, y)) H.P(x, y, PAL.kitchenDot);
           }
         }
         for (let i = 0; i < 30; i++) {
           const x = 108 + Math.floor(rand() * 190);
-          const y = 98 + Math.floor(rand() * 121);
-          if (x < 160 && y < 182) continue;
-          H.P(x, y, PAL.kitchenSpeck);
+          const y = 100 + Math.floor(rand() * 119);
+          if (inKitchen(x, y)) H.P(x, y, PAL.kitchenSpeck);
         }
-        H.R(160, 97, 140, 1, '#a8865e');
+        H.R(240, 100, 32, 1, '#a8865e');
         // Foyer landing
         H.R(20, 182, 87, 38, PAL.foyer);
         H.R(20, 182, 87, 1, PAL.foyerEdge);
@@ -492,8 +500,10 @@ class MapManager {
         H.R(20, 2, 280, 1, PAL.led);
         H.R(20, 3, 280, 2, 'rgba(57,255,122,0.20)');
         H.R(20, 5, 280, 4, 'rgba(57,255,122,0.08)');
-        // Sliding glass door
-        H.img(S.env.slidingDoor, 47, 7);
+        // Sliding glass door (east of the couch, next to the puzzle table)
+        H.img(S.env.slidingDoor, 219, 4);
+        // "HAPPY ANNIVERSARY" banner hung on the wall above the couch
+        H.img(S.env.banner, 160 - Math.floor(S.env.banner.width / 2), 8);
 
         // ---------- WEST BRICK STRIP ----------
         M.tile(ctx, S.env.brick, 20, 2, 10, 98, 5);
@@ -515,9 +525,21 @@ class MapManager {
         H.R(41, 166, 1, 54, PAL.wallTopEdge);
         M.sideDoor(H, 40, 187, 7, 28, 'right');
 
-        // ---------- CENTER DIVIDER BOX ----------
-        M.wallBlock(H, 107, 100, 53, 82, { west: true, east: true });
+        // ---------- CENTER BOX (extended east: the TV sits against its north side) ----------
+        M.wallBlock(H, 107, 100, 114, 82, { west: true, east: true });
         M.sideDoor(H, 107, 117, 7, 24, 'left');
+
+        // ---------- KITCHEN NORTH WALL with a doorway from the living room (x: 240..272) ----------
+        const thinWall = (x, w) => {
+          H.R(x, 100, w, 3, PAL.wallTop);
+          H.R(x, 100, w, 1, PAL.wallTopEdge);
+          H.R(x, 103, w, 7, PAL.wall);
+          H.R(x, 103, w, 1, PAL.wallShade);
+          H.R(x, 107, w, 3, PAL.base);
+          H.R(x, 107, w, 1, PAL.baseHi);
+        };
+        thinWall(221, 19);
+        thinWall(272, 28);
 
         // ---------- FOYER: FRONT DOOR + WELCOME MAT ----------
         H.R(77, 214, 25, 6, '#f1ebdf');
@@ -549,35 +571,31 @@ class MapManager {
         H.R(138, 198, 11, 1, '#9a6a43'); H.R(138, 209, 11, 1, '#9a6a43');
         H.R(137, 207, 1, 2, PAL.brass); H.P(137, 207, PAL.brassHi);
         // Cabinets | sink | dishwasher | cabinets
-        H.img(S.makeSouthCabinets(23), 152, 197);
-        H.img(S.env.sink, 175, 197);
-        H.img(S.env.dishwasher, 195, 197);
-        H.img(S.makeSouthCabinets(61), 211, 197);
+        H.img(S.makeSouthCabinets(35), 152, 197);
+        H.img(S.env.sink, 187, 197);
+        H.img(S.env.dishwasher, 207, 197);
+        H.img(S.makeSouthCabinets(49), 223, 197);
         H.R(152, 196, 120, 1, '#2b1d14');
 
         // ---------- KITCHEN EAST RUN (fronts face west into the room) ----------
-        H.img(S.env.fridge, 272, 97);
-        H.img(S.env.prepCounter, 272, 127);
+        H.img(S.env.fridge, 272, 110);
+        H.img(S.env.prepCounter, 272, 137);
         H.img(S.env.stove, 272, 157);
-        H.R(271, 97, 1, 95, '#2b1d14');
-        H.R(272, 96, 28, 1, '#2b1d14');
-        // Washer & dryer removed: that corner is left as clean pitch-black void
-        H.R(272, 192, 30, 30, PAL.void);
-        H.R(272, 192, 28, 1, PAL.cap);
-        H.R(271, 192, 1, 28, PAL.cap);
+        H.img(S.env.cornerCounter, 272, 192);   // counter space + microwave facing the sink
+        H.R(271, 110, 1, 87, '#2b1d14');
 
         // ---------- LIVING ROOM FURNITURE (sprites carry a 1px outline margin) ----------
-        H.img(S.env.punchBag, 21, 31);
-        H.img(S.env.couch, 115, 32);          // centered L-couch
-        H.img(S.env.coffeeTable, 155, 49);    // inside the L
-        H.img(S.env.puzzleTable, 278, 31);    // against the east wall, above the fridge
+        H.img(S.env.punchBag, 37, 31);
+        H.img(S.env.couch, 115, 30);          // centered L-couch, back against the north wall
+        H.img(S.env.coffeeTable, 155, 47);    // inside the L
+        H.img(S.env.puzzleTable, 267, 30);    // spans the living room's height, by the sliding door
       },
       drawUnder: (ctx, t) => {
         // A few leaves drifting past outside the sliding glass door
         M.drawLeaves(ctx, t, {
-          count: 3, small: true, x0: 45, x1: 67, y0: 5, y1: 34,
+          count: 3, small: true, x0: 217, x1: 241, y0: 2, y1: 34,
           speed: [5, 9], drift: [1, 4], sway: 3, seed: 316,
-          clip: [[49, 9, 11, 21], [62, 9, 2, 21]]
+          clip: [[221, 6, 13, 24], [236, 6, 2, 24]]
         });
         // Gentle breathing of the emerald LED bloom
         const a = 0.05 + (Math.sin(t * 1.4) + 1) * 0.025;
@@ -690,13 +708,14 @@ class MapManager {
         H.R(118, 175, 70, 2, PAL.base);
         H.R(118, 177, 70, 1, PAL.wallShade);
         H.R(110, 195, 86, 2, PAL.cap);
-        H.R(134, 178, 38, 17, '#000000');
-        H.R(135, 179, 36, 15, '#f4f1ea');
-        H.R(137, 180, 32, 5, '#18213d');
-        H.R(137, 187, 32, 5, '#18213d');
-        H.R(135, 185, 36, 2, '#f4f1ea');
-        H.R(152, 180, 2, 12, '#f4f1ea');
-        H.R(134, 193, 38, 2, '#ddd8cc');
+        // This wall is drawn folded down (its floor edge is at the top), so the sill sits up top
+        H.R(134, 178, 38, 2, '#ddd8cc');
+        H.R(134, 180, 38, 15, '#000000');
+        H.R(135, 180, 36, 14, '#f4f1ea');
+        H.R(137, 181, 32, 5, '#18213d');
+        H.R(137, 188, 32, 5, '#18213d');
+        H.R(135, 186, 36, 2, '#f4f1ea');
+        H.R(152, 181, 2, 12, '#f4f1ea');
       },
       drawUnder: (ctx, t) => {
         // Faint cool moonlight from the landing window
@@ -704,9 +723,9 @@ class MapManager {
         A(ctx, 140, 158, 26, 7, 'rgba(170,190,255,0.05)');
         // A few fall leaves drifting past outside the window panes
         M.drawLeaves(ctx, t, {
-          count: 5, small: true, x0: 132, x1: 174, y0: 175, y1: 197,
+          count: 5, small: true, up: true, x0: 132, x1: 174, y0: 176, y1: 198,
           speed: [5, 8], drift: [2, 5], sway: 3, seed: 2021,
-          clip: [[137, 180, 15, 5], [154, 180, 15, 5], [137, 187, 15, 5], [154, 187, 15, 5]]
+          clip: [[137, 181, 15, 5], [154, 181, 15, 5], [137, 188, 15, 5], [154, 188, 15, 5]]
         });
       }
     };
@@ -850,7 +869,8 @@ class MapManager {
       const speed = o.speed[0] + p3 * (o.speed[1] - o.speed[0]);
       const drift = o.drift[0] + p4 * (o.drift[1] - o.drift[0]);
       const sway = Math.sin(t * (0.8 + p5 * 1.2) + p1 * 6.283) * o.sway;
-      const y = o.y0 + ((p1 * spanY + t * speed) % spanY);
+      const travel = o.up ? -t * speed : t * speed;
+      const y = o.y0 + ((((p1 * spanY + travel) % spanY) + spanY) % spanY);
       const x = o.x0 + ((((p2 * spanX + t * drift + sway) % spanX) + spanX) % spanX);
       const tumble = frames[i % frames.length];
       const fr = tumble[Math.floor(t * (2 + p5 * 3) + p2 * 4) % 4];

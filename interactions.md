@@ -99,9 +99,9 @@ Dials Jaydon's phone:
 ## 3. Room 2: First Floor Townhouse Inspectables
 
 ### Foyer & Hallway (Bottom-Left & Center)
-1. **Coat Closet** ($x: 40..95, y: 370..440$):
+1. **Coat Closet** ($x: 40..95, y: 365..440$):
    ```text
-   * Just some warm coats hanging.
+   * What is this closet even for?
    ```
 2. **Shoe Rack** (Pocket left of door, leaning against bathroom wall, $x: 115..141, y: 390..430$):
    ```text
@@ -113,9 +113,9 @@ Dials Jaydon's phone:
    ```text
    * You don't have to use the bathroom right now.
    ```
-5. **Middle Hallway Storage Closet** ($x: 215, y: 235$):
+5. **Middle Hallway Closet (Water Heater)** ($x: 215, y: 235$):
    ```text
-   * A hallway storage closet. It's packed full.
+   * You hear grumbling from the water heater inside.
    ```
 6. **Stairs Entrance** ($x: 215..265, y: 405..440$):
    ```text
@@ -128,11 +128,11 @@ Dials Jaydon's phone:
    ```text
    * The pantry is closed.
    ```
-8. **Lower Cabinets Left of Sink** ($x: 305..350, y: 395..440$):
+8. **Lower Cabinets Left of Sink** ($x: 305..374, y: 395..440$):
    ```text
    * Dark wood cabinetry filled with plates and mugs.
    ```
-9. **Kitchen Sink with Dirty Dishes** ($x: 350..386, y: 400..435$):
+9. **Kitchen Sink with Dirty Dishes** ($x: 374..414, y: 400..435$):
    - Interactive prompt:
      ```text
      * There are dirty dishes piled in the sink.
@@ -147,33 +147,33 @@ Dials Jaydon's phone:
      ```text
      * You decide to leave them for later.
      ```
-10. **Dishwasher** ($x: 390..420, y: 395..440$):
+10. **Dishwasher** ($x: 414..446, y: 395..440$):
     ```text
     * Never figured out how it worked.
     ```
-11. **Lower Cabinets Right of Dishwasher** ($x: 422..545, y: 395..440$):
+11. **Lower Cabinets Right of Dishwasher** ($x: 446..544, y: 395..440$):
     ```text
     * More dark wood cabinets with bowls and spices.
     ```
-12. **Refrigerator** ($x: 545..600, y: 195..255$):
+12. **Refrigerator** ($x: 544..600, y: 220..274$):
     ```text
     * I'm not particularly hungry.
     ```
-13. **Prep Counter** ($x: 545..600, y: 255..315$):
+13. **Prep Counter** ($x: 544..600, y: 274..315$):
     ```text
     * A kitchen counter with spices and cutting boards.
     ```
-14. **Rotated Warm Oven** ($x: 545..600, y: 315..385$):
+14. **Rotated Warm Oven** ($x: 544..600, y: 315..385$):
     ```text
     * The oven is warm. A rich aroma of brown sugar and dates fills the kitchen.
     ```
 
 ### Living Room (Full Width, North)
-15. **Sliding Screen Door** ($x: 95..150, y: 45..75$):
+15. **Sliding Screen Door** ($x: 438..502$, north wall east of the couch):
     ```text
     * It's chilly outside.
     ```
-16. **Freestanding Heavy Punching Bag Station** ($x: 45..93, y: 65..135$):
+16. **Freestanding Heavy Punching Bag Station** ($x: 77..125, y: 65..135$):
     - Interactive prompt:
       ```text
       [First Time]:
@@ -203,19 +203,19 @@ Dials Jaydon's phone:
       ```text
       * You leave the punching bag hanging peacefully.
       ```
-17. **Red L-Sectional Couch** ($x: 232..408, y: 66..134$):
+17. **Red L-Sectional Couch** ($x: 232..408, y: 62..130$):
     ```text
     * The red sectional couch in the center of the room. Warm and inviting.
     ```
-18. **Coffee Table Inside L** ($x: 312..388, y: 100..130$, inspect from the corridor below it):
+18. **Coffee Table Inside L** ($x: 312..388, y: 96..126$, inspect from the corridor below it):
     ```text
     * Papers just strewn about.
     ```
-19. **TV Stand Opposite Couch** ($x: 244..396, y: 160..188$):
+19. **TV Stand Opposite Couch** ($x: 244..396, y: 170..198$):
     ```text
     * The TV is quiet. A cozy reflection fills the screen.
     ```
-20. **White Folding Table with Duckling Puzzle** ($x: 558..594, y: 65..161$, east wall):
+20. **White Folding Table with Duckling Puzzle** ($x: 536..584, y: 62..198$, spans the room's height):
     ```text
     * A cute puzzle of ducklings and flowers.
     ```
@@ -299,13 +299,18 @@ Dials Jaydon's phone:
     - *If bag was punched*:
       ```text
       * Jaydon gasps and dramatically pretends to take 1 extra damage from that punching bag workout!
-      * Jaydon: "Whoa! Ow, ow! Those strong core muscles are really paying off!"
       ```
     - *If bag was not punched* (N = damage dealt):
       ```text
       * Jaydon gasps and dramatically pretends to take N damage anyway.
-      * Jaydon: "Whoa! Ow, ow, critical hit!"
       ```
+  - Then he goes down: the battle sprite falls flat on the floor (dazed face) and his portrait turns `dazed`:
+    ```text
+    * Jaydon staggers back and falls to the ground.
+    ```
+    - *If bag was punched*: `* Jaydon: "Ugh... you are very strong... Those core muscles are really paying off."`
+    - *If bag was not punched*: `* Jaydon: "Ugh... you are very strong..."`
+  - He gets back up when it's Mallika's turn again.
 - **When Jaydon's HP is at 1 (Floor Reached)**:
   - Jaydon takes **0 damage** (shows `MISS`; HP remains at 1).
   - Portrait: `neutral`.

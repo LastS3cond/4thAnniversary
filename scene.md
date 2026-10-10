@@ -49,13 +49,14 @@
 |                          |  Front Door Framed in Red Brick    |              |
 |                          |  Brass '316' Plaque (Left of Door) |              |
 |                          |  Autumn Lawn & Concrete Walkway    |              |
-|                          |  Sidewalk + Asphalt Street (y>344) |              |
+|                          |  Sidewalk + Empty Parking (y>344)  |              |
 +-------------------------------------------------------------------------------+
 ```
 
 ### Aesthetic & Environment:
 - **Season**: **Fall Emulation** (autumn theme). Autumn grass lawn (golden/olive tones `#5a6828`, `#6b7a32`) with scattered rust-colored fallen leaves (`#c05822`, `#d97724`, `#e29b38`).
 - **Falling Leaves**: A few tumbling autumn leaves drift on the breeze across the sky, facade and lawn, passing in front of Mallika (replacing winter snow).
+- **Parking**: Below the sidewalk is a row of empty parking spaces (white stall lines and concrete wheel stops) instead of a road.
 - **Playable Alleyway Bounds**: Thinner playable alleyway—the first 1/4 and last 1/4 of the 640px screen are cut out. Walkable area is strictly bounded between **$x = 160$** and **$x = 480$**. Outside this ($x < 160$ and $x > 480$) is pitch-black void.
 
 ### Facade Architecture:
@@ -81,29 +82,29 @@
 0    40                        320                     600   640
 +----+------------------------------------------------------+----+
 |    | LIVING ROOM (full width, y: 60..200)                 |    |
-|    | Emerald LED strip along the whole north wall         |    |
-| B  | Bag | Sliding Door | RED L-COUCH + COFFEE TABLE |Puz-|  B |
-| L  |     |              | ~ walking corridor ~       |zle |  L |
-| A  |     |              | TV STAND (faces the couch) |Tbl |  A |
-| C  +-----------+----------+------------+-------------+----+  C |
-| K  | BATHROOM  | HALLWAY  | CENTER BOX | KITCHEN     |Frdg|  K |
-|    | (40..135) |(135..215)| (215..320) | (open to    |Cntr|    |
-| V  |           |          |            |  living rm) |Stov|  V |
-| O  +-----------+          +------------+             +----+  O |
-| I  | COAT      | SHOE     | STAIRS | PANTRY | SINK |D/W|VOID|  I |
-| D  | CLOSET    | RACK     |        |        |      |   |W/D |  D |
-+----+-----------+----------+--------+--------+------+---+----+----+
+|    | LED strip | "HAPPY ANNIVERSARY" banner | Sliding Door |    |
+| B  |  Bag  RED L-COUCH + COFFEE TABLE (against N wall)  |Puz-|  B |
+| L  |       ~ wide walking corridor ~                    |zle |  L |
+| A  |       BLACK TV STAND (against the TV wall)         |Tbl |  A |
+| C  +-----------+----------+-------------------+---door--+----+  C |
+| K  | BATHROOM  | HALLWAY  | CENTER BOX / TV   | KITCHEN |Frdg|  K |
+|    | (40..135) |(135..215)| WALL (215..442)   | galley  |Cntr|    |
+| V  |           |          |                   |         |Stov|  V |
+| O  +-----------+          +-------------------+         +----+  O |
+| I  | COAT      | SHOE     | STAIRS | PANTRY | CAB | SINK|D/W|MICR|  I |
+| D  | CLOSET    | RACK     |        |        |     |     |   |OWAV|  D |
++----+-----------+----------+--------+--------+-----+-----+---+----+----+
 ```
 
 ### Zoning & Proportions
 - **Living Room**: Spans the **full width** of the townhouse along the north ($x = 40..600, y = 60..200$). There is no dividing wall; the old empty pocket above the kitchen is now living room.
-- **Kitchen**: Sits on the right below the living room ($x = 320..600, y = 195..440$), open to it; the floor changes from hardwood to warm vinyl at $y \approx 194$.
+- **Kitchen**: A galley on the right below the living room ($x = 442..600, y = 220..440$, plus the strip in front of the stairs/pantry/counters, $y = 365..395$). It is closed off from the living room by a wall at $y = 200..220$ with a **doorway at $x = 480..544$**.
 - **Pitch-Black Void**: The exterior perimeter ($x < 40$, $x > 600$, $y < 60$, $y > 440$) and removed utility areas are deep black void.
 
 ### Foyer & Entry Pocket (Bottom-Left)
 1. **Coat Closet**:
    - Located in the **bottom-left corner** ($x = 40..95, y = 370..440$, size $55 \times 70$).
-   - Ceramic tile foyer landing. Brass door handle. Inspect text: `* Just some warm coats hanging.`
+   - Ceramic tile foyer landing. Brass door handle. Inspect text: `* What is this closet even for?`
 2. **Shoe Rack**:
    - Must **not** be on the same south wall as the front door.
    - Sits in the **pocket to the left of the front door, leaning against the vertical bathroom wall** ($x = 115..141, y = 390..430$).
@@ -119,60 +120,64 @@ Running from left to right along the south wall ($y = 395..440$):
 2. **Pantry**:
    - Tall wooden pantry door ($x = 270..305, y = 390..440$) with brass knob. Inspect text: `* The pantry is closed.`
 3. **Lower Cabinets (Left)**:
-   - Dark wood shaker cabinets ($x = 305..350$).
+   - Dark wood shaker cabinets ($x = 305..374$, three doors).
 4. **Kitchen Sink (Rotated 180°, Window Removed)**:
-   - **Orientation**: Rotated 180° so the faucet is on the south perimeter wall pointing north into the stainless steel double basin ($x = 350..386, y = 400..435$).
+   - **Orientation**: Rotated 180° so the faucet is on the south perimeter wall pointing north into the stainless steel double basin ($x = 374..414, y = 400..435$; one cabinet further right than before).
    - **Window**: **Completely removed** (there is no exterior window above this sink).
    - **Dishes & Inspection**: Pile of dirty dishes. Selecting `Clean them?` prompts: `* There are too many.`
 5. **Dishwasher**:
-   - Stainless steel/black dishwasher ($x = 390..420, y = 395..440$). Inspect text: `* Never figured out how it worked.`
+   - Stainless steel/black dishwasher ($x = 414..446, y = 395..440$). Inspect text: `* Never figured out how it worked.`
 6. **Lower Cabinets (Right)**:
-   - Continuous row of dark wood cabinets ($x = 422..545$) extending to the east wall.
+   - Continuous row of dark wood cabinets ($x = 446..544$) running to the corner counter.
 
-### Kitchen East Wall & Removal of Clutter
-Running from top to bottom along the right wall ($x = 545..600$):
+### Kitchen East Wall
+Running from top to bottom along the right wall ($x = 544..600$), below the kitchen's north wall ($y = 200..220$):
 1. **Refrigerator (Top)**:
-   - Clean stainless steel double-door fridge ($y = 195..255$). Inspect text: `* I'm not particularly hungry.`
+   - Clean stainless steel double-door fridge ($y = 220..274$). Inspect text: `* I'm not particularly hungry.`
 2. **Kitchen Counter (Middle)**:
-   - Prep counter with butcher block and spices ($y = 255..315$).
-3. **Stove & Oven (Rotated 90°, Microwave Removed)**:
-   - **Orientation**: Rotated 90° so the appliance backguard is against the east wall ($x = 595$) and the oven door/burners face west into the room ($x = 545..600, y = 315..385$).
-   - **Microwave**: **Completely removed** to eliminate visual clutter.
+   - Prep counter with butcher block and spices ($y = 274..315$).
+3. **Stove & Oven (Rotated 90°)**:
+   - **Orientation**: Rotated 90° so the appliance backguard is against the east wall ($x = 595$) and the oven door/burners face west into the room ($x = 544..600, y = 315..385$).
    - **Atmosphere**: Warm oven glow. Inspect text: `* The oven is warm. A rich aroma of brown sugar and dates fills the kitchen.`
-4. **Washer & Dryer**:
-   - **Completely removed**. That corner (below the stove, $x = 545..600, y = 384..440$) is left as clean pitch-black void.
+4. **Corner Counter + Microwave** (no interaction):
+   - Counter space in the corner between the oven and the south cabinets ($x = 544..600, y = 384..440$). A black microwave sits on it next to the oven, its door facing west toward the sink; the oven sticks out further into the room than the microwave does.
+   - (Washer & dryer remain removed.)
 
 ### Living Room & Furniture Layout
-Spans the whole north of the house ($x = 40..600, y = 60..200$). The couch and TV stand sit in the middle and take up a good share of the room; open space around them is intentional:
+Spans the whole north of the house ($x = 40..600, y = 60..200$). The couch and TV stand sit in the middle and take up a good share of the room, each pushed close to its wall; open space around them is intentional:
 1. **Emerald Ceiling LED Strip**:
    - A glowing emerald-green LED strip running along the entire north ceiling perimeter casting a subtle ambient green bloom (`rgba(0, 255, 68, 0.08)`).
 2. **Sliding Screen Door**:
-   - Sliding glass patio door on north wall ($x = 95..150, y = 45..75$) with vertical blinds; a few fall leaves drift past outside the glass. Inspect text: `* It's chilly outside.`
+   - Sliding glass patio door on the north wall east of the couch, right beside the puzzle table ($x = 438..502$, $64 \times 52$, 1.14x the old size) with vertical blinds; a few fall leaves drift past outside the glass. Inspect text: `* It's chilly outside.`
+2b. **"Happy Anniversary" Banner**:
+   - A pink ribbon banner reading **HAPPY ANNIVERSARY** (with little hearts) hangs on the north wall directly above the couch. Decorative, no interaction.
 3. **Freestanding Heavy Punching Bag Station (Enlarged)**:
-   - Tucked in the top-left corner against the brick wall ($x = 45..93, y = 65..135$, size $48 \times 70$).
+   - In the top-left of the living room, a little out from the brick wall ($x = 77..125, y = 65..135$, size $48 \times 70$).
    - **Structure**: Freestanding metal frame contraption with triangular cantilever support arm, circular steel base with **sandbags weighing down the support legs**. Heavy black vinyl punching bag.
    - **Interaction**: Interactive prompt `Give it a punch?` Selecting YES plays hit SFX, gives `* WHAM! Attack power +1` on first hit, and increases ATK to 11 in STAT menu.
 4. **Red L-Sectional Couch (Centered)**:
-   - Placed in the **middle of the living room** ($x = 232..408, y = 66..134$, $176 \times 68$).
-   - Distinct, unmistakable **L-shape**: Long back cushion along the north, chaise lounge extension projecting forward on the left side. Warm crimson upholstery (`#9e2a2b`).
+   - Placed in the **middle of the living room**, back against the north wall ($x = 232..408, y = 62..130$, $176 \times 68$).
+   - Distinct, unmistakable **L-shape**: Long back cushion along the north, chaise lounge extension projecting forward on the left side. Warm crimson upholstery (`#9e2a2b`) with **red throw pillows**.
    - **Nintendo Switch**: Removed from cushion (no clutter).
 5. **Coffee Table (Inside the L)**:
-   - Tucked neatly inside the nook of the L-couch ($x = 312..388, y = 100..130$).
+   - Tucked neatly inside the nook of the L-couch ($x = 312..388, y = 96..126$).
    - **Surface**: No laptop. Just **papers and a notebook strewn about**. Inspect text: `* Papers just strewn about.`
 6. **TV Stand (Directly Opposite Couch)**:
-   - Placed opposite the couch, centered, facing north ($x = 244..396, y = 160..188$, $152 \times 28$). Seen from behind; no clutter on the TV.
-   - **Corridor**: There is a clear, open **walking corridor between the couch and the TV stand** ($y = 134..160$) so the player can freely walk between them (Mallika correctly passes behind the TV).
+   - **Black** TV stand opposite the couch, centered, facing north and pushed against the TV wall (the center box's north side) ($x = 244..396, y = 170..198$, $152 \times 28$). Seen from behind; no clutter on the TV.
+   - **Corridor**: A wide, open **walking corridor between the couch and the TV stand** ($y = 130..170$) so the player can freely walk between them (Mallika correctly passes behind the TV).
 7. **White Plastic Folding Table & Duckling Puzzle (Enlarged)**:
-   - Long rectangular folding table ($36 \times 96$, $x = 558..594, y = 65..161$) with folding bench on its room side.
-   - Positioned against the right (east) living room wall, **directly above where the fridge begins**.
+   - Long rectangular folding table ($48 \times 136$, $x = 536..584, y = 62..198$; 1.33x wide, 1.42x long) with folding bench on its room side. It **spans the height of the living room**.
+   - Sits at the east end of the living room, right beside the sliding door, above the kitchen wall where the fridge begins.
    - **Puzzle**: A colorful jigsaw puzzle covering half the table depicting ducklings among flowers. Inspect text: `* A cute puzzle of ducklings and flowers.`
 
 ### Interior Walls & The "Void"
 1. **Living Room / Kitchen Dividing Wall**:
    - **Removed.** The living room spans the full width and the kitchen opens directly off its south-east side.
-2. **Center Interior Dividing Wall Box**:
-   - Moved **DOWN so it is at par with the bathroom box** ($x = 215..320, y = 200..365$).
-   - Leaves a central void where the back of the hallway closet sits.
+2. **Center Box / TV Wall**:
+   - At par with the bathroom box and **extended east toward the kitchen** ($x = 215..442, y = 200..365$). The TV stand sits against its north side, with the hallway on one side and the kitchen doorway on the other (like the real house).
+   - The hallway closet on its west face holds the water heater: `* You hear grumbling from the water heater inside.`
+2b. **Kitchen North Wall**:
+   - Thin wall at $y = 200..220$ from the center box to $x = 480$, then a **doorway ($x = 480..544$)**, then wall again above the fridge ($x = 544..600$).
 3. **Bathroom Block**:
    - Enclosed room on the left of the hallway ($x = 40..135, y = 200..365$). Door facing hallway at $x = 130$.
 4. **Hallway Corridor**:
@@ -180,7 +185,7 @@ Spans the whole north of the house ($x = 40..600, y = 60..200$). The couch and T
 5. **Left Wall Brickwork**:
    - Only a single vertical strip of exposed red brick along the left living room wall ($x = 40..60, y = 60..200$, solid collider). All other walls use warm neutral drywall (`#eae3d2`).
 6. **How Walls Read**:
-   - Wall masses (bathroom block, center box, coat closet) show a muted taupe top (`#6b5a4e`), cream side bands where doors face the hallway/foyer, and a cream south face with a wood baseboard. Fixtures on the kitchen walls show their fronts toward the room (cabinet doors / black dishwasher along the north edge of the south run, oven door and fridge handles along the west edge of the east run).
+   - Wall masses (bathroom block, center box, coat closet) show a muted taupe top (`#6b5a4e`), cream side bands where doors face the hallway/foyer, and a cream south face with a wood baseboard. Side-view doors on those thin bands are plain wood with a dark frame (no light casing). Fixtures on the kitchen walls show their fronts toward the room (cabinet doors / black dishwasher along the north edge of the south run, oven door and fridge handles along the west edge of the east run).
 
 ---
 
@@ -215,7 +220,7 @@ Spans the whole north of the house ($x = 40..600, y = 60..200$). The couch and T
   - Smooth 180° turn from left flight to right flight.
   - **No Directional Text**: The `"TURN 180° ►"` instruction text has been removed for a clean, non-handholding Undertale aesthetic.
 - **Landing Window & Collider**:
-  - Double-hung window on the south landing wall framing the night sky ($x = 270..340, y = 350..390$). A few autumn leaves drift past outside its panes (never snow), and a faint moonlight patch falls on the landing.
+  - Double-hung window on the south landing wall framing the night sky ($x = 270..340, y = 350..390$). That wall is drawn folded down (its floor edge is at the top), so the sill sits at the top and the few autumn leaves drifting past outside fall toward it. Never snow; a faint moonlight patch falls on the landing.
   - **Strict Collider**: A solid collider at `{ x: 235, y: 350, w: 140, h: 40 }` prevents the player from ever walking onto or through the window graphic.
 - **Flight 2 (Right, Ascending to Second Floor)**:
   - 7 beige carpet steps ascending north ($x = 315..375, y = 60..290$).
@@ -323,12 +328,13 @@ $80 \times 80$ pixel dialogue portraits displayed in the combat text box:
 | Coat Closet | $55 \times 70$ | Bottom-Left Foyer | Tile landing, brass knob |
 | Shoe Rack | $24 \times 36$ | Pocket left of door | Leaning against bathroom wall |
 | Red L-Couch | $176 \times 68$ | Middle of Living Room | Clear L-shape, no Switch on cushion |
-| TV Stand | $152 \times 28$ | Opposite Couch | Walking corridor between TV and Couch |
+| TV Stand | $152 \times 28$ | Against the TV wall, opposite the couch | Black; wide corridor between TV and couch |
 | Coffee Table | $76 \times 30$ | Inside the L-Couch | Strewn papers and notebook |
-| Puzzle Table | $36 \times 96$ | East Living Room Wall (above the fridge) | Duckling and flowers jigsaw puzzle |
+| Puzzle Table | $48 \times 136$ | East end of the living room (spans its height) | Duckling and flowers jigsaw puzzle |
 | Heavy Punching Bag | $48 \times 70$ | West Brick Corner | Metal stand, cantilever, sandbag legs |
-| Kitchen Sink | $36 \times 28$ | South Kitchen Wall | Rotated 180°, NO window, dirty dishes |
-| Stove / Oven | $55 \times 70$ | East Kitchen Wall | Rotated 90°, white coil range, warm glow, NO microwave |
+| Kitchen Sink | $40 \times 35$ | South Kitchen Wall | Rotated 180°, NO window, dirty dishes |
+| Stove / Oven | $56 \times 70$ | East Kitchen Wall | Rotated 90°, white coil range, warm glow |
+| Microwave | $\approx 30 \times 30$ | Corner counter next to the oven | Faces the sink; set back behind the oven's front |
 
 ---
 *End of Master Scene Specification.*

@@ -17,8 +17,8 @@ This document tracks learned preferences, design rules, and behavioral guideline
    - Prefer a pitch-black void (`#000000`) for exterior bounds and removed utility areas (e.g. washer/dryer corner).
    - Strict colliders must prevent the player from walking onto walls, windows, or off-screen.
 4. **Townhouse Architecture & True Scale**:
-   - **Proportions**: The Living Room spans the full width of the house along the north ($x = 40..600$); the Kitchen sits below it on the right ($x = 320..600$). No dividing wall between them.
-   - **Centerpiece**: The couch and TV stand sit in the middle of the living room and take up a good share of it; open space around them is fine.
+   - **Proportions**: The Living Room spans the full width of the house along the north ($x = 40..600$); the Kitchen is a galley below it on the right, reached through a doorway in the kitchen's north wall. The center box extends east as the TV wall (hallway on one side of the TV, kitchen doorway on the other, like the real house).
+   - **Centerpiece**: The couch (red pillows) and black TV stand sit in the middle of the living room, each pushed toward its own wall with a wide corridor between them; a "Happy Anniversary" banner hangs above the couch. Open space around them is fine.
    - **Center Divider Box**: Moved DOWN to be at par with the bathroom box ($y = 200..365$).
    - **Corridors**: Hallways and staircases should be narrow corridors (~80px wide), not cavernous rooms.
    - **Walking Clearances**: Maintain clear walking corridors between furniture (e.g., between the couch and TV stand).
@@ -32,9 +32,10 @@ This document tracks learned preferences, design rules, and behavioral guideline
    - Keep every sprite on the native 2x art-pixel grid (Undertale's 320 × 240) with black character outlines so everything reads as one cohesive pixel-art world.
 7. **Decluttering & Perspective**:
    - Kitchen sink is rotated 180° (faucet south pointing into basin) with exterior window removed.
-   - Kitchen stove is rotated 90° (backguard east, oven door west). Countertop microwave is removed to eliminate visual clutter.
+   - Kitchen stove is rotated 90° (backguard east, oven door west). The microwave lives on the corner counter next to the oven (facing the sink, set back behind the oven's front), not on the stove.
    - Remove unnecessary text labels in the overworld (e.g., remove `[WALL]` label, remove `TURN 180° ►` prompt, no labels next to doors).
-   - The season is fall everywhere: a few drifting leaves outside (exterior, landing window, sliding door glass), never snow or winter references.
+   - The season is fall everywhere: a few drifting leaves outside (exterior, landing window, sliding door glass), never snow or winter references. Outside, empty parking spaces sit below the sidewalk instead of a road.
+   - Thin side-view doors get a plain dark frame (no light casing); front-facing doors keep their casing.
    - Remove suitcases prop graphic from the second-floor hallway.
 
 ---
@@ -81,7 +82,7 @@ This document tracks learned preferences, design rules, and behavioral guideline
    - Cleanly align player and opponent rows (MALLIKA HP 20/20, JAYDON HP 20/20).
 2. **FIGHT Damage (Down to 1 HP)**:
    - Mallika and Jaydon both start at 20 HP.
-   - Attacks deal timing-based damage (2–6, +1 after punching the bag), so Jaydon can take several hits.
+   - Attacks deal timing-based damage (2–6, +1 after punching the bag), so Jaydon can take several hits. Each hit knocks him flat ("* Jaydon staggers back and falls to the ground.") and he groans "Ugh... you are very strong..." before getting back up.
    - Damage is capped so Jaydon bottoms out at 1 / 20; at 1 HP attacks deal 0 damage (`MISS`) and display: `* Jaydon has pretended enough.`
 3. **ACT Submenu Nuances**:
    - **Check**: Jaydon asks `"Do you like it so far?"`.

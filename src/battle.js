@@ -62,6 +62,7 @@ class BattleManager {
     // FIGHT impact feedback (shake, surprised 'o' mouth, damage number)
     this.hitFx = null;
     this.pendingDamage = 0;
+    this.jaydonDown = false;   // knocked flat on the floor after taking a hit
     this.buttonIcons = null;
   }
 
@@ -87,6 +88,7 @@ class BattleManager {
     ];
 
     this.hitFx = null;
+    this.jaydonDown = false;
     this.setBattleText("* (Why is he in pajama pants?)");
 
     if (window.audioManager) {
@@ -165,6 +167,8 @@ class BattleManager {
       this.hitFx.t += dt;
       if (this.hitFx.t > 1500) this.hitFx = null;
     }
+    // He gets back up once it's Mallika's turn again
+    if (this.battleState === 'SELECT_BUTTON') this.jaydonDown = false;
 
     // Typewriter text animation
     if (this.textCharIndex < this.currentText.length) {
@@ -222,13 +226,20 @@ class BattleManager {
               ? "* Jaydon gasps and dramatically pretends to take 1 extra damage from that punching bag workout!"
               : `* Jaydon gasps and dramatically pretends to take ${dmg} damage anyway.`;
             const reactionMsg = (window.game && window.game.hasPunchedBag)
-              ? "Whoa! Ow, ow! Those strong core muscles are really paying off!"
-              : "Whoa! Ow, ow, critical hit!";
+              ? "Ugh... you are very strong... Those core muscles are really paying off."
+              : "Ugh... you are very strong...";
             this.setMultipleMessages([
               "* You try to attack, but you can't bring yourself to do it.",
               punchMsg
             ], () => {
-              this.jaydonTurnReaction(reactionMsg);
+              // ...and down he goes
+              this.jaydonDown = true;
+              this.jaydonPortrait = 'dazed';
+              this.setMultipleMessages([
+                "* Jaydon staggers back and falls to the ground."
+              ], () => {
+                this.jaydonTurnReaction(reactionMsg);
+              });
             });
           }
         }
@@ -520,8 +531,12 @@ class BattleManager {
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     ctx.textAlign = 'left';
 
-    // 1. Jaydon's battle sprite (centered top). Gentle bob on the 2x pixel grid.
-    if (S && S.jaydonBattle) {
+    // 1a. Knocked down: lying on the floor of the battle area
+    if (S && this.jaydonDown && S.jaydonBattleFallen) {
+      const fallen = S.jaydonBattleFallen;
+      ctx.drawImage(fallen, canvasWidth / 2 - fallen.width / 2, 204 - 116);
+    } else if (S && S.jaydonBattle) {
+      // 1b. Jaydon's battle sprite (centered top). Gentle bob on the 2x pixel grid.
       const fx = this.hitFx;
       const tookHit = fx && fx.dmg > 0 && fx.t < 1400;
       const sprite = tookHit ? S.jaydonBattleHit : S.jaydonBattle;

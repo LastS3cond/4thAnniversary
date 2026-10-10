@@ -61,6 +61,15 @@ class SpriteManager {
     return canvas;
   }
 
+  // Rotates a canvas 90 degrees counter-clockwise (exact, keeps pixels crisp)
+  rotateCCW(src) {
+    const { canvas, ctx } = this.createCanvas(src.height, src.width);
+    ctx.translate(0, src.width);
+    ctx.rotate(-Math.PI / 2);
+    ctx.drawImage(src, 0, 0);
+    return canvas;
+  }
+
   flipH(src) {
     const { canvas, ctx } = this.createCanvas(src.width, src.height);
     ctx.translate(src.width, 0);
@@ -559,7 +568,7 @@ class SpriteManager {
       // happy crinkled arcs
       [[eyeL, 22], [eyeL + 1, 21], [eyeL + 2, 21], [eyeL + 3, 22]].forEach(([x, y]) => D(x, y, P.b));
       [[eyeR, 22], [eyeR + 1, 21], [eyeR + 2, 21], [eyeR + 3, 22]].forEach(([x, y]) => D(x, y, P.b));
-    } else if (expr === 'cough') {
+    } else if (expr === 'cough' || expr === 'dazed') {
       // squeezed shut  > <
       [[eyeL, 20], [eyeL + 1, 21], [eyeL + 2, 22], [eyeL + 1, 23], [eyeL, 24]].forEach(([x, y]) => D(x + 1, y, P.b));
       [[eyeR + 3, 20], [eyeR + 2, 21], [eyeR + 1, 22], [eyeR + 2, 23], [eyeR + 3, 24]].forEach(([x, y]) => D(x - 1, y, P.b));
@@ -609,6 +618,9 @@ class SpriteManager {
       D(32, 30, P.m); D(39, 30, P.m); D(33, 31, P.m); D(38, 31, P.m);
     } else if (expr === 'cough') {
       R(35, 30, 2, 2, P.m);
+    } else if (expr === 'dazed') {
+      // woozy zigzag mouth
+      [[32, 30], [33, 29], [34, 30], [35, 29], [36, 30], [37, 29], [38, 30]].forEach(([x, y]) => D(x, y, P.m));
     } else if (expr === 'blush') {
       // small flustered wobble smile
       D(32, 29, P.M); D(33, 30, P.M); D(34, 30, P.M); D(35, 29, P.M);
@@ -694,6 +706,8 @@ class SpriteManager {
   generateJaydonBattleSprite() {
     this.jaydonBattle = this.scaleCanvas(this.buildJaydonBattle('neutral'), 2);
     this.jaydonBattleHit = this.scaleCanvas(this.buildJaydonBattle('surprised'), 2);
+    // Knocked flat on the floor after a hit (head to the left)
+    this.jaydonBattleFallen = this.scaleCanvas(this.rotateCCW(this.buildJaydonBattle('dazed')), 2);
   }
 
   // ==========================================
@@ -702,7 +716,7 @@ class SpriteManager {
   // ==========================================
   generateJaydonPortraits() {
     this.portraits = {};
-    ['neutral', 'blush', 'surprised', 'laugh', 'cough'].forEach((expr) => {
+    ['neutral', 'blush', 'surprised', 'laugh', 'cough', 'dazed'].forEach((expr) => {
       const { canvas, ctx } = this.createCanvas(40, 40);
       // Shoulders of his heather-grey long sleeve
       this.rect(ctx, 2, 37, 36, 3, '#7a808b');
@@ -775,9 +789,9 @@ class SpriteManager {
       R(0, 1, 4, 29, shade); R(0, 1, 1, 29, hi);
       R(83, 1, 5, 20, shade); R(87, 1, 1, 20, dark);
       R(0, 30, 4, 4, '#46101a'); R(83, 21, 5, 4, '#46101a');
-      // throw pillows
-      R(6, 2, 11, 6, '#e6d8b8'); R(6, 2, 11, 1, '#f6ecd4'); R(6, 7, 11, 1, '#bfae88');
-      R(70, 2, 10, 6, '#e6d8b8'); R(70, 2, 10, 1, '#f6ecd4'); R(70, 7, 10, 1, '#bfae88');
+      // red throw pillows
+      R(6, 2, 11, 6, '#d8403a'); R(6, 2, 11, 1, '#f06a5c'); R(6, 7, 11, 1, '#a82a26');
+      R(70, 2, 10, 6, '#d8403a'); R(70, 2, 10, 1, '#f06a5c'); R(70, 7, 10, 1, '#a82a26');
     });
 
     // ---------- Coffee table inside the L: papers + notebook strewn about (38 x 15) ----------
@@ -806,51 +820,55 @@ class SpriteManager {
     // ---------- TV stand + TV seen from behind (TV faces north toward the couch) (76 x 22) ----------
     this.env.tvStand = this.makeProp(76, 22, (ctx, R) => {
       // TV back panel
-      R(12, 0, 52, 7, '#18191c');
-      R(12, 0, 52, 1, '#34363b');
-      R(35, 7, 6, 1, '#26282c');
-      // stand top + body (wood)
-      R(0, 8, 76, 3, '#8a5a36');
-      R(0, 8, 76, 1, '#a8744a');
-      R(0, 11, 76, 7, '#5e3a22');
-      R(1, 12, 74, 1, '#4c2e1a');
-      R(2, 18, 3, 4, '#3f2615'); R(71, 18, 3, 4, '#3f2615');
+      R(12, 0, 52, 7, '#101012');
+      R(12, 0, 52, 1, '#2e2f35');
+      R(35, 7, 6, 1, '#1a1a1d');
+      // black TV stand: lighter top surface, dark body
+      R(0, 8, 76, 3, '#34343a');
+      R(0, 8, 76, 1, '#4c4c54');
+      R(0, 11, 76, 7, '#1b1b1f');
+      R(1, 12, 74, 1, '#28282d');
+      R(2, 18, 3, 4, '#0c0c0e'); R(71, 18, 3, 4, '#0c0c0e');
     });
 
-    // ---------- White folding table + folding bench + duckling puzzle (19 x 49) ----------
-    this.env.puzzleTable = this.makeProp(19, 49, (ctx, R, P) => {
+    // ---------- White folding table + folding bench + duckling puzzle (24 x 68) ----------
+    this.env.puzzleTable = this.makeProp(24, 68, (ctx, R, P) => {
       // folding bench (tucked along the west side)
-      R(0, 4, 4, 40, '#dcdad3'); R(0, 4, 1, 40, '#f1efe9'); R(0, 44, 4, 2, '#a9a79f');
+      R(0, 6, 5, 56, '#dcdad3'); R(0, 6, 1, 56, '#f1efe9'); R(0, 62, 5, 2, '#a9a79f');
       // table top
-      R(3, 0, 16, 45, '#efede7');
-      R(3, 0, 16, 1, '#ffffff');
-      R(18, 0, 1, 45, '#cfccc3');
-      R(3, 45, 16, 2, '#bdb9ae');
-      R(4, 47, 2, 2, '#8c9097'); R(16, 47, 2, 2, '#8c9097');
+      R(4, 0, 20, 64, '#efede7');
+      R(4, 0, 20, 1, '#ffffff');
+      R(23, 0, 1, 64, '#cfccc3');
+      R(4, 64, 20, 2, '#bdb9ae');
+      R(5, 66, 2, 2, '#8c9097'); R(21, 66, 2, 2, '#8c9097');
       // --- the duckling + water lily puzzle (north half) ---
-      R(5, 2, 12, 20, '#3f7f8f');
-      R(5, 2, 12, 1, '#2e6370'); R(5, 21, 12, 1, '#2e6370');
-      R(5, 2, 1, 20, '#2e6370'); R(16, 2, 1, 20, '#2e6370');
+      R(7, 3, 14, 28, '#3f7f8f');
+      R(7, 3, 14, 1, '#2e6370'); R(7, 30, 14, 1, '#2e6370');
+      R(7, 3, 1, 28, '#2e6370'); R(20, 3, 1, 28, '#2e6370');
       // ripples
-      P(7, 6, '#6fb0bb'); P(8, 6, '#6fb0bb'); P(12, 16, '#6fb0bb'); P(13, 16, '#6fb0bb'); P(10, 11, '#6fb0bb');
+      [[9, 8], [10, 8], [15, 22], [16, 22], [12, 16], [17, 11]].forEach(([x, y]) => P(x, y, '#6fb0bb'));
       // lily pads
-      R(6, 13, 4, 3, '#4f9b3a'); P(6, 13, '#79c25a'); R(6, 18, 3, 2, '#4f9b3a');
-      R(11, 4, 3, 2, '#4f9b3a'); R(13, 19, 3, 2, '#4f9b3a'); P(13, 19, '#79c25a');
+      R(8, 18, 5, 3, '#4f9b3a'); P(8, 18, '#79c25a');
+      R(8, 25, 4, 3, '#4f9b3a');
+      R(14, 6, 4, 3, '#4f9b3a'); P(14, 6, '#79c25a');
+      R(15, 26, 4, 3, '#4f9b3a'); P(15, 26, '#79c25a');
       // yellow water lilies
-      R(7, 12, 2, 2, '#ffe680'); P(7, 12, '#ffffff');
-      R(12, 3, 2, 2, '#ffe680'); P(13, 3, '#ffffff');
+      R(9, 17, 2, 2, '#ffe680'); P(9, 17, '#ffffff');
+      R(15, 5, 2, 2, '#ffe680'); P(16, 5, '#ffffff');
+      R(16, 25, 2, 2, '#ffe680');
       // purple flowers along the bank
-      P(15, 8, '#c45ad6'); P(15, 10, '#e07ae8'); P(14, 12, '#c45ad6'); P(15, 14, '#e07ae8'); P(6, 20, '#c45ad6');
-      // three ducklings in a row
+      [[19, 10], [19, 12], [18, 14], [19, 16], [18, 19], [8, 29]].forEach(([x, y], i) => P(x, y, i % 2 ? '#e07ae8' : '#c45ad6'));
+      // a little row of ducklings
       const duck = (x, y) => {
         R(x, y, 3, 2, '#f2c33c'); P(x + 2, y - 1, '#f2c33c'); P(x + 3, y - 1, '#f08a24');
         P(x, y + 1, '#c99a2a');
       };
-      duck(7, 8); duck(10, 9); duck(12, 13);
-      // --- south half: tall blue cups + pens ---
-      R(7, 27, 3, 4, '#1f5fb0'); R(7, 27, 3, 1, '#4f8ad8');
-      R(12, 33, 3, 4, '#1f5fb0'); R(12, 33, 3, 1, '#4f8ad8');
-      R(6, 38, 5, 1, '#1a1a1a'); R(13, 28, 1, 4, '#c8323a');
+      duck(9, 11); duck(12, 12); duck(15, 14);
+      // --- south half: tall blue cups, pens, phone ---
+      R(9, 38, 4, 5, '#1f5fb0'); R(9, 38, 4, 1, '#4f8ad8');
+      R(15, 46, 4, 5, '#1f5fb0'); R(15, 46, 4, 1, '#4f8ad8');
+      R(8, 55, 7, 1, '#1a1a1a'); R(18, 38, 1, 6, '#c8323a');
+      R(14, 56, 5, 3, '#3a3d44'); P(15, 57, '#8fb3d9');
     });
 
     // ---------- White shoe rack with New Balances (14 x 22) ----------
@@ -872,21 +890,21 @@ class SpriteManager {
       sneaker(1, 20, '#b5bbc4', '#c8323a'); sneaker(7, 20, '#b5bbc4', '#c8323a');
     });
 
-    // ---------- Sliding glass door with vertical blinds (28 x 23) ----------
+    // ---------- Sliding glass door with vertical blinds (32 x 26) ----------
     {
-      const { canvas, ctx } = this.createCanvas(28, 23);
+      const { canvas, ctx } = this.createCanvas(32, 26);
       const R = (x, y, w, h, c) => this.rect(ctx, x, y, w, h, c);
-      R(0, 0, 28, 23, '#9aa1aa');
-      R(2, 2, 11, 21, '#131a2c'); R(15, 2, 11, 21, '#131a2c');
-      R(2, 2, 11, 1, '#22304d'); R(15, 2, 11, 1, '#22304d');
-      // a few cold specks outside
-      this.px(ctx, 5, 7, '#cfd8ea'); this.px(ctx, 9, 13, '#cfd8ea'); this.px(ctx, 6, 17, '#cfd8ea');
+      R(0, 0, 32, 26, '#9aa1aa');
+      R(2, 2, 13, 24, '#131a2c'); R(17, 2, 13, 24, '#131a2c');
+      R(2, 2, 13, 1, '#22304d'); R(17, 2, 13, 1, '#22304d');
+      // a few faint stars outside
+      this.px(ctx, 5, 8, '#cfd8ea'); this.px(ctx, 10, 15, '#cfd8ea'); this.px(ctx, 7, 20, '#cfd8ea');
       // vertical blinds gathered on the right pane
-      for (let x = 17; x < 26; x += 2) { R(x, 2, 1, 21, '#e6e4dc'); R(x + 1, 2, 1, 21, '#c4c1b6'); }
-      R(0, 0, 28, 1, '#c6ccd3');
-      R(13, 2, 2, 21, '#7d848e');
-      R(11, 11, 1, 3, '#d7dbe0');
-      this.env.slidingDoor = this.outline(canvas);
+      for (let x = 19; x < 30; x += 2) { R(x, 2, 1, 24, '#e6e4dc'); R(x + 1, 2, 1, 24, '#c4c1b6'); }
+      R(0, 0, 32, 1, '#c6ccd3');
+      R(15, 2, 2, 24, '#7d848e');
+      R(13, 12, 1, 4, '#d7dbe0');
+      this.env.slidingDoor = canvas;
     }
 
     // ---------- Kitchen: south counter run pieces ----------
@@ -934,37 +952,37 @@ class SpriteManager {
     }
 
     // ---------- Kitchen: east wall pieces (fronts face west) ----------
-    // Fridge (28 x 30) - clean stainless double door
+    // Fridge (28 x 27) - clean stainless double door
     {
-      const { canvas, ctx } = this.createCanvas(28, 30);
+      const { canvas, ctx } = this.createCanvas(28, 27);
       const R = (x, y, w, h, c) => this.rect(ctx, x, y, w, h, c);
-      R(0, 0, 28, 30, '#c9ced5');
-      R(0, 0, 13, 30, '#d9dde2');
-      R(0, 14, 13, 1, '#9aa1aa');
-      R(1, 0, 1, 30, '#eef0f3');
-      R(10, 4, 1, 7, '#7f8790'); R(10, 18, 1, 7, '#7f8790');
-      R(13, 0, 1, 30, '#9aa1aa');
+      R(0, 0, 28, 27, '#c9ced5');
+      R(0, 0, 13, 27, '#d9dde2');
+      R(0, 13, 13, 1, '#9aa1aa');
+      R(1, 0, 1, 27, '#eef0f3');
+      R(10, 3, 1, 7, '#7f8790'); R(10, 16, 1, 7, '#7f8790');
+      R(13, 0, 1, 27, '#9aa1aa');
       R(14, 0, 14, 2, '#b4bac2');
-      R(0, 28, 28, 2, '#8d949d');
-      this.env.fridge = this.outline(canvas);
+      R(0, 25, 28, 2, '#8d949d');
+      this.env.fridge = canvas;
     }
-    // Prep counter (28 x 30): cabinets + butcher block + spices
+    // Prep counter (28 x 20): cabinets + butcher block + spices
     {
-      const { canvas, ctx } = this.createCanvas(28, 30);
+      const { canvas, ctx } = this.createCanvas(28, 20);
       const R = (x, y, w, h, c) => this.rect(ctx, x, y, w, h, c);
-      R(0, 0, 9, 30, '#6e4426');
-      R(1, 1, 7, 13, '#7d4f2e'); R(1, 16, 7, 13, '#7d4f2e');
-      R(6, 6, 1, 2, '#d9a93c'); R(6, 21, 1, 2, '#d9a93c');
-      R(8, 0, 1, 30, '#4f2f1a');
-      R(9, 0, 19, 30, '#ece2c8');
-      R(9, 0, 1, 30, '#fbf5e6');
-      R(12, 4, 9, 13, '#b98a54'); R(12, 4, 9, 1, '#d8ab70'); R(12, 16, 9, 1, '#8c6238');
-      R(15, 8, 4, 1, '#8c6238');
+      R(0, 0, 9, 20, '#6e4426');
+      R(1, 1, 7, 8, '#7d4f2e'); R(1, 11, 7, 8, '#7d4f2e');
+      R(6, 4, 1, 2, '#d9a93c'); R(6, 14, 1, 2, '#d9a93c');
+      R(8, 0, 1, 20, '#4f2f1a');
+      R(9, 0, 19, 20, '#ece2c8');
+      R(9, 0, 1, 20, '#fbf5e6');
+      R(12, 3, 8, 11, '#b98a54'); R(12, 3, 8, 1, '#d8ab70'); R(12, 13, 8, 1, '#8c6238');
+      R(14, 7, 4, 1, '#8c6238');
       const jar = (x, y, c) => { R(x, y, 2, 3, c); this.px(ctx, x, y, '#ffffff'); };
-      jar(22, 4, '#c8323a'); jar(25, 4, '#e0a43a'); jar(22, 9, '#5f8f3a'); jar(25, 9, '#8b5a2b');
-      jar(14, 21, '#e0a43a'); jar(18, 22, '#c8323a');
-      R(26, 0, 2, 30, '#ddd2b6');
-      this.env.prepCounter = this.outline(canvas);
+      jar(22, 3, '#c8323a'); jar(25, 3, '#e0a43a'); jar(22, 8, '#5f8f3a'); jar(25, 8, '#8b5a2b');
+      jar(22, 14, '#e0a43a');
+      R(26, 0, 2, 20, '#ddd2b6');
+      this.env.prepCounter = canvas;
     }
     // Stove + oven (28 x 35): white electric coil range, oven door faces west, backguard east
     {
@@ -994,12 +1012,39 @@ class SpriteManager {
       R(25, 16, 2, 3, '#1f1f22'); this.px(ctx, 25, 17, '#5cff8a');
       this.env.stove = this.outline(canvas);
     }
+    // Corner counter (28 x 28) with a microwave on it: next to the oven, facing
+    // west toward the sink, set back so the oven sticks out further than it does.
+    {
+      const { canvas, ctx } = this.createCanvas(28, 28);
+      const R = (x, y, w, h, c) => this.rect(ctx, x, y, w, h, c);
+      R(0, 0, 28, 28, '#ece2c8');
+      // cabinet fronts below the counter (continuing both runs)
+      R(0, 0, 9, 14, '#6e4426');
+      R(1, 0, 7, 4, '#7d4f2e');
+      R(1, 6, 7, 7, '#7d4f2e');
+      R(6, 9, 1, 2, '#d9a93c');
+      R(8, 0, 1, 14, '#4f2f1a'); R(0, 13, 9, 1, '#4f2f1a');
+      R(9, 0, 1, 14, '#fbf5e6'); R(0, 14, 9, 1, '#fbf5e6');
+      R(26, 0, 2, 28, '#ddd2b6'); R(0, 26, 28, 2, '#ddd2b6');
+      // microwave: top surface + its door/window on the west face
+      R(11, 22, 15, 1, 'rgba(0,0,0,0.22)');
+      R(11, 7, 15, 15, '#000000');
+      R(15, 8, 10, 13, '#2c2c31');
+      R(15, 8, 10, 1, '#47474e');
+      R(12, 8, 3, 13, '#1d1d21');
+      R(12, 10, 2, 7, '#3d4b5c');
+      this.px(ctx, 12, 10, '#5d6f84');
+      R(12, 18, 2, 2, '#9aa1aa');
+      this.px(ctx, 13, 18, '#5cff8a');
+      this.env.cornerCounter = canvas;
+    }
+
     // ---------- Kitchen wood cabinet run (south wall) generator ----------
     this.makeSouthCabinets = (w) => {
       const { canvas, ctx } = this.createCanvas(w, 23);
       const R = (x, y, ww, h, c) => this.rect(ctx, x, y, ww, h, c);
       R(0, 0, w, 9, '#6e4426');
-      const doors = Math.max(1, Math.round(w / 10));
+      const doors = Math.max(1, Math.round(w / 11));
       const dw = w / doors;
       for (let i = 0; i < doors; i++) {
         const x0 = Math.round(i * dw);
@@ -1014,6 +1059,28 @@ class SpriteManager {
       R(0, 21, w, 2, '#ddd2b6');
       return canvas;
     };
+
+    // ---------- "HAPPY ANNIVERSARY" ribbon banner (hung above the couch) ----------
+    {
+      const text = 'HAPPY ANNIVERSARY';
+      const tw = this.textWidth(text);
+      const w = tw + 14;
+      this.env.banner = this.makeProp(w + 6, 11, (ctx, R, P) => {
+        // folded tails (notched)
+        R(0, 3, 4, 7, '#a52e46');
+        ctx.clearRect(0, 6, 1, 1);
+        R(w + 2, 3, 4, 7, '#a52e46');
+        ctx.clearRect(w + 5, 6, 1, 1);
+        // main ribbon
+        R(3, 1, w, 9, '#d8445e');
+        R(3, 1, w, 1, '#f07a8c');
+        R(3, 9, w, 1, '#a52e46');
+        // tiny hearts at each end
+        P(5, 4, '#fff1d8'); P(7, 4, '#fff1d8'); R(5, 5, 3, 1, '#fff1d8'); P(6, 6, '#fff1d8');
+        P(w - 3, 4, '#fff1d8'); P(w - 1, 4, '#fff1d8'); R(w - 3, 5, 3, 1, '#fff1d8'); P(w - 2, 6, '#fff1d8');
+        this.drawText(ctx, text, 3 + Math.floor((w - tw) / 2), 3, '#fff6e6');
+      });
+    }
 
     // ---------- Brick tile (16 x 8) ----------
     {
