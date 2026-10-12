@@ -112,5 +112,6 @@ This document tracks learned preferences, design rules, and behavioral guideline
   - `interactions.md`: Master catalog of all dialogues and overworld/combat mechanics.
   - `README.md`: Concise high-level project summary linking to both.
   - `preferences.md`: Continuous record of design rules.
+  - `handoff.md`: Engineering notes for the next developer (conventions, gotchas, debugging, shipping).
 
 ---

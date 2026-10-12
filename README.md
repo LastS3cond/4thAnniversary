@@ -24,6 +24,10 @@ Detailed specifications have been split into modular, focused documents:
    - *Design rules and learned preferences.*
    - Tracks authentic Undertale visual guidelines, spatial proportions, text-wrapping limits, and character design choices accumulated across development.
 
+4. 🛠️ **[Developer Handoff Notes (`handoff.md`)](handoff.md)**
+   - *Practical advice for the next developer.*
+   - How the code fits together, coordinate and rendering conventions, known traps (dialogue, battle, finale), console debugging snippets, how to verify changes, known gaps, and shipping.
+
 ---
 
 ## 🎮 Quick Start & Play Guide
@@ -116,6 +120,7 @@ flowchart LR
 | `scene.md` | Master handoff document for LLM / character and scene redesign. |
 | `interactions.md`| Master encyclopedia of all dialogue and overworld/battle interactions. |
 | `preferences.md` | Recorded design guidelines and accumulated user preferences. |
+| `handoff.md` | Developer handoff notes: conventions, gotchas, debugging, verification, and shipping. |
 
 ---
 

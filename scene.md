@@ -294,6 +294,7 @@ Spans the whole north of the house ($x = 40..600, y = 60..200$). The couch and T
   - **Glasses**: Soft grey/slate rectangular frames (`#4b5563`) cleanly resting on the bridge of the nose.
   - **Lips & Mouth**: Subtle, gentle smile with smaller, restrained lips (not overly wide or thick).
   - **Fight Reaction Mouth**: When taking a hit in battle, his mouth changes to an expressive, clean circular **'o' / surprised look** (not a goofy or silly grin).
+- **Knocked Down**: After each hit he lies flat on the floor of the battle area (the battle sprite turned on its side, `dazed` face) until Mallika's next turn.
 - **Arms & Pose**: Distinct **long-sleeved arms and hands** resting naturally alongside his torso.
 - **Clothing**: Heather-grey long-sleeve knit shirt and high-contrast red plaid pajama pants.
 
@@ -304,6 +305,7 @@ $80 \times 80$ pixel dialogue portraits displayed in the combat text box:
 3. `surprised`: Wide sky-blue eyes, round circular 'o' mouth.
 4. `laugh`: Eyes crinkled in genuine joy, warm wide grin.
 5. `cough`: Eyes squeezed shut with a small cloud puff (`*cough cough*`).
+6. `dazed`: Eyes squeezed shut with a woozy zigzag mouth (after he falls to the ground).
 
 ---
 
