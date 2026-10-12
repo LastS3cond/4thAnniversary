@@ -17,37 +17,12 @@ class FinaleManager {
       "* (...it fills you with DETERMINATION.)",
       "* Happy Anniversary, Mallika. I love you."
     ];
-    this.monologue = this.rawMonologue.map(p => this.wrapText(p, 28));
+    this.monologue = this.rawMonologue.map(p => TextLayout.wrap(p, 28));
     this.pageIndex = 0;
     this.charIndex = 0;
     this.charTimer = 0;
     this.textSpeed = 35;
     this.isDone = false;
-  }
-
-  wrapText(text, maxChars = 28) {
-    const rawLines = text.split('\n');
-    const result = [];
-    for (let line of rawLines) {
-      if (line.length <= maxChars) {
-        result.push(line);
-      } else {
-        const words = line.split(' ');
-        let cur = '';
-        for (let w of words) {
-          if (!cur) {
-            cur = w;
-          } else if ((cur + ' ' + w).length <= maxChars) {
-            cur += ' ' + w;
-          } else {
-            result.push(cur);
-            cur = w;
-          }
-        }
-        if (cur) result.push(cur);
-      }
-    }
-    return result.join('\n');
   }
 
   startFinale() {

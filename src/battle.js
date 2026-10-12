@@ -96,50 +96,18 @@ class BattleManager {
     }
   }
 
-  // Splits a message into pages of at most 4 wrapped lines so text never spills out of the box.
-  paginate(text, maxChars) {
-    const lines = this.wrapText(text, maxChars).split('\n');
-    const pages = [];
-    for (let i = 0; i < lines.length; i += 4) pages.push(lines.slice(i, i + 4).join('\n'));
-    return pages.length ? pages : [''];
-  }
-
-  wrapText(text, maxChars = 26) {
-    const rawLines = text.split('\n');
-    const result = [];
-    for (let line of rawLines) {
-      if (line.length <= maxChars) {
-        result.push(line);
-      } else {
-        const words = line.split(' ');
-        let cur = '';
-        for (let w of words) {
-          if (!cur) {
-            cur = w;
-          } else if ((cur + ' ' + w).length <= maxChars) {
-            cur += ' ' + w;
-          } else {
-            result.push(cur);
-            cur = w;
-          }
-        }
-        if (cur) result.push(cur);
-      }
-    }
-    return result.join('\n');
-  }
-
   setBattleText(text, onDone = null, maxChars = null) {
     const limit = maxChars || (this.battleState === 'JAYDON_TALK' ? 22 : 26);
-    this.currentText = this.wrapText(text, limit);
+    this.currentText = TextLayout.wrap(text, limit);
     this.textCharIndex = 0;
     this.textTimer = 0;
     this.onMessageDoneCallback = onDone;
   }
 
+  // Queues messages, split into pages of at most 4 wrapped lines so text never spills out of the box.
   setMultipleMessages(messages, onDone = null) {
     this.messageQueue = [];
-    messages.forEach((m) => this.messageQueue.push(...this.paginate(m, 26)));
+    messages.forEach((m) => this.messageQueue.push(...TextLayout.paginate(m, 26, 4)));
     this.battleState = 'MESSAGE';
     this.advanceMessageQueue(onDone);
   }
@@ -505,7 +473,7 @@ class BattleManager {
   // --- JAYDON'S REACTION TURN ---
   jaydonTurnReaction(text, onDone = null) {
     this.battleState = 'JAYDON_TALK';
-    const pages = this.paginate(`* Jaydon: "${text}"`, 22);
+    const pages = TextLayout.paginate(`* Jaydon: "${text}"`, 22, 4);
     const showPage = (i) => {
       const last = i === pages.length - 1;
       this.setBattleText(pages[i], last ? onDone : () => showPage(i + 1), 22);

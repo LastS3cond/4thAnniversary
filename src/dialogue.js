@@ -20,39 +20,9 @@ class DialogueManager {
     this.onChoiceCallback = null;
   }
 
+  // Word-wraps text and splits it into pages (see src/core/text.js)
   wrapAndPaginate(text, maxChars = 36, maxLines = 4) {
-    const rawLines = text.split('\n');
-    const wrappedLines = [];
-    for (let line of rawLines) {
-      if (line.length <= maxChars) {
-        wrappedLines.push(line);
-      } else {
-        const words = line.split(' ');
-        let cur = '';
-        for (let w of words) {
-          if (!cur) {
-            cur = w;
-          } else if ((cur + ' ' + w).length <= maxChars) {
-            cur += ' ' + w;
-          } else {
-            wrappedLines.push(cur);
-            cur = w;
-          }
-        }
-        if (cur) wrappedLines.push(cur);
-      }
-    }
-
-    // Chunk into pages of at most maxLines
-    const pages = [];
-    for (let i = 0; i < wrappedLines.length; i += maxLines) {
-      pages.push(wrappedLines.slice(i, i + maxLines).join('\n'));
-    }
-    return pages.length > 0 ? pages : [''];
-  }
-
-  wrapText(text, maxChars = 36) {
-    return this.wrapAndPaginate(text, maxChars, 4).join('\n');
+    return TextLayout.paginate(text, maxChars, maxLines);
   }
 
   start(pages, onComplete = null, portrait = null) {

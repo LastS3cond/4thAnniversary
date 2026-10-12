@@ -106,6 +106,7 @@ This document tracks learned preferences, design rules, and behavioral guideline
 ## 💻 Codebase Standards
 
 - **Zero External Dependencies**: Pure vanilla HTML5, Canvas 2D, and Web Audio API.
+- **Rooms Are Data**: Each room is one file in `src/rooms/`; every inspectable thing is a single object entry bundling its art, collision, and interaction. Keep room-specific logic out of the engine files (`game.js`, `src/world/`), and keep refactors pixel-identical to the player.
 - **Handoff Documentation**:
   - `scene.md`: Master specification for character sprite and scene redesigns.
   - `interactions.md`: Master catalog of all dialogues and overworld/combat mechanics.
