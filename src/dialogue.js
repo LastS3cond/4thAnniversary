@@ -152,7 +152,7 @@ class DialogueManager {
     if (!this.isActive) return;
 
     // Classic Undertale Dialogue Box: bottom of the screen, or the top when
-    // Mallika is standing in the lower half (so the box never covers her).
+    // the player is standing in the lower half (so the box never covers them).
     const boxX = 32;
     const boxW = canvasWidth - 64;
     const boxH = 120;
@@ -170,9 +170,9 @@ class DialogueManager {
     const textStartY = boxY + 20;
     let maxTextWidth = boxW - 48;
 
-    // Draw Portrait if present
-    if (this.currentPortrait && window.spriteManager && window.spriteManager.portraits[this.currentPortrait]) {
-      const portrait = window.spriteManager.portraits[this.currentPortrait];
+    // Draw Portrait if present ('character/expression', e.g. 'jaydon/blush')
+    const portrait = this.currentPortrait && window.spriteManager ? window.spriteManager.portrait(this.currentPortrait) : null;
+    if (portrait) {
       ctx.drawImage(portrait, boxX + 16, boxY + 20, 80, 80);
       textStartX += 90;
       maxTextWidth -= 90;

@@ -26,13 +26,15 @@
  *   prop:  { sprite, x, y, baseY }        a sprite drawn every frame and depth-sorted with the
  *                                         characters (art px); `baseY` (screen px) defaults to
  *                                         the bottom edge of `solid` / `at`
+ *   npc:   { character, x, y, dir }       a character (src/characters/) standing here, drawn
+ *                                         like the player (screen px, sprite top-left)
  *   text | choice | door | onInteract     what Z does, see src/world/interactions.js
  *
- * When Mallika can reach several zones at once, the object listed first wins.
+ * When the player can reach several zones at once, the object listed first wins.
  */
 class MapManager {
   constructor() {
-    this.currentRoom = 'exterior';
+    this.currentRoom = null;   // set to the story's start room by Game.init()
     this.rooms = {};
     this.bgCache = {};
   }
@@ -71,6 +73,7 @@ class MapManager {
           baseY: o.prop.baseY !== undefined ? o.prop.baseY : base.y + base.h
         };
       }),
+      npcs: objects.filter((o) => o.npc).map((o) => o.npc),
       buildBackground: def.buildBackground,
       drawUnder: def.drawUnder,
       drawOver: def.drawOver
@@ -129,6 +132,7 @@ class MapManager {
       const img = S.env[p.sprite];
       if (img) list.push({ img, x: p.x * 2, y: p.y * 2, w: img.width * 2, h: img.height * 2, baseY: p.baseY });
     });
+    room.npcs.forEach((n) => list.push(MapManager.characterActor(n.character, n.x, n.y, n.dir)));
     list.sort((a, b) => a.baseY - b.baseY);
     list.forEach((a) => {
       if (a.draw) { a.draw(ctx); return; }
@@ -136,6 +140,13 @@ class MapManager {
     });
 
     if (room.drawOver) room.drawOver(ctx, t);
+  }
+
+  // A character (src/characters/) standing at (x, y) facing `dir`, ready for depth sorting
+  static characterActor(name, x, y, dir, frame = 0) {
+    const c = window.spriteManager.characters[name];
+    const frames = c.walk[dir] || c.walk.down;
+    return { img: frames[frame] || frames[0], x, y, baseY: y + c.baseline };
   }
 
   // ----------------------------------------------------

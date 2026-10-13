@@ -38,7 +38,7 @@
     jaydonDoorOpen = true;
     const mallikaX = Math.min(p.x, 276);
     const jaydonX = Math.max(316, Math.min(322, mallikaX + 44));
-    const jaydon = { room: 'second_floor', x: 352, y: p.y - 2, dir: 'left', sprites: window.spriteManager.jaydonOW, footOffset: 60 };
+    const jaydon = { room: 'second_floor', x: 352, y: p.y - 2, dir: 'left', character: 'jaydon' };
     game.npcs.push(jaydon);
     const c = { t: 0, duration: 520, fromX: p.x, toX: mallikaX, jFromX: 352, jToX: jaydonX };
     p.dir = 'right';
@@ -69,7 +69,7 @@
             "* Jaydon steps into the hallway wearing glasses, a long-sleeve shirt, and red plaid pajama pants."
           ], () => {
             // Launch the Undertale encounter flash!
-            game.triggerBattleEncounter();
+            game.triggerBattleEncounter('jaydon');
           });
         }
       }

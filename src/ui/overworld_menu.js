@@ -1,47 +1,19 @@
 /**
- * Undertale 4th Anniversary - Overworld C-menu (ITEM / STAT / CELL)
+ * Undertale 4th Anniversary - Overworld C-menu
  *
  * C / Ctrl toggles it, Up / Down moves, Z / Enter opens an entry's dialogue, X / Shift closes.
- * Each entry's `pages(game)` returns the dialogue pages it shows.
+ * The entries come from the story (src/story.js): { label, pages(game) }. The box fits three.
  */
 class OverworldMenu {
-  constructor(game) {
+  constructor(game, entries) {
     this.game = game;
     this.isOpen = false;
     this.index = 0;
-    this.entries = [
-      {
-        label: 'ITEM',
-        pages: () => [
-          "* ITEM:\n* Sticky Toffee Pudding\n* Pretty Dress",
-          "* Sticky Toffee Pudding:\n* Warm & baked with love.",
-          "* Pretty Dress:\n* A lovely Dress waiting to\n  be worn on a date!"
-        ]
-      },
-      {
-        label: 'STAT',
-        pages: (g) => {
-          const atkDesc = g.hasPunchedBag ? "* ATK 11 (Bag bonus +1)" : "* ATK 10";
-          return [
-            "* MALLIKA   LV 1",
-            `* HP 20 / 20\n${atkDesc}\n* DEF 10`,
-            "* WEAPON: Strong core muscles\n* ARMOR: Denim overalls",
-            "* LOVE: lots"
-          ];
-        }
-      },
-      {
-        label: 'CELL',
-        pages: () => [
-          "* You dialed Jaydon's cell...\n* (ring... ring...)",
-          "* A muffled ringtone plays\n  from his bedroom upstairs!"
-        ]
-      }
-    ];
+    this.entries = entries;
   }
 
   // Handles the toggle key and, while open, menu input. Returns true when the menu used this
-  // frame (so the overworld should not move Mallika or check interactions).
+  // frame (so the overworld should not move the player or check interactions).
   update(input) {
     if (input.wasPressed('KeyC') || input.wasPressed('ControlLeft')) {
       this.isOpen = !this.isOpen;

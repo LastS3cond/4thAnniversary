@@ -2,8 +2,8 @@
  * Undertale 4th Anniversary - Main Game Loop & State Controller
  *
  * States: 'TITLE' -> 'OVERWORLD' (plus 'CUTSCENE' and 'ENCOUNTER_FLASH') -> 'BATTLE' -> 'FINALE'.
- * Rooms, their objects and what happens when Mallika inspects them live in src/world and
- * src/rooms; this file moves Mallika around and hands control between the screens.
+ * This file moves the player around and hands control between the screens. What the game is
+ * about (rooms, characters, battles, music, where it starts) is content: see src/story.js.
  */
 
 class Game {
@@ -17,7 +17,7 @@ class Game {
     // Game States: 'TITLE', 'OVERWORLD', 'CUTSCENE', 'ENCOUNTER_FLASH', 'BATTLE', 'FINALE'
     this.state = 'TITLE';
 
-    // Player (Mallika)
+    // Player (the story's character, see Story.player)
     this.player = {
       x: 300,
       y: 380,
@@ -27,7 +27,8 @@ class Game {
       dir: 'up',  // 'down', 'up', 'left', 'right'
       isMoving: false,
       walkFrame: 0,
-      animTimer: 0
+      animTimer: 0,
+      character: Story.player   // whose sprites and footprint to use (src/characters/)
     };
 
     // Encounter Transition State
@@ -41,17 +42,22 @@ class Game {
     this.targetRoom = null;
     this.targetSpawn = null;
 
-    // Other characters standing in rooms: { room, x, y, dir, sprites, footOffset }
+    // Other characters standing in rooms: { room, x, y, dir, character }
     this.npcs = [];
     // Scripted sequence running in the 'CUTSCENE' state (an object with update(dt))
     this.cutscene = null;
 
     // Overworld C-Menu
-    this.menu = new OverworldMenu(this);
+    this.menu = new OverworldMenu(this, Story.menu);
 
-    // Doorway transition protection cooldown & state flags
+    // Battle waiting behind the encounter flash (an Encounters name)
+    this.encounterName = null;
+
+    // Doorway transition protection cooldown
     this.doorCooldown = 0;
-    this.hasPunchedBag = false;
+
+    // Story progress shared by rooms, menus and battles (e.g. flags.punchedBag)
+    this.flags = {};
 
     this.lastTime = performance.now();
   }
@@ -60,7 +66,8 @@ class Game {
     // Generate all procedural sprites
     window.spriteManager.init();
 
-    // Spawn player in exterior room
+    // Spawn the player in the story's first room
+    window.mapManager.currentRoom = Story.startRoom;
     const currentRoom = window.mapManager.getCurrentRoom();
     this.player.x = currentRoom.spawn.x;
     this.player.y = currentRoom.spawn.y;
@@ -75,7 +82,7 @@ class Game {
     if (window.audioManager) {
       window.audioManager.ensureAudio();
       window.audioManager.playMenuSelect();
-      window.audioManager.playBgm('snowy');
+      window.audioManager.playBgm(window.mapManager.getCurrentRoom().bgm);
     }
     this.state = 'OVERWORLD';
   }
@@ -115,8 +122,7 @@ class Game {
         this.flashVisible = !this.flashVisible;
         this.flashCount++;
         if (this.flashCount >= 6) { // 3 flashes (on/off x 3)
-          this.state = 'BATTLE';
-          window.battleManager.startBattle();
+          this.startBattle(this.encounterName);
         }
       }
       return;
@@ -245,16 +251,24 @@ class Game {
     }
   }
 
-  // Mallika's feet (screen px): the part of her that bumps into walls and steps onto doors.
-  // Her head and torso can overlap furniture tops.
-  feetBox(x, y) {
-    return { x: x + 8, y: y + 42, w: 24, h: 16 };
+  // The player's collision box relative to the sprite's top-left (from their character art)
+  playerFeet() {
+    return window.spriteManager.characters[this.player.character].feet || Game.DEFAULT_FEET;
   }
 
-  // What Mallika can reach with Z: a box just in front of her feet, 25px in her facing direction
+  // The player's feet (screen px): the part that bumps into walls and steps onto doors.
+  // Head and torso can overlap furniture tops.
+  feetBox(x, y) {
+    const f = this.playerFeet();
+    return { x: x + f.x, y: y + f.y, w: f.w, h: f.h };
+  }
+
+  // What the player can reach with Z: a feet-wide box starting 7px above the feet,
+  // 25px tall, moved 25px in the facing direction
   probeBox() {
     const p = this.player;
-    const box = { x: p.x + 8, y: p.y + 35, w: 24, h: 25 };
+    const f = this.playerFeet();
+    const box = { x: p.x + f.x, y: p.y + (f.y - 7), w: f.w, h: 25 };
     if (p.dir === 'up') box.y -= 25;
     else if (p.dir === 'down') box.y += 25;
     else if (p.dir === 'left') box.x -= 25;
@@ -269,7 +283,7 @@ class Game {
     if (door) door.onEnter();
   }
 
-  // Would Mallika's feet hit a wall or solid object at (newX, newY)?
+  // Would the player's feet hit a wall or solid object at (newX, newY)?
   checkCollision(newX, newY) {
     return window.mapManager.isBlocked(this.feetBox(newX, newY));
   }
@@ -291,7 +305,9 @@ class Game {
     this.state = 'OVERWORLD';
   }
 
-  triggerBattleEncounter() {
+  // Flashes the screen, then starts the named battle (see src/encounters/)
+  triggerBattleEncounter(name) {
+    this.encounterName = name;
     this.state = 'ENCOUNTER_FLASH';
     this.flashCount = 0;
     this.flashTimer = 0;
@@ -311,9 +327,23 @@ class Game {
     this.targetSpawn = { x: spawnX, y: spawnY, dir: dir };
   }
 
-  startFinale() {
+  // Starts a battle right away (normally reached through triggerBattleEncounter's flash)
+  startBattle(name) {
+    this.state = 'BATTLE';
+    window.battleManager.start(Encounters.get(name));
+  }
+
+  // Back to walking around after a battle that doesn't end the game (call from onVictory)
+  returnToOverworld() {
+    this.state = 'OVERWORLD';
+    const room = window.mapManager.getCurrentRoom();
+    if (room.bgm && window.audioManager) window.audioManager.playBgm(room.bgm);
+  }
+
+  // The ending screen: { lines: [...monologue pages], footer }
+  startFinale(ending) {
     this.state = 'FINALE';
-    window.finaleManager.startFinale();
+    window.finaleManager.startFinale(ending);
   }
 
   // ==========================================
@@ -337,7 +367,7 @@ class Game {
       return;
     }
 
-    // 1 + 2. Room environment with Mallika (and Jaydon) depth-sorted among the props
+    // 1 + 2. Room environment with the player and other characters depth-sorted among the props
     window.mapManager.drawRoom(this.ctx, this.collectActors());
 
     // 3. Draw Overworld C-Menu (if open)
@@ -379,20 +409,18 @@ class Game {
 
   // Characters handed to the map renderer, sorted by where their feet touch the floor
   collectActors() {
-    const actors = [];
-    const dirSprites = window.spriteManager.mallika[this.player.dir];
-    if (dirSprites) {
-      const sprite = dirSprites[this.player.walkFrame] || dirSprites[0];
-      actors.push({ img: sprite, x: this.player.x, y: this.player.y, baseY: this.player.y + 58 });
-    }
+    const p = this.player;
+    const actors = [MapManager.characterActor(p.character, p.x, p.y, p.dir, p.walkFrame)];
     for (const npc of this.npcs) {
       if (npc.room !== window.mapManager.currentRoom) continue;
-      const img = npc.sprites[npc.dir] || npc.sprites.down;
-      actors.push({ img, x: npc.x, y: npc.y, baseY: npc.y + npc.footOffset });
+      actors.push(MapManager.characterActor(npc.character, npc.x, npc.y, npc.dir));
     }
     return actors;
   }
 }
+
+// Footprint for characters that don't define `feet` (Mallika's: a 40 x 60 sprite)
+Game.DEFAULT_FEET = { x: 8, y: 42, w: 24, h: 16 };
 
 window.Game = Game;
 

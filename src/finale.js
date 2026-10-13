@@ -1,6 +1,7 @@
 /**
- * Undertale 4th Anniversary - Emotional Climax & Save Star Finale
- * Pulsing yellow Save Star, Determination monologue, peaceful resting scene.
+ * Undertale 4th Anniversary - Ending screen
+ * Pulsing yellow Save Star, a short typewriter monologue, and a resting footer line.
+ * What it says comes from whoever starts it: game.startFinale({ lines, footer }).
  */
 
 class FinaleManager {
@@ -11,13 +12,9 @@ class FinaleManager {
     this.starAngle = 0;
     this.particles = [];
 
-    // Monologue pages with word wrap
-    this.rawMonologue = [
-      "* (Knowing how much love, laughter, and adventures you share...)",
-      "* (...it fills you with DETERMINATION.)",
-      "* Happy Anniversary, Mallika. I love you."
-    ];
-    this.monologue = this.rawMonologue.map(p => TextLayout.wrap(p, 28));
+    // Monologue pages (word-wrapped at 28 characters; keep each page to 3 lines)
+    this.monologue = [];
+    this.footer = '';
     this.pageIndex = 0;
     this.charIndex = 0;
     this.charTimer = 0;
@@ -25,9 +22,12 @@ class FinaleManager {
     this.isDone = false;
   }
 
-  startFinale() {
+  // ending: { lines: [...monologue pages], footer: 'shown once the last page is read' }
+  startFinale(ending) {
     this.isActive = true;
     this.fadeAlpha = 1.0;
+    this.monologue = ending.lines.map((p) => TextLayout.wrap(p, 28));
+    this.footer = ending.footer || '';
     this.pageIndex = 0;
     this.charIndex = 0;
     this.charTimer = 0;
@@ -102,9 +102,9 @@ class FinaleManager {
         }
       }
     } else {
-      // Resting screen: Press Z to revisit Townhouse
+      // Resting screen: this is the end, Z does nothing
       if (input.wasPressed('KeyZ') || input.wasPressed('Enter')) {
-        // Can optionally restart overworld if player wishes
+        // (a restart or 'continue' would go here)
       }
     }
   }
@@ -171,8 +171,8 @@ class FinaleManager {
       ? this.monologue[this.monologue.length - 1]
       : this.monologue[this.pageIndex].substring(0, this.charIndex);
 
-    // Special golden highlight for final line
-    if (this.isDone || this.pageIndex === 2) {
+    // Special golden highlight for the final page
+    if (this.isDone || this.pageIndex === this.monologue.length - 1) {
       ctx.fillStyle = '#ffff55';
     }
 
@@ -187,7 +187,7 @@ class FinaleManager {
       ctx.fillStyle = `rgba(255, 255, 255, ${restAlpha})`;
       ctx.font = '10px "Press Start 2P", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText("♥ Always & Forever ♥", boxX + boxW / 2, boxY + boxH - 25);
+      ctx.fillText(this.footer, boxX + boxW / 2, boxY + boxH - 25);
       ctx.textAlign = 'left';
     }
 

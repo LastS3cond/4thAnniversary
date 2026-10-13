@@ -198,7 +198,7 @@ Dials Jaydon's phone:
       ```
     - **If YES**:
       - Plays punch hit SFX (`window.audioManager.playHit()`).
-      - First punch sets `hasPunchedBag = true` (permanently increasing STAT menu ATK to 11 and unlocking bonus dialogue in battle):
+      - First punch sets `game.flags.punchedBag = true` (permanently increasing STAT menu ATK to 11 and unlocking bonus dialogue in battle):
         ```text
         * WHAM!
         * You give the punching bag a solid punch!

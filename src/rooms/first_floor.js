@@ -11,13 +11,13 @@
 
   // Punching bag: only punches on YES; the first punch grants the +1 ATK used in the battle
   const punchingBag = (game) => {
-    const prompt = game.hasPunchedBag
+    const prompt = game.flags.punchedBag
       ? "* A heavy punching bag on a metal stand, weighed down with sandbags.\n* Punch it again?"
       : "* A heavy punching bag on its own contraption, weighed down with sandbags.\n* Give it a punch?";
     ask(prompt, () => {
       if (window.audioManager) window.audioManager.playHit();
-      if (!game.hasPunchedBag) {
-        game.hasPunchedBag = true;
+      if (!game.flags.punchedBag) {
+        game.flags.punchedBag = true;
         say([
           "* WHAM!",
           "* You give the punching bag a solid punch!\n* Attack power +1."
@@ -142,7 +142,7 @@
         name: 'Cabinets (west)',
         at: { x: 305, y: 395, w: 69, h: 45 },
         text: ["* Dark wood cabinetry filled with plates and mugs."],
-        art: (ctx, S, H) => H.img(PropArt.southCabinets(S, 35), 152, 197)
+        art: { sprite: 'cabinetsWest', x: 152, y: 197 }
       },
       {
         name: 'Sink',                     // dirty dishes
@@ -164,7 +164,7 @@
         name: 'Cabinets (east)',
         at: { x: 446, y: 395, w: 98, h: 45 },
         text: ["* More dark wood cabinets with bowls and spices."],
-        art: (ctx, S, H) => H.img(PropArt.southCabinets(S, 49), 223, 197)
+        art: { sprite: 'cabinetsEast', x: 223, y: 197 }
       },
 
       // ---------- Kitchen east run (fronts face west into the room) ----------

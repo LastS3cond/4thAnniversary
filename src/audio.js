@@ -1,7 +1,17 @@
 /**
  * Undertale 4th Anniversary - Pure Web Audio API Sound & Music Synthesizer
  * Zero external audio dependencies; synthesizes retro chiptune BGM and SFX.
+ * The songs themselves are data in src/music.js.
  */
+
+// Background music tracks: Music.define(key, { step, voices }) (format described in src/music.js)
+const Music = {
+  tracks: {},
+
+  define(key, track) {
+    Music.tracks[key] = track;
+  }
+};
 
 class AudioManager {
   constructor() {
@@ -274,15 +284,24 @@ class AudioManager {
     this.currentTrack = trackName;
     this.bgmStep = 0;
 
-    if (trackName === 'snowy') {
-      this.startSnowyBgm();
-    } else if (trackName === 'home') {
-      this.startHomeBgm();
-    } else if (trackName === 'battle') {
-      this.startBattleBgm();
-    } else if (trackName === 'determination') {
-      this.startDeterminationBgm();
-    }
+    const track = Music.tracks[trackName];
+    if (track) this.startTrack(track);
+  }
+
+  // Step sequencer: every `step` ms, play each voice's note for the current step
+  startTrack(track) {
+    const length = track.voices[0].notes.length;
+    this.bgmTimer = setInterval(() => {
+      const idx = this.bgmStep % length;
+      track.voices.forEach((voice) => {
+        const note = voice.notes[idx];
+        if (note) {
+          const freq = typeof note === 'number' ? note : this.noteToFreq(note);
+          this.playChiptuneNote(freq, voice.wave, voice.length, voice.volume, voice.filter);
+        }
+      });
+      this.bgmStep++;
+    }, track.step);
   }
 
   stopBgm() {
@@ -326,124 +345,6 @@ class AudioManager {
 
     osc.start();
     osc.stop(this.ctx.currentTime + duration);
-  }
-
-  // 1. Snowy Exterior Theme (Peaceful, gentle sine/triangle bells, walking in cold snow)
-  startSnowyBgm() {
-    const melody = [
-      'G4', 'E4', 'D4', 'C4', 'D4', 'E4', 'G4', null,
-      'A4', 'G4', 'E4', 'D4', 'C4', 'D4', 'E4', null,
-      'F4', 'E4', 'D4', 'C4', 'D4', 'E4', 'D4', null,
-      'G4', 'F4', 'E4', 'D4', 'C4', 'B3', 'C4', null
-    ];
-    const bass = [
-      'C3', null, 'G3', null, 'C3', null, 'E3', null,
-      'A2', null, 'E3', null, 'A2', null, 'C3', null,
-      'F2', null, 'C3', null, 'F2', null, 'A2', null,
-      'G2', null, 'D3', null, 'G2', null, 'B2', null
-    ];
-
-    const stepInterval = 280; // ms
-    this.bgmTimer = setInterval(() => {
-      const idx = this.bgmStep % melody.length;
-      const mNote = melody[idx];
-      const bNote = bass[idx];
-
-      if (mNote) {
-        this.playChiptuneNote(this.noteToFreq(mNote), 'triangle', 0.45, 0.22, 1400);
-      }
-      if (bNote) {
-        this.playChiptuneNote(this.noteToFreq(bNote), 'sine', 0.5, 0.18, 400);
-      }
-      this.bgmStep++;
-    }, stepInterval);
-  }
-
-  // 2. Home Theme (Warm, cozy loop, acoustic chiptune arpeggios, green LED vibe)
-  startHomeBgm() {
-    const melody = [
-      'C4', 'E4', 'G4', 'C5', 'B4', 'G4', 'E4', 'D4',
-      'C4', 'E4', 'A4', 'C5', 'B4', 'G4', 'E4', null,
-      'F4', 'A4', 'C5', 'E5', 'D5', 'A4', 'F4', 'G4',
-      'E4', 'G4', 'C5', 'D5', 'C5', null, null, null
-    ];
-    const bass = [
-      'C3', null, 'G3', null, 'E3', null, 'G3', null,
-      'A2', null, 'E3', null, 'C3', null, 'E3', null,
-      'F2', null, 'C3', null, 'A2', null, 'C3', null,
-      'G2', null, 'D3', null, 'C3', null, 'G2', null
-    ];
-
-    const stepInterval = 240; // ms
-    this.bgmTimer = setInterval(() => {
-      const idx = this.bgmStep % melody.length;
-      const mNote = melody[idx];
-      const bNote = bass[idx];
-
-      if (mNote) {
-        this.playChiptuneNote(this.noteToFreq(mNote), 'square', 0.35, 0.15, 1200);
-      }
-      if (bNote) {
-        this.playChiptuneNote(this.noteToFreq(bNote), 'triangle', 0.4, 0.22, 500);
-      }
-      this.bgmStep++;
-    }, stepInterval);
-  }
-
-  // 3. Battle Theme (Upbeat, bouncy, energetic Undertale battle rhythm!)
-  startBattleBgm() {
-    const lead = [
-      'D4', 'D4', 'D5', 'A4', null, 'G#4', 'G4', 'F4',
-      'D4', 'F4', 'G4', null, 'C4', 'C4', 'D4', null,
-      'D4', 'D4', 'D5', 'A4', null, 'G#4', 'G4', 'F4',
-      'D4', 'F4', 'G4', 'A4', 'C5', 'A4', 'D5', null
-    ];
-    const bass = [
-      'D3', 'D3', 'D3', 'D3', 'C3', 'C3', 'B2', 'B2',
-      'Bb2', 'Bb2', 'Bb2', 'Bb2', 'C3', 'C3', 'C#3', 'C#3',
-      'D3', 'D3', 'D3', 'D3', 'C3', 'C3', 'B2', 'B2',
-      'G2', 'G2', 'A2', 'A2', 'C3', 'C3', 'D3', 'D3'
-    ];
-
-    const stepInterval = 150; // ms (fast & energetic!)
-    this.bgmTimer = setInterval(() => {
-      const idx = this.bgmStep % lead.length;
-      const lNote = lead[idx];
-      const bNote = bass[idx];
-
-      if (lNote) {
-        this.playChiptuneNote(this.noteToFreq(lNote), 'square', 0.18, 0.22, 2200);
-      }
-      if (bNote) {
-        this.playChiptuneNote(this.noteToFreq(bNote), 'sawtooth', 0.14, 0.18, 700);
-      }
-      // Add subtle retro hi-hat noise on even beats
-      if (idx % 2 === 1) {
-        this.playChiptuneNote(2000, 'triangle', 0.04, 0.08, 3000);
-      }
-      this.bgmStep++;
-    }, stepInterval);
-  }
-
-  // 4. Determination Theme (Gentle, touching music box theme during the Save Star)
-  startDeterminationBgm() {
-    const melody = [
-      'D4', 'F#4', 'A4', 'D5', 'C#5', 'A4', 'F#4', 'E4',
-      'D4', 'F#4', 'B4', 'D5', 'C#5', 'A4', 'F#4', null,
-      'G4', 'B4', 'D5', 'F#5', 'E5', 'B4', 'G4', 'A4',
-      'F#4', 'A4', 'D5', 'E5', 'D5', null, null, null
-    ];
-
-    const stepInterval = 320; // slow, gentle, heartfelt
-    this.bgmTimer = setInterval(() => {
-      const idx = this.bgmStep % melody.length;
-      const note = melody[idx];
-      if (note) {
-        // Pure music box sine chime with slight shimmer
-        this.playChiptuneNote(this.noteToFreq(note), 'sine', 0.7, 0.28, 2500);
-      }
-      this.bgmStep++;
-    }, stepInterval);
   }
 }
 

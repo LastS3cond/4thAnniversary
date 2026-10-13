@@ -1,23 +1,56 @@
 /**
- * Undertale 4th Anniversary - Battle System Engine
- * Faithful replica of Undertale battle interface, menu logic, and text sequences.
+ * Undertale 4th Anniversary - Battle engine
+ *
+ * The Undertale battle screen: FIGHT / ACT / ITEM / MERCY buttons, the typewriter text box,
+ * the fight meter, damage numbers and the HP rows. Who you fight and what every action does
+ * comes from an encounter (src/encounters/*.js), registered with Encounters.define(name, {...})
+ * and started with game.triggerBattleEncounter(name).
+ *
+ * An encounter definition:
+ *   player:   { name, hp }                       status-row label and starting HP
+ *   enemy:    { name, speaker, hp, minHp, character }
+ *             status-row label, the name in '* Jaydon: "..."' lines, HP, the lowest HP that
+ *             FIGHT can bring it to, and the character (src/characters/) whose `battle` poses
+ *             and `portraits` are shown
+ *   bgm:      music key (default 'battle')
+ *   idleText: the line shown while choosing a button
+ *   setup(battle)                                 reset per-fight counters in battle.vars
+ *   acts:     [{ name, run(battle) }]             ACT menu, laid out in two columns
+ *   items:    [{ name, use(battle) }]             ITEM menu (the box fits two)
+ *   fight:    { damage(accuracy, battle), onHit(battle, damage), onMiss(battle) }
+ *             accuracy is 0..1 from the meter; damage defaults to 2-6
+ *   spare(battle)                                 MERCY > Spare (check battle.spareable)
+ *   onVictory(game)                               runs after battle.win()
+ *
+ * Inside those handlers `battle` offers narrate(messages, then), reply(text, then), win(),
+ * knockDown(), plus player.hp / player.maxHp, enemy.hp, portrait (the enemy's expression),
+ * spareable (turns MERCY yellow) and vars (scratch space for the encounter).
  */
+const Encounters = {
+  list: {},
+
+  define(name, def) {
+    Encounters.list[name] = def;
+  },
+
+  get(name) {
+    const def = Encounters.list[name];
+    if (!def) throw new Error(`Unknown encounter "${name}"`);
+    return def;
+  }
+};
 
 class BattleManager {
   constructor() {
     this.isActive = false;
+    this.encounter = null;
 
-    // Combatant Stats
-    this.mallikaHp = 20;
-    this.mallikaMaxHp = 20;
-    this.jaydonHp = 20;
-    this.jaydonMaxHp = 20;
-    this.jaydonAtk = 1;
-    this.jaydonDef = 999;
-    this.jaydonSparedEligible = false;
-    this.actsCompletedCount = 0;
-    this.smokeCount = 0;
-    this.flirtCount = 0;
+    // Combatants (set up by start())
+    this.player = null;   // { name, hp, maxHp }
+    this.enemy = null;    // { name, speaker, hp, maxHp, minHp, sprites, portraits, down }
+    this.spareable = false;
+    this.portrait = 'neutral';
+    this.vars = {};
 
     // Main Buttons: 0: FIGHT, 1: ACT, 2: ITEM, 3: MERCY
     this.selectedButton = 0;
@@ -25,7 +58,7 @@ class BattleManager {
 
     // State machine within battle:
     // 'SELECT_BUTTON', 'SUBMENU_ACT', 'SUBMENU_ITEM', 'SUBMENU_MERCY',
-    // 'FIGHT_METER', 'FIGHT_SLASH', 'MESSAGE', 'JAYDON_TALK'
+    // 'FIGHT_METER', 'FIGHT_SLASH', 'MESSAGE', 'ENEMY_TALK'
     this.battleState = 'SELECT_BUTTON';
 
     // Submenu cursor indices
@@ -37,79 +70,98 @@ class BattleManager {
     this.fightMeterX = 0;
     this.fightMeterSpeed = 350;
     this.fightMeterDirection = 1;
-    this.isFighting = false;
     this.slashTimer = 0;
 
-    // Items inventory
-    this.items = [
-      { name: 'Sticky Toffee Pudding', used: false },
-      { name: 'Dress', used: false }
-    ];
-
     // Current battle text display
-    this.currentText = "* (Why is he in pajama pants?)";
+    this.currentText = '';
     this.textCharIndex = 0;
     this.textTimer = 0;
     this.textSpeed = 25;
     this.messageQueue = [];
     this.onMessageDoneCallback = null;
 
-    // Jaydon Dialogue Bubble
-    this.jaydonBubbleText = "";
-    this.jaydonBubbleTimer = 0;
-    this.jaydonPortrait = 'neutral';
-
-    // FIGHT impact feedback (shake, surprised 'o' mouth, damage number)
+    // FIGHT impact feedback (shake, hit pose, damage number)
     this.hitFx = null;
     this.pendingDamage = 0;
-    this.jaydonDown = false;   // knocked flat on the floor after taking a hit
     this.buttonIcons = null;
   }
 
-  startBattle() {
+  start(encounter) {
+    const look = window.spriteManager.characters[encounter.enemy.character];
+    this.encounter = encounter;
     this.isActive = true;
-    this.mallikaHp = 20;
-    this.mallikaMaxHp = 20;
-    this.jaydonHp = 20;
-    this.jaydonMaxHp = 20;
-    this.jaydonAtk = 1;
-    this.jaydonDef = 999;
-    this.jaydonSparedEligible = false;
-    this.actsCompletedCount = 0;
-    this.smokeCount = 0;
-    this.flirtCount = 0;
+    this.player = { name: encounter.player.name, hp: encounter.player.hp, maxHp: encounter.player.hp };
+    this.enemy = {
+      name: encounter.enemy.name,
+      speaker: encounter.enemy.speaker,
+      hp: encounter.enemy.hp,
+      maxHp: encounter.enemy.hp,
+      minHp: encounter.enemy.minHp || 0,
+      sprites: look.battle,
+      portraits: look.portraits || {},
+      down: false            // knocked flat on the floor after taking a hit
+    };
+    this.spareable = false;
+    this.vars = {};
+    if (encounter.setup) encounter.setup(this);
     this.selectedButton = 0;
     this.battleState = 'SELECT_BUTTON';
-    this.jaydonPortrait = 'neutral';
-
-    this.items = [
-      { name: 'Sticky Toffee Pudding', used: false },
-      { name: 'Dress', used: false }
-    ];
-
+    this.portrait = 'neutral';
     this.hitFx = null;
-    this.jaydonDown = false;
-    this.setBattleText("* (Why is he in pajama pants?)");
+    this.setBattleText(encounter.idleText);
 
     if (window.audioManager) {
-      window.audioManager.playBgm('battle');
+      window.audioManager.playBgm(encounter.bgm || 'battle');
     }
   }
 
   setBattleText(text, onDone = null, maxChars = null) {
-    const limit = maxChars || (this.battleState === 'JAYDON_TALK' ? 22 : 26);
+    const limit = maxChars || (this.battleState === 'ENEMY_TALK' ? 22 : 26);
     this.currentText = TextLayout.wrap(text, limit);
     this.textCharIndex = 0;
     this.textTimer = 0;
     this.onMessageDoneCallback = onDone;
   }
 
-  // Queues messages, split into pages of at most 4 wrapped lines so text never spills out of the box.
-  setMultipleMessages(messages, onDone = null) {
+  // ==========================================
+  // ENCOUNTER API (used by src/encounters/*.js)
+  // ==========================================
+
+  // Shows narration boxes (split into pages of at most 4 wrapped lines so text never spills
+  // out of the box), then calls `then`, or returns to the buttons if there is none.
+  narrate(messages, then = null) {
     this.messageQueue = [];
     messages.forEach((m) => this.messageQueue.push(...TextLayout.paginate(m, 26, 4)));
     this.battleState = 'MESSAGE';
-    this.advanceMessageQueue(onDone);
+    this.advanceMessageQueue(then);
+  }
+
+  // The enemy speaks, with their current portrait: * Jaydon: "..."
+  reply(text, then = null) {
+    this.battleState = 'ENEMY_TALK';
+    const pages = TextLayout.paginate(`* ${this.enemy.speaker}: "${text}"`, 22, 4);
+    const showPage = (i) => {
+      const last = i === pages.length - 1;
+      this.setBattleText(pages[i], last ? then : () => showPage(i + 1), 22);
+    };
+    showPage(0);
+  }
+
+  // The enemy lies flat on the floor until the player's next turn
+  knockDown() {
+    this.enemy.down = true;
+  }
+
+  // Ends the battle; the encounter's onVictory decides what happens next
+  win() {
+    this.isActive = false;
+    if (this.encounter.onVictory) this.encounter.onVictory(window.game);
+  }
+
+  // Back to choosing a button
+  endTurn() {
+    this.battleState = 'SELECT_BUTTON';
+    this.setBattleText(this.encounter.idleText);
   }
 
   advanceMessageQueue(finalCallback = null) {
@@ -122,8 +174,7 @@ class BattleManager {
       if (finalCallback) {
         finalCallback();
       } else {
-        this.battleState = 'SELECT_BUTTON';
-        this.setBattleText("* (Why is he in pajama pants?)");
+        this.endTurn();
       }
     }
   }
@@ -135,8 +186,8 @@ class BattleManager {
       this.hitFx.t += dt;
       if (this.hitFx.t > 1500) this.hitFx = null;
     }
-    // He gets back up once it's Mallika's turn again
-    if (this.battleState === 'SELECT_BUTTON') this.jaydonDown = false;
+    // The enemy gets back up once it's the player's turn again
+    if (this.battleState === 'SELECT_BUTTON') this.enemy.down = false;
 
     // Typewriter text animation
     if (this.textCharIndex < this.currentText.length) {
@@ -180,35 +231,10 @@ class BattleManager {
           this.slashTimer = 0;
           const dmg = this.pendingDamage;
           if (dmg <= 0) {
-            this.jaydonPortrait = 'neutral';
-            this.setMultipleMessages([
-              "* You try to attack, but you can't bring yourself to do it.",
-              "* Jaydon has pretended enough."
-            ], () => {
-              this.jaydonTurnReaction("Hey, take it easy!");
-            });
+            this.encounter.fight.onMiss(this);
           } else {
-            this.jaydonHp = Math.max(1, this.jaydonHp - dmg);
-            this.jaydonPortrait = 'surprised';
-            const punchMsg = (window.game && window.game.hasPunchedBag)
-              ? "* Jaydon gasps and dramatically pretends to take 1 extra damage from that punching bag workout!"
-              : `* Jaydon gasps and dramatically pretends to take ${dmg} damage anyway.`;
-            const reactionMsg = (window.game && window.game.hasPunchedBag)
-              ? "Ugh... you are very strong... Those core muscles are really paying off."
-              : "Ugh... you are very strong...";
-            this.setMultipleMessages([
-              "* You try to attack, but you can't bring yourself to do it.",
-              punchMsg
-            ], () => {
-              // ...and down he goes
-              this.jaydonDown = true;
-              this.jaydonPortrait = 'dazed';
-              this.setMultipleMessages([
-                "* Jaydon staggers back and falls to the ground."
-              ], () => {
-                this.jaydonTurnReaction(reactionMsg);
-              });
-            });
+            this.enemy.hp = Math.max(this.enemy.minHp, this.enemy.hp - dmg);
+            this.encounter.fight.onHit(this, dmg);
           }
         }
         break;
@@ -225,7 +251,7 @@ class BattleManager {
         }
         break;
 
-      case 'JAYDON_TALK':
+      case 'ENEMY_TALK':
         if (input.wasPressed('KeyZ') || input.wasPressed('Enter')) {
           if (this.textCharIndex < this.currentText.length) {
             this.textCharIndex = this.currentText.length;
@@ -235,8 +261,7 @@ class BattleManager {
             cb();
           } else {
             // Return to player's turn
-            this.battleState = 'SELECT_BUTTON';
-            this.setBattleText("* (Why is he in pajama pants?)");
+            this.endTurn();
           }
         }
         break;
@@ -293,13 +318,12 @@ class BattleManager {
         window.audioManager.playSlash();
         setTimeout(() => window.audioManager.playHit(), 200);
       }
-      // Timing-based damage (2-6, +1 from the punching bag workout).
-      // Jaydon can be worn down to 1 HP but never lower: at 1 HP he has "pretended enough".
+      // Timing-based damage, never taking the enemy below its minimum HP
       const center = 320;
       const accuracy = Math.max(0, 1 - Math.abs(this.fightMeterX + 6 - center) / 270);
-      let dmg = 2 + Math.round(accuracy * 4);
-      if (window.game && window.game.hasPunchedBag) dmg += 1;
-      this.pendingDamage = Math.max(0, Math.min(dmg, this.jaydonHp - 1));
+      const fight = this.encounter.fight;
+      const dmg = fight.damage ? fight.damage(accuracy, this) : 2 + Math.round(accuracy * 4);
+      this.pendingDamage = Math.max(0, Math.min(dmg, this.enemy.hp - this.enemy.minHp));
       this.hitFx = { t: 0, dmg: this.pendingDamage };
       this.battleState = 'FIGHT_SLASH';
       this.slashTimer = 0;
@@ -307,17 +331,27 @@ class BattleManager {
   }
 
   // --- ACT SUBMENU ---
+  // Two columns, filled row by row: [0] [1] / [2] [3] / ...
   handleActSubmenu(input) {
-    // 2x2 grid navigation:
-    // [0: Check]   [1: Flirt]
-    // [2: Smoke]   [3: Hug]
+    const count = this.encounter.acts.length;
     if (input.wasPressed('ArrowLeft') || input.wasPressed('KeyA') || input.wasPressed('ArrowRight') || input.wasPressed('KeyD')) {
-      this.actIndex = this.actIndex ^ 1;
-      if (window.audioManager) window.audioManager.playMenuMove();
+      const target = this.actIndex ^ 1;
+      if (target < count) {
+        this.actIndex = target;
+        if (window.audioManager) window.audioManager.playMenuMove();
+      }
     }
-    if (input.wasPressed('ArrowUp') || input.wasPressed('KeyW') || input.wasPressed('ArrowDown') || input.wasPressed('KeyS')) {
-      this.actIndex = this.actIndex ^ 2;
-      if (window.audioManager) window.audioManager.playMenuMove();
+    const up = input.wasPressed('ArrowUp') || input.wasPressed('KeyW');
+    const down = input.wasPressed('ArrowDown') || input.wasPressed('KeyS');
+    if (up || down) {
+      const rows = Math.ceil(count / 2);
+      const row = Math.floor(this.actIndex / 2);
+      const nextRow = (row + (down ? 1 : rows - 1)) % rows;
+      const target = Math.min(count - 1, nextRow * 2 + (this.actIndex % 2));
+      if (rows > 1) {
+        this.actIndex = target;
+        if (window.audioManager) window.audioManager.playMenuMove();
+      }
     }
 
     if (input.wasPressed('KeyX') || input.wasPressed('ShiftLeft')) {
@@ -328,77 +362,17 @@ class BattleManager {
 
     if (input.wasPressed('KeyZ') || input.wasPressed('Enter')) {
       if (window.audioManager) window.audioManager.playMenuSelect();
-
-      if (this.actIndex === 0) {
-        // Check
-        this.jaydonPortrait = 'neutral';
-        this.setMultipleMessages([
-          "* JAYDON - ATK 1 DEF 999",
-          "* Currently trying his best to give you the sweetest anniversary possible."
-        ], () => {
-          this.jaydonTurnReaction("Do you like it so far?");
-        });
-      } else if (this.actIndex === 1) {
-        // Flirt (Rotating responses)
-        this.flirtCount++;
-        this.jaydonPortrait = 'blush';
-        this.jaydonDef = 0;
-        const flirtResponses = [
-          "Whoa...",
-          "Focus, Focus, FOCUS",
-          "That's not allowed",
-          "HEY, what are you trying to do here?"
-        ];
-        const reactionText = flirtResponses[Math.min(this.flirtCount - 1, 3)];
-        this.setMultipleMessages([
-          "* You give Jaydon that familiar look.",
-          "* Jaydon blushes bright red! His defense dropped to 0.",
-          "* Jaydon looks back into his bedroom before refocusing on you."
-        ], () => {
-          this.jaydonTurnReaction(reactionText);
-        });
-      } else if (this.actIndex === 2) {
-        // Smoke (Max 2 uses, then out of joints; no damage to Jaydon so max damage is 1)
-        if (this.smokeCount >= 2) {
-          this.setMultipleMessages([
-            "* (We are out of joints!)"
-          ], () => {
-            this.battleState = 'SELECT_BUTTON';
-            this.setBattleText("* (Why is he in pajama pants?)");
-          });
-          return;
-        }
-        this.smokeCount++;
-        this.jaydonPortrait = 'cough';
-        this.mallikaHp = Math.max(1, this.mallikaHp - 5);
-        this.jaydonDef = Math.max(0, this.jaydonDef - 50);
-        if (window.audioManager) window.audioManager.playHit();
-        this.setMultipleMessages([
-          "* You both share a joint.",
-          "* *Cough cough*",
-          "* (Deals 5 damage to Mallika! Defense lowered!)"
-        ], () => {
-          this.jaydonTurnReaction("*cough cough* Do you want some water?");
-        });
-      } else if (this.actIndex === 3) {
-        // Hug (Only this makes Jaydon spare eligible!)
-        this.jaydonPortrait = 'neutral';
-        this.jaydonSparedEligible = true;
-        this.setMultipleMessages([
-          "* You wrap your arms around Jaydon in a warm hug.",
-          "* His embrace feels warm and steady.",
-          "* Jaydon's name turns YELLOW on the Mercy menu!"
-        ], () => {
-          this.jaydonTurnReaction("You give the best hugs in the world.");
-        });
-      }
+      this.encounter.acts[this.actIndex].run(this);
     }
   }
 
   // --- ITEM SUBMENU ---
   handleItemSubmenu(input) {
-    if (input.wasPressed('ArrowUp') || input.wasPressed('KeyW') || input.wasPressed('ArrowDown') || input.wasPressed('KeyS')) {
-      this.itemIndex = (this.itemIndex + 1) % this.items.length;
+    const items = this.encounter.items;
+    const up = input.wasPressed('ArrowUp') || input.wasPressed('KeyW');
+    const down = input.wasPressed('ArrowDown') || input.wasPressed('KeyS');
+    if (up || down) {
+      this.itemIndex = (this.itemIndex + (down ? 1 : items.length - 1)) % items.length;
       if (window.audioManager) window.audioManager.playMenuMove();
     }
 
@@ -410,33 +384,7 @@ class BattleManager {
 
     if (input.wasPressed('KeyZ') || input.wasPressed('Enter')) {
       if (window.audioManager) window.audioManager.playMenuSelect();
-      const item = this.items[this.itemIndex];
-
-      if (item.name === 'Sticky Toffee Pudding') {
-        this.mallikaHp = this.mallikaMaxHp;
-        if (window.audioManager) window.audioManager.playHeal();
-        this.setMultipleMessages([
-          "* You shared the freshly baked Sticky Toffee Pudding! (HP Maxed)"
-        ], () => {
-          this.jaydonPortrait = 'neutral';
-          this.jaydonTurnReaction("Is it as good as the one you made?", () => {
-            this.setMultipleMessages([
-              "* You let him down easy."
-            ], () => {
-              this.battleState = 'SELECT_BUTTON';
-              this.setBattleText("* (Why is he in pajama pants?)");
-            });
-          });
-        });
-      } else if (item.name === 'Dress') {
-        this.jaydonPortrait = 'blush';
-        this.setMultipleMessages([
-          "* You inspect the package...",
-          "* It's a new pretty Dress! Mallika's style increased by 100!"
-        ], () => {
-          this.jaydonTurnReaction("You're going to look absolutely stunning in it.");
-        });
-      }
+      items[this.itemIndex].use(this);
     }
   }
 
@@ -450,42 +398,7 @@ class BattleManager {
 
     if (input.wasPressed('KeyZ') || input.wasPressed('Enter')) {
       if (window.audioManager) window.audioManager.playMenuSelect();
-
-      // SPARE (Only yellow and eligible after giving Jaydon a Hug)
-      if (this.jaydonSparedEligible) {
-        this.jaydonPortrait = 'laugh';
-        this.setMultipleMessages([
-          "* You chose to SPARE Jaydon.",
-          "* YOU WON! You earned 0 EXP and lots of LOVE.",
-          "* But you gained something more precious."
-        ], () => {
-          this.triggerVictoryFinale();
-        });
-      } else {
-        this.setMultipleMessages([
-          "* Jaydon isn't ready to be spared yet.",
-          "* Try giving him a hug first!"
-        ]);
-      }
-    }
-  }
-
-  // --- JAYDON'S REACTION TURN ---
-  jaydonTurnReaction(text, onDone = null) {
-    this.battleState = 'JAYDON_TALK';
-    const pages = TextLayout.paginate(`* Jaydon: "${text}"`, 22, 4);
-    const showPage = (i) => {
-      const last = i === pages.length - 1;
-      this.setBattleText(pages[i], last ? onDone : () => showPage(i + 1), 22);
-    };
-    showPage(0);
-  }
-
-  // --- VICTORY & FINALE TRIGGER ---
-  triggerVictoryFinale() {
-    this.isActive = false;
-    if (window.game) {
-      window.game.startFinale();
+      this.encounter.spare(this);
     }
   }
 
@@ -493,21 +406,22 @@ class BattleManager {
   draw(ctx, canvasWidth, canvasHeight) {
     if (!this.isActive) return;
     const S = window.spriteManager;
+    const look = this.enemy.sprites;
 
     // Pitch Black Void Background
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     ctx.textAlign = 'left';
 
-    // 1a. Knocked down: lying on the floor of the battle area
-    if (S && this.jaydonDown && S.jaydonBattleFallen) {
-      const fallen = S.jaydonBattleFallen;
-      ctx.drawImage(fallen, canvasWidth / 2 - fallen.width / 2, 204 - 116);
-    } else if (S && S.jaydonBattle) {
-      // 1b. Jaydon's battle sprite (centered top). Gentle bob on the 2x pixel grid.
+    // 1a. Knocked down: lying on the floor of the battle area, just above the box
+    if (this.enemy.down && look.fallen) {
+      const fallen = look.fallen;
+      ctx.drawImage(fallen, canvasWidth / 2 - fallen.width / 2, 232 - fallen.height);
+    } else if (look.idle) {
+      // 1b. The enemy's battle sprite (centered top). Gentle bob on the 2x pixel grid.
       const fx = this.hitFx;
       const tookHit = fx && fx.dmg > 0 && fx.t < 1400;
-      const sprite = tookHit ? S.jaydonBattleHit : S.jaydonBattle;
+      const sprite = tookHit && look.hit ? look.hit : look.idle;
       let shake = 0;
       if (fx && fx.t > 200 && fx.t < 750) shake = Math.round(Math.sin(fx.t * 0.09) * 4 * (1 - (fx.t - 200) / 550)) * 2;
       const bob = Math.round(Math.sin(Date.now() * 0.003) * 1.5) * 2;
@@ -587,19 +501,18 @@ class BattleManager {
       ctx.fillRect(bx + 4, boxY + 16, 4, boxH - 32);
 
     } else if (this.battleState === 'SUBMENU_ACT') {
-      const acts = ['* Check', '* Flirt', '* Smoke', '* Hug'];
       ctx.fillStyle = '#ffffff';
-      acts.forEach((act, idx) => {
+      this.encounter.acts.forEach((act, idx) => {
         const ax = boxX + 70 + (idx % 2) * 260;
         const ay = boxY + 34 + Math.floor(idx / 2) * 46;
         if (this.actIndex === idx) {
           ctx.drawImage(S.ui.soul, ax - 34, ay, 16, 16);
         }
-        ctx.fillText(act, ax, ay);
+        ctx.fillText(`* ${act.name}`, ax, ay);
       });
 
     } else if (this.battleState === 'SUBMENU_ITEM') {
-      this.items.forEach((item, idx) => {
+      this.encounter.items.forEach((item, idx) => {
         const ix = boxX + 70;
         const iy = boxY + 34 + idx * 46;
         ctx.fillStyle = '#ffffff';
@@ -610,8 +523,8 @@ class BattleManager {
       });
 
     } else if (this.battleState === 'SUBMENU_MERCY') {
-      // Spare turns yellow only once Jaydon has been hugged
-      ctx.fillStyle = this.jaydonSparedEligible ? '#ffff00' : '#ffffff';
+      // Spare turns yellow once the enemy can be spared
+      ctx.fillStyle = this.spareable ? '#ffff00' : '#ffffff';
       ctx.drawImage(S.ui.soul, boxX + 36, boxY + 34, 16, 16);
       ctx.fillText("* Spare", boxX + 70, boxY + 34);
 
@@ -621,9 +534,10 @@ class BattleManager {
       let textStartX = boxX + 28;
       const textStartY = boxY + 26;
 
-      // Portrait while Jaydon talks (exact 2x: 80 x 80)
-      if (this.battleState === 'JAYDON_TALK' && S.portraits[this.jaydonPortrait]) {
-        ctx.drawImage(S.portraits[this.jaydonPortrait], boxX + 18, boxY + 30, 80, 80);
+      // Portrait while the enemy talks (exact 2x: 80 x 80)
+      const face = this.enemy.portraits[this.portrait];
+      if (this.battleState === 'ENEMY_TALK' && face) {
+        ctx.drawImage(face, boxX + 18, boxY + 30, 80, 80);
         textStartX += 88;
       }
 
@@ -633,7 +547,7 @@ class BattleManager {
       });
     }
 
-    // 3. Status rows: MALLIKA HP 20/20 | JAYDON HP 20/20 (clean, aligned, no LV)
+    // 3. Status rows: PLAYER HP 20/20 | ENEMY HP 20/20 (clean, aligned, no LV)
     ctx.font = '13px "Press Start 2P", monospace';
     ctx.textBaseline = 'middle';
     const hpBarW = 90;
@@ -650,8 +564,8 @@ class BattleManager {
       ctx.fillStyle = '#ffffff';
       ctx.fillText(`${hp} / ${max}`, 320, y);
     };
-    row('MALLIKA', '#ffffff', this.mallikaHp, this.mallikaMaxHp, '#ffff00', 384);
-    row('JAYDON', this.jaydonSparedEligible ? '#ffff00' : '#ffffff', this.jaydonHp, this.jaydonMaxHp, '#00ff66', 406);
+    row(this.player.name, '#ffffff', this.player.hp, this.player.maxHp, '#ffff00', 384);
+    row(this.enemy.name, this.spareable ? '#ffff00' : '#ffffff', this.enemy.hp, this.enemy.maxHp, '#00ff66', 406);
 
     // 4. Four main Undertale action buttons
     const icons = this.getButtonIcons();

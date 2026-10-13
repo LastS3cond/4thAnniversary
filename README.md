@@ -91,6 +91,7 @@ flowchart LR
 - **Canvas 2D Rendering**: Native $640 \times 480$ letterboxed CRT viewport with nearest-neighbor scaling (`imageSmoothingEnabled = false`).
 - **Web Audio Synthesizer**: Pure Web Audio API synthesizers producing retro square waves, triangle basses, and noise channels for all BGM (*Snowy*, *Home*, *Heartache*, *Determination*) and SFX without external MP3/WAV files.
 - **Typewriter Text Engine**: Dynamic word-wrapping with Undertale dialogue box borders and portrait support.
+- **Engine vs. Content**: The engine (input, text, audio, sprites toolkit, dialogue, map, battle and ending screens, game loop) knows nothing about this particular story. Everything specific to it lives in content files: characters, props, rooms, battles, music, and `src/story.js`. A new level is new content files (see [Extending the Game](#-extending-the-game)).
 - **Data-Driven Rooms**: Each room is one file in `src/rooms/` listing its walls and objects; an object bundles its art, collision, and interaction in a single entry (see [Adding an Interactive Object](#-adding-an-interactive-object)).
 - **Zero Dependencies**: 100% vanilla JavaScript, HTML, and CSS.
 
@@ -100,23 +101,29 @@ flowchart LR
 
 | File | Purpose |
 |---|---|
-| `index.html` | CRT container, canvas viewport, and script bootstrap (scripts load in dependency order). |
+| `index.html` | CRT container, canvas viewport, and script bootstrap: engine scripts first, then content. |
 | `style.css` | Retro CRT scanlines, CRT screen curvature, and letterboxing styling. |
-| `src/game.js` | Main game loop and state machine (title, overworld, cutscene, battle, finale), Mallika's movement, and room transitions. |
+| **Engine** | |
+| `src/game.js` | Main game loop and state machine (title, overworld, cutscene, battle, finale), player movement, room transitions, and story flags. |
 | `src/core/input.js` | Keyboard and pointer input. |
 | `src/core/text.js` | Shared word-wrapping and pagination used by every text box. |
-| `src/audio.js` | Web Audio API synthesizer for all 4 music tracks and 10+ sound effects. |
-| `src/sprites.js` | Procedural pixel art (native 320×240 art pixels, shown at 2x) for Mallika, Jaydon, portraits, UI, and a tiny 3×5 pixel font. |
-| `src/dialogue.js` | Undertale dialogue boxes, typewriter animations, and `[ YES / NO ]` prompts. |
+| `src/audio.js` | Web Audio API synthesizer: 10+ sound effects and the step sequencer that plays `Music` tracks. |
+| `src/sprites.js` | Pixel-art toolkit (native 320×240 art pixels, shown at 2x), the 3×5 pixel font, UI sprites, and the `CharacterArt` / `PropArt` registries. |
+| `src/dialogue.js` | Undertale dialogue boxes, typewriter animations, portraits, and `[ YES / NO ]` prompts. |
 | `src/world/art.js` | Shared palette and room drawing helpers (wall blocks, side doors, drifting leaves, stepped glows). |
-| `src/world/props.js` | Furniture and fixture sprites (couch, kitchen pieces, banner...), one `PropArt.define` each. |
 | `src/world/interactions.js` | What objects do on Z: text, `[ YES / NO ]` choices, doors, and scripted interactions. |
 | `src/world/map_manager.js` | Room registry, cached backgrounds, depth-sorted drawing, and collision / interaction lookups. |
-| `src/rooms/*.js` | One file per room: walls, objects (art + collision + interaction), static background, and animated details (leaves, lantern, LED, oven glow). |
+| `src/battle.js` | Battle engine (FIGHT meter, ACT / ITEM / MERCY menus, text box, HP rows) driven by `Encounters` definitions. |
+| `src/finale.js` | Ending screen: golden Save Star, sparkles, and a monologue passed in by whoever starts it. |
 | `src/ui/title_screen.js` | The `[ ♥ PLAY? ]` title screen. |
-| `src/ui/overworld_menu.js` | The C-menu (`ITEM`, `STAT`, `CELL`). |
-| `src/battle.js` | Complete battle engine (FIGHT, ACT, ITEM, MERCY, damage capping). |
-| `src/finale.js` | Golden Save Star, particle systems, and Determination climax. |
+| `src/ui/overworld_menu.js` | The C-menu box (its entries come from the story). |
+| **Content** | |
+| `src/story.js` | Where the game starts, who you play, and the C-menu entries (`ITEM`, `STAT`, `CELL`). |
+| `src/music.js` | The four songs as note data (exterior, home, battle, Determination). |
+| `src/characters/*.js` | One file per character: walking frames, footprint, battle poses, and portraits (Mallika, Jaydon). |
+| `src/props/*.js` | Furniture and fixture sprites (the townhouse set: couch, kitchen pieces, banner...). |
+| `src/rooms/*.js` | One file per room: walls, objects (art + collision + interaction), static background, and animated details (leaves, lantern, LED, oven glow). |
+| `src/encounters/*.js` | One file per battle: stats, ACT / ITEM / MERCY behaviour, fight reactions, and what happens after winning (Jaydon). |
 | `scene.md` | Master handoff document for LLM / character and scene redesign. |
 | `interactions.md`| Master encyclopedia of all dialogue and overworld/battle interactions. |
 | `preferences.md` | Recorded design guidelines and accumulated user preferences. |
@@ -126,7 +133,7 @@ flowchart LR
 
 ## 🧩 Adding an Interactive Object
 
-1. **Draw the sprite** in `src/world/props.js` (art pixels; `S.makeProp` adds the black outline):
+1. **Draw the sprite** in a file in `src/props/` (art pixels; `S.makeProp` adds the black outline):
    ```js
    PropArt.define('plant', (S) => S.makeProp(12, 20, (ctx, R, P) => {
      R(3, 13, 6, 7, '#8b5a2b');                              // pot
@@ -156,6 +163,24 @@ Swap `text` or `prop` for whatever the object needs:
 - **Coordinates**: zones, walls and spawn points are screen pixels (640 × 480); sprite positions are art pixels (320 × 240, half of screen pixels).
 - **Order matters**: when Mallika can reach two zones at once, the object listed first wins. `art` paints in list order (`layer: 1` puts it on top).
 - **Keep the docs in sync**: add new text to `interactions.md` and new layout details to `scene.md`.
+
+---
+
+## 🧱 Extending the Game
+
+A new level is mostly new content files. Add each one to `index.html` under the content scripts.
+
+| To add... | Write | Start from |
+|---|---|---|
+| A character (new design or new person) | `CharacterArt.define(name, (S) => ({ walk, baseline, feet, battle, portraits }))` in `src/characters/` | `src/characters/mallika.js` (walking), `src/characters/jaydon.js` (battle poses + portraits) |
+| A room | `window.mapManager.addRoom({ name, bgm, spawn, walls, objects, buildBackground })` in `src/rooms/`, plus a `door` object in an existing room that leads to it | `src/rooms/staircase.js` (small) |
+| A character standing in a room | an object with `npc: { character, x, y, dir }` (plus `at` / `solid` / `text` to talk to them) | the object guide above |
+| A battle | `Encounters.define(name, { player, enemy, idleText, acts, items, fight, spare, onVictory })` in `src/encounters/`, started with `game.triggerBattleEncounter(name)` | `src/encounters/jaydon.js`; the handler API is documented at the top of `src/battle.js` |
+| A song | `Music.define(key, { step, voices })` in `src/music.js`, then use the key as a room's or battle's `bgm` | the existing tracks |
+| Story progress | read / write `game.flags.whatever` from any handler | the punching bag in `src/rooms/first_floor.js` |
+| A different start, player, or C-menu | edit `src/story.js` | |
+
+After a battle, `onVictory(game)` decides what happens: `game.startFinale({ lines, footer })` for an ending screen, or `game.returnToOverworld()` to keep exploring.
 
 ---
 *Happy 4th Anniversary, Mallika & Jaydon! ♥*

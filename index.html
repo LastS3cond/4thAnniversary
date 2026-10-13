@@ -21,28 +21,31 @@
     </div>
   </div>
 
-  <!-- Engine core -->
+  <!-- Engine: how the game works (reusable) -->
   <script src="src/core/input.js"></script>
   <script src="src/core/text.js"></script>
   <script src="src/audio.js"></script>
   <script src="src/sprites.js"></script>
   <script src="src/dialogue.js"></script>
-
-  <!-- World: art toolkit, prop sprites, interactions, map manager, then one file per room -->
   <script src="src/world/art.js"></script>
-  <script src="src/world/props.js"></script>
   <script src="src/world/interactions.js"></script>
   <script src="src/world/map_manager.js"></script>
+  <script src="src/battle.js"></script>
+  <script src="src/finale.js"></script>
+  <script src="src/ui/title_screen.js"></script>
+  <script src="src/ui/overworld_menu.js"></script>
+  <script src="src/game.js"></script>
+
+  <!-- Content: what this game is (music, characters, props, rooms, battles, story) -->
+  <script src="src/music.js"></script>
+  <script src="src/characters/mallika.js"></script>
+  <script src="src/characters/jaydon.js"></script>
+  <script src="src/props/townhouse.js"></script>
   <script src="src/rooms/exterior.js"></script>
   <script src="src/rooms/first_floor.js"></script>
   <script src="src/rooms/staircase.js"></script>
   <script src="src/rooms/second_floor.js"></script>
-
-  <!-- Screens and the main loop -->
-  <script src="src/ui/title_screen.js"></script>
-  <script src="src/ui/overworld_menu.js"></script>
-  <script src="src/battle.js"></script>
-  <script src="src/finale.js"></script>
-  <script src="src/game.js"></script>
+  <script src="src/encounters/jaydon.js"></script>
+  <script src="src/story.js"></script>
 </body>
 </html>
